@@ -1,0 +1,33 @@
+{
+  "name": "sah-in-aja",
+  "type": "module",
+  "scripts": {
+    "build": "rsbuild build",
+    "dev": "rsbuild dev",
+    "format": "prettier --write .",
+    "format:lint:typecheck": "bun run format && bun run lint:typecheck",
+    "lint": "biome check --write --unsafe .",
+    "lint:typecheck": "bun run lint && bun run typecheck",
+    "preview": "rsbuild preview",
+    "typecheck": "tsc --noEmit && cd convex && tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.8",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
+    "@rsbuild/core": "^1.6.11",
+    "@rsbuild/plugin-react": "^1.4.2",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "prettier": "^3.7.3",
+    "prettier-plugin-tailwindcss": "^0.7.1",
+    "typescript": "^5.9.3"
+  },
+  "trustedDependencies": [
+    "core-js"
+  ]
+}
