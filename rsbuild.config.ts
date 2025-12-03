@@ -5,6 +5,25 @@ import { pluginReact } from "@rsbuild/plugin-react";
 
 // Docs: https://rsbuild.rs/config/
 export default defineConfig({
+  html: {
+    meta: {
+      description:
+        "SAH-in Aja! Platform persiapan sertifikasi halal berbasis AI untuk UMKM Indonesia. Foto area produksi, dapat laporan kesiapan halal, lengkap dengan dokumen wajib dan panduan step-by-step ke BPJPH/MUI.",
+      viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
+    },
+    tags: [
+      {
+        tag: "link",
+        attrs: {
+          href: "https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap",
+          rel: "stylesheet",
+        },
+      },
+    ],
+    favicon: "public/favicon.avif",
+    title: "SAH-in Aja! - Siap Audit Halal",
+  },
+
   output: {
     assetPrefix: "/",
   },
@@ -28,5 +47,11 @@ export default defineConfig({
   server: {
     host: "localhost",
     port: 3000,
+  },
+
+  source: {
+    entry: {
+      index: "./src/main.tsx",
+    },
   },
 });
