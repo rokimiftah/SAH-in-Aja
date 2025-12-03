@@ -852,7 +852,7 @@ KONTEKS USER:
 `;
 
   const response = await llm.generate({
-    model: "nvidia/llama-3.1-nemotron-70b-instruct",
+    model: "openai/gpt-oss-120b",
     systemPrompt,
     userMessage: query,
     temperature: 0.3, // Lower temperature for factual responses
@@ -1332,7 +1332,7 @@ async function generateLLMResponse(query: string, assessmentContext: Assessment 
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "nvidia/llama-3.1-nemotron-70b-instruct",
+      model: "openai/gpt-oss-120b",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "system", content: contextPrompt },

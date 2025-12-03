@@ -723,7 +723,7 @@ function getHalalKnowledge(detectedItems: string[]) {
 │  │  1. Load photos from storage                         │   │
 │  │  2. Load knowledge base (ingredients.json)           │   │
 │  │  3. Build context-rich prompt                        │   │
-│  │  4. Call NVIDIA Vision API (Llama 4 Maverick)        │   │
+│  │  4. Call NVIDIA Vision API (Mistral Large 3)         │   │
 │  │  5. Parse structured response                        │   │
 │  │  6. Match findings with knowledge base               │   │
 │  │  7. Calculate compliance score                       │   │
@@ -820,7 +820,7 @@ export default defineSchema({
     ),
 
     // AI Analysis
-    aiModel: v.string(), // "meta-llama/llama-4-maverick-17b-128e-instruct"
+    aiModel: v.string(), // "mistralai/mistral-large-3-675b-instruct-2512"
     promptVersion: v.string(), // "v1.2.0" for tracking
 
     findings: v.array(
@@ -1209,7 +1209,7 @@ export default defineSchema({
 
 ### **6.1 Vision AI Selection**
 
-**Model:** `meta-llama/llama-4-maverick-17b-128e-instruct` (NVIDIA Build)
+**Model:** `mistralai/mistral-large-3-675b-instruct-2512` (NVIDIA Build)
 
 **Why this model:**
 
@@ -1217,7 +1217,7 @@ export default defineSchema({
 - ✅ **Structured output** - Good at following JSON format instructions
 - ✅ **Free tier** - NVIDIA Build offers generous free quota
 - ✅ **Fast inference** - ~5-10 seconds for 5-7 images
-- ✅ **High accuracy** - Competitive with GPT-4V for object detection
+- ✅ **High accuracy** - Excellent vision understanding capabilities
 
 ### **6.2 Prompt Engineering Strategy**
 
@@ -1560,7 +1560,7 @@ export const analyzeKitchen = action({
       });
 
       const response = await nvidia.chat.completions.create({
-        model: "meta-llama/llama-4-maverick-17b-128e-instruct",
+        model: "mistralai/mistral-large-3-675b-instruct-2512",
         messages: [
           { role: "system", content: systemPrompt },
           {
@@ -1597,7 +1597,7 @@ export const analyzeKitchen = action({
         photoUrls: args.photoUrls,
         analysis: final,
         promptVersion: getCurrentPromptVersion(),
-        aiModel: "meta-llama/llama-4-maverick-17b-128e-instruct",
+        aiModel: "mistralai/mistral-large-3-675b-instruct-2512",
       });
 
       return {
@@ -4225,7 +4225,7 @@ function TrainingMode() {
 
 - [ ] Photo capture (7 photos)
 - [ ] Compression & upload
-- [ ] AI analysis (NVIDIA Llama 4 Maverick)
+- [ ] AI analysis (NVIDIA Mistral Large 3)
 - [ ] Results display (score + findings)
 - [ ] Basic knowledge base (50 items)
 

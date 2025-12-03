@@ -148,10 +148,10 @@ Sequential Upload to Convex Storage (not parallel)
   - Upload 1 → Success → Upload 2 → etc.
   - Show progress: "Mengirim foto 1/5... 45%"
     ↓
-Convex Action → NVIDIA Llama 4 Maverick Vision
-  - Model: llama-4-maverick-17b-128e-instruct
+Convex Action → NVIDIA Mistral Large 3 Vision
+  - Model: mistralai/mistral-large-3-675b-instruct-2512
   - Multimodal: Send all 5 photos in single request
-  - 1M context window, 128 experts (MoE)
+  - 128K context window
     ↓
 System Prompt: "Analyze based on SJPH HAS 23000 criteria..."
     ↓
@@ -410,19 +410,19 @@ FAQ Matching (keyword/similarity)
 
 **Vision AI - Siap Halal:**
 
-- **Llama 4 Maverick 17B 128E Instruct** (FREE - 40 rpm)
-  - Model ID: `meta-llama/llama-4-maverick-17b-128e-instruct`
-  - Architecture: 17B active params, 128 experts MoE (400B total)
-  - Context: 1M tokens
+- **Mistral Large 3 675B Instruct** (FREE - 40 rpm)
+  - Model ID: `mistralai/mistral-large-3-675b-instruct-2512`
+  - Architecture: 675B parameters
+  - Context: 128K tokens
   - Capabilities: Native multimodal (text + images), tool use, JSON mode
-  - Performance: Beats GPT-4o on multimodal benchmarks, ELO 1417
+  - Performance: State-of-the-art vision understanding
   - Rate Limit: 40 RPM (shared with text AI)
   - API: OpenAI-compatible via build.nvidia.com
-  - **Why Maverick > Llama 3.2 90B Vision:**
-    - ✅ Newer (April 2025 vs Sept 2024)
-    - ✅ Better performance (beats GPT-4o)
-    - ✅ Larger context (1M vs 128K)
-    - ✅ More efficient (MoE architecture)
+  - **Why Mistral Large 3:**
+    - ✅ Excellent multimodal capabilities
+    - ✅ Strong reasoning and analysis
+    - ✅ Good instruction following
+    - ✅ Supports structured output
 
 **Text AI - Dokumen Halal + Asisten Halal:**
 
@@ -683,14 +683,14 @@ Performance on 3G (Target Device):
 
 #### 🌐 External APIs & Services
 
-| Service                       | Purpose                           | Pricing   | Rate Limit                |
-| ----------------------------- | --------------------------------- | --------- | ------------------------- |
-| **NVIDIA - Llama 4 Maverick** | Vision AI (Siap Halal)            | ✅ FREE   | 40 RPM (shared)           |
-| **NVIDIA - GPT-OSS-120B**     | Text AI (Dokumen Halal + Asisten) | ✅ FREE   | 40 RPM (shared)           |
-| **jsPDF (Server)**            | PDF generation for documents      | ✅ FREE   | Server-side only          |
-| **Convex Cloud**              | Backend + Database + Storage      | ✅ FREE   | 1GB, 1M actions/mo        |
-| **Cloudflare**                | CDN + DNS + R2 Storage            | ✅ FREE   | 100GB R2, unlimited CDN   |
-| **Total Development Cost**    | All APIs                          | **$0.00** | Non-issue for development |
+| Service                      | Purpose                           | Pricing   | Rate Limit                |
+| ---------------------------- | --------------------------------- | --------- | ------------------------- |
+| **NVIDIA - Mistral Large 3** | Vision AI (Siap Halal)            | ✅ FREE   | 40 RPM (shared)           |
+| **NVIDIA - GPT-OSS-120B**    | Text AI (Dokumen Halal + Asisten) | ✅ FREE   | 40 RPM (shared)           |
+| **jsPDF (Server)**           | PDF generation for documents      | ✅ FREE   | Server-side only          |
+| **Convex Cloud**             | Backend + Database + Storage      | ✅ FREE   | 1GB, 1M actions/mo        |
+| **Cloudflare**               | CDN + DNS + R2 Storage            | ✅ FREE   | 100GB R2, unlimited CDN   |
+| **Total Development Cost**   | All APIs                          | **$0.00** | Non-issue for development |
 
 ---
 
@@ -1013,7 +1013,7 @@ function showInstallPrompt() {
 
 ```
 Cost per Request:
-- Siap Halal: ~$0.05 (NVIDIA Llama 4 Maverick) = Rp 750
+- Siap Halal: ~$0.05 (NVIDIA Mistral Large 3) = Rp 750
 - Dokumen Halal: ~$0.05 (Template generation) = Rp 750
 - Chat Konsultasi: ~$0.01 (GPT-OSS-120B) = Rp 150
 
@@ -1062,7 +1062,7 @@ Margin:
 
 #### **Siang (6h): Prompt Engineering & API Testing**
 
-**Test Vision AI (NVIDIA Llama 4 Maverick):**
+**Test Vision AI (NVIDIA Mistral Large 3):**
 
 - [ ] Create NVIDIA API client helper (OpenAI-compatible):
 
@@ -1203,7 +1203,7 @@ Margin:
       ];
 
       const response = await nvidia.chat.completions.create({
-        model: "meta-llama/llama-4-maverick-17b-128e-instruct",
+        model: "mistralai/mistral-large-3-675b-instruct-2512",
         messages,
         temperature: 0.3, // More deterministic for compliance
         max_tokens: 2000,
@@ -1773,7 +1773,7 @@ Margin:
 
 3. **Technical Execution (100%):**
    - ✅ All 3 features fully functional (not mocks)
-   - ✅ Real AI processing (NVIDIA Build: Llama 4 Maverick + GPT-OSS-120B)
+   - ✅ Real AI processing (NVIDIA Build: Mistral Large 3 + GPT-OSS-120B)
    - ✅ Production-ready: Error handling, edge cases, mobile-optimized
    - ✅ Smart architecture: Simplified RAG for realistic hackathon scope
    - ✅ Code quality: TypeScript, proper structure, maintainable
@@ -1868,7 +1868,7 @@ Margin:
 
 5. **How It Works - Siap Halal**
    - Screenshot of photo analysis
-   - Brief tech explanation (NVIDIA Llama 4 Maverick)
+   - Brief tech explanation (NVIDIA Mistral Large 3)
 
 6. **How It Works - Dokumen Halal**
    - Screenshot of contract PDF
@@ -1928,7 +1928,7 @@ Margin:
    ```
 
 4. ✅ **Test APIs:**
-   - [ ] Test NVIDIA Llama 4 Maverick with sample photos
+   - [ ] Test NVIDIA Mistral Large 3 with sample photos
    - [ ] Test NVIDIA NIM with sample text
    - [ ] Verify rate limits work
 
@@ -1951,7 +1951,7 @@ Margin:
 
 **AI Model Choices:**
 
-- ✅ **Llama 4 Maverick 17B 128E** for vision (beats GPT-4o, 1M context, MoE efficient)
+- ✅ **Mistral Large 3 675B** for vision (excellent multimodal capabilities, strong reasoning)
 - ✅ **GPT-OSS-120B** for text (OpenAI RL trained, best reasoning for document generation)
 
 **Simplifications (Time-Saving):**

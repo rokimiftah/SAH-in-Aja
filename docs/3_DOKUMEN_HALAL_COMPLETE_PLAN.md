@@ -745,7 +745,7 @@ function validateClauseSelection(selectedClauses: string[]): ValidationResult {
                     │                 │
          ┌──────────▼─────────┐ ┌─────▼──────────┐
          │  NVIDIA NIM API    │ │  Groq API      │
-         │  (Llama 4 Maverick)│ │  (Llama 3.3)   │
+         │  (Mistral Large 3) │ │  (Llama 3.3)   │
          │  Vision + Text     │ │  Fast inference│
          └────────────────────┘ └────────────────┘
 ```
