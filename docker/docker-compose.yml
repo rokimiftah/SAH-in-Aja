@@ -1,0 +1,29 @@
+services:
+  backend:
+    image: ghcr.io/get-convex/convex-backend:dcae54b0ce84cc66cc9a16b1bef4706c0c7a1e99
+    restart: unless-stopped
+    ports:
+      - "3220:3210"
+      - "3221:3211"
+    volumes:
+      - data:/convex/data
+    env_file:
+      - env
+    healthcheck:
+      test: curl -f http://localhost:3210/version
+      interval: 5s
+      start_period: 10s
+
+  dashboard:
+    image: ghcr.io/get-convex/convex-dashboard:dcae54b0ce84cc66cc9a16b1bef4706c0c7a1e99
+    restart: unless-stopped
+    ports:
+      - "6796:6791"
+    env_file:
+      - env
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  data:
