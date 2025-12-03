@@ -15,6 +15,7 @@ import type * as halalConsultations from "../halalConsultations.js";
 import type * as halalDocuments from "../halalDocuments.js";
 import type * as halalScans from "../halalScans.js";
 import type * as lib_nvidia from "../lib/nvidia.js";
+import type * as storage from "../storage.js";
 import type * as users from "../users.js";
 
 import type {
@@ -31,6 +32,7 @@ declare const fullApi: ApiFromModules<{
   halalDocuments: typeof halalDocuments;
   halalScans: typeof halalScans;
   "lib/nvidia": typeof lib_nvidia;
+  storage: typeof storage;
   users: typeof users;
 }>;
 

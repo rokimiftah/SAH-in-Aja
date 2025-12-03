@@ -5,57 +5,85 @@ import { createNvidiaClient, NVIDIA_MODELS, SYSTEM_PROMPTS } from "./lib/nvidia"
 
 export const analyzeKitchen = action({
   args: {
-    photoUrls: v.array(v.string()),
+    photoStorageIds: v.array(v.id("_storage")),
   },
-  handler: async (_ctx, args) => {
+  handler: async (ctx, args) => {
     const apiKey = process.env.NVIDIA_API_KEY;
     if (!apiKey) {
       throw new Error("NVIDIA_API_KEY not configured");
     }
 
+    // Convert storage IDs to URLs
+    const photoUrls: string[] = [];
+    for (const storageId of args.photoStorageIds) {
+      const url = await ctx.storage.getUrl(storageId);
+      if (url) {
+        photoUrls.push(url);
+      }
+    }
+
+    if (photoUrls.length === 0) {
+      throw new Error("No valid photo URLs");
+    }
+
     const nvidia = createNvidiaClient(apiKey);
 
     // Build message content with images
-    const imageContents = args.photoUrls.map((url) => ({
+    const imageContents = photoUrls.map((url) => ({
       type: "image_url" as const,
       image_url: { url },
     }));
 
-    const response = await nvidia.chat.completions.create({
-      model: NVIDIA_MODELS.VISION,
-      messages: [
-        {
-          role: "system",
-          content: SYSTEM_PROMPTS.HALAL_ASSESSMENT,
-        },
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: "Analisis foto area produksi/dapur berikut untuk penilaian kesiapan sertifikasi halal:",
-            },
-            ...imageContents,
-          ],
-        },
-      ],
-      temperature: 0.3,
-      max_tokens: 2000,
-      response_format: { type: "json_object" },
-    });
+    let response: Awaited<ReturnType<typeof nvidia.chat.completions.create>>;
+    try {
+      response = await nvidia.chat.completions.create({
+        model: NVIDIA_MODELS.VISION,
+        messages: [
+          {
+            role: "system",
+            content: SYSTEM_PROMPTS.HALAL_ASSESSMENT,
+          },
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: "Analisis foto area produksi/dapur berikut untuk penilaian kesiapan sertifikasi halal:",
+              },
+              ...imageContents,
+            ],
+          },
+        ],
+        temperature: 0.3,
+        max_tokens: 2000,
+      });
+    } catch (apiError) {
+      console.error("NVIDIA API Error:", apiError);
+      throw new Error(`AI API Error: ${apiError instanceof Error ? apiError.message : "Unknown error"}`);
+    }
 
     const content = response.choices[0]?.message?.content;
     if (!content) {
       throw new Error("No response from AI");
     }
 
+    // Strip markdown code blocks if present (```json ... ``` or ``` ... ```)
+    let jsonContent = content.trim();
+    if (jsonContent.startsWith("```")) {
+      // Remove opening ```json or ```
+      jsonContent = jsonContent.replace(/^```(?:json)?\s*\n?/, "");
+      // Remove closing ```
+      jsonContent = jsonContent.replace(/\n?```\s*$/, "");
+    }
+
     try {
-      const result = JSON.parse(content);
+      const result = JSON.parse(jsonContent);
       return {
         score: result.score || 0,
         findings: result.findings || [],
         actionItems: result.actionItems || [],
-        summary: result.summary || "",
+        summaryPoints: result.summaryPoints || [],
+        overallMessage: result.overallMessage || "",
       };
     } catch {
       // If JSON parsing fails, return raw content
@@ -63,7 +91,8 @@ export const analyzeKitchen = action({
         score: 0,
         findings: [],
         actionItems: [],
-        summary: content,
+        summaryPoints: [],
+        overallMessage: content,
       };
     }
   },

@@ -51,20 +51,33 @@ OUTPUT FORMAT (JSON):
   "findings": [
     {
       "type": "pass|warning|critical",
-      "item": "<deskripsi temuan>",
+      "item": "<deskripsi temuan singkat>",
       "location": "<lokasi dalam foto>",
       "confidence": <0.0-1.0>
     }
   ],
   "actionItems": ["<langkah perbaikan 1>", "<langkah perbaikan 2>"],
-  "summary": "<ringkasan singkat dalam bahasa Indonesia>"
+  "summaryPoints": [
+    "✅ <hal positif 1>",
+    "✅ <hal positif 2>",
+    "⚠️ <hal yang perlu diperbaiki 1>",
+    "⚠️ <hal yang perlu diperbaiki 2>"
+  ],
+  "overallMessage": "<satu kalimat motivasi/kesimpulan untuk pemilik usaha>"
 }
 
+PANDUAN BAHASA:
+- Gunakan bahasa Indonesia SEDERHANA seperti berbicara dengan ibu-ibu warung
+- Hindari istilah teknis, gunakan kata sehari-hari
+- summaryPoints maksimal 4-5 poin, mulai dengan emoji ✅ untuk positif dan ⚠️ untuk perlu perbaikan
+- overallMessage harus memotivasi, bukan menakut-nakuti
+- Contoh baik: "Dapurnya sudah bersih, tinggal ganti kecap yang ada label halalnya ya Bu!"
+- Contoh buruk: "Fasilitas produksi tidak memenuhi standar SJPH HAS 23000 kriteria 6"
+
 PENTING:
-- Gunakan bahasa Indonesia yang mudah dipahami UMKM
 - Berikan skor realistis (tidak terlalu ketat untuk usaha rumahan)
 - Jika ragu tentang suatu item, tandai confidence rendah
-- Fokus pada temuan yang actionable`,
+- Fokus pada temuan yang bisa langsung diperbaiki`,
 
   DOCUMENT_GENERATOR: `Anda adalah asisten pembuat dokumen SJPH (Sistem Jaminan Produk Halal) untuk UMKM Indonesia.
 
