@@ -1,0 +1,94 @@
+{
+  "halal_certification": [
+    {
+      "id": "hc-1",
+      "question": "Bagaimana cara mendaftar sertifikasi halal BPJPH?",
+      "answer": "Langkah pendaftaran sertifikasi halal:\n1. Buka halal.go.id\n2. Registrasi akun pelaku usaha\n3. Login dan pilih 'Pengajuan Sertifikasi Halal'\n4. Lengkapi data usaha dan produk\n5. Upload dokumen SJPH\n6. Bayar biaya sertifikasi\n7. Tunggu jadwal audit LPH\n8. Jika lulus, sertifikat diterbitkan\n\nBiaya UMKM Mikro: GRATIS (program SEHATI)",
+      "keywords": ["daftar", "cara", "sertifikasi", "halal", "bpjph", "pendaftaran"],
+      "source": "halal.go.id"
+    },
+    {
+      "id": "hc-2",
+      "question": "Apa saja dokumen yang diperlukan untuk sertifikasi halal?",
+      "answer": "Dokumen wajib SJPH:\n1. SOP Produksi Halal\n2. Daftar Bahan Baku dengan sertifikat halal\n3. Perjanjian Supplier Halal\n4. Form Traceability\n5. Surat Komitmen Halal\n6. Denah Lokasi Produksi\n7. Foto Area Produksi\n8. NIB (Nomor Induk Berusaha)",
+      "keywords": ["dokumen", "persyaratan", "sjph", "syarat", "berkas"],
+      "source": "BPJPH"
+    },
+    {
+      "id": "hc-3",
+      "question": "Berapa biaya sertifikasi halal?",
+      "answer": "Biaya sertifikasi halal:\n\nGRATIS untuk UMKM Mikro (Program SEHATI):\n- Omset < 2 Miliar/tahun\n- Daftar via halal.go.id pilih SEHATI\n\nBerbayar untuk usaha menengah/besar:\n- Mulai Rp 300.000 - Rp 5.000.000\n- Tergantung jenis dan jumlah produk\n\nBiaya audit LPH: Rp 1.500.000 - Rp 3.000.000 (terpisah)",
+      "keywords": ["biaya", "harga", "tarif", "gratis", "sehati", "bayar"],
+      "source": "halal.go.id"
+    },
+    {
+      "id": "hc-4",
+      "question": "Berapa lama proses sertifikasi halal?",
+      "answer": "Estimasi waktu proses:\n1. Persiapan dokumen: 1-2 minggu\n2. Review dokumen BPJPH: 1-3 hari kerja\n3. Audit LPH: 1-2 minggu\n4. Penetapan kehalalan MUI: 1-2 minggu\n5. Penerbitan sertifikat: 1-3 hari\n\nTOTAL: sekitar 1-2 bulan\n\nTips: Siapkan dokumen lengkap untuk mempercepat proses",
+      "keywords": ["lama", "waktu", "proses", "berapa hari", "durasi"],
+      "source": "BPJPH"
+    },
+    {
+      "id": "hc-5",
+      "question": "Apa itu SJPH dan HAS 23000?",
+      "answer": "SJPH (Sistem Jaminan Produk Halal) adalah sistem manajemen yang diterapkan pelaku usaha untuk menjamin kehalalan produk.\n\nHAS 23000 adalah standar SJPH yang ditetapkan BPJPH dengan 11 kriteria:\n1. Kebijakan Halal\n2. Tim Manajemen Halal\n3. Pelatihan dan Edukasi\n4. Bahan\n5. Produk\n6. Fasilitas Produksi\n7. Prosedur Tertulis\n8. Kemampuan Telusur\n9. Penanganan Produk Tidak Sesuai\n10. Audit Internal\n11. Kaji Ulang Manajemen",
+      "keywords": ["sjph", "has 23000", "sistem jaminan", "standar", "kriteria"],
+      "source": "LPPOM MUI"
+    }
+  ],
+  "halal_materials": [
+    {
+      "id": "hm-1",
+      "question": "Bahan apa saja yang haram dan harus dihindari?",
+      "answer": "BAHAN JELAS HARAM:\n- Daging babi dan turunannya (gelatin babi, lard)\n- Alkohol (etanol, wine, mirin, sake)\n- Darah dan produk darah\n- Bangkai\n\nBAHAN PERLU CEK SERTIFIKAT:\n- Gelatin (bisa dari sapi halal atau babi)\n- Emulsifier E471, E481, E482\n- Shortening, margarin\n- Whey, kasein\n- Enzim\n- Pewarna karmin/E120",
+      "keywords": ["bahan", "haram", "critical", "tidak boleh", "hindari"],
+      "source": "LPPOM MUI"
+    },
+    {
+      "id": "hm-2",
+      "question": "Bagaimana cara mengecek apakah bahan halal?",
+      "answer": "Cara mengecek kehalalan bahan:\n1. Cek logo halal MUI/BPJPH di kemasan\n2. Scan QR code sertifikat halal\n3. Cek di website halalmui.org atau halal.go.id\n4. Minta sertifikat halal dari supplier\n5. Hubungi LPPOM MUI untuk verifikasi\n\nTips: Simpan copy sertifikat halal setiap bahan untuk dokumen SJPH",
+      "keywords": ["cek", "verifikasi", "halal", "bahan", "sertifikat"],
+      "source": "halalmui.org"
+    },
+    {
+      "id": "hm-3",
+      "question": "Apa itu critical point dalam produksi halal?",
+      "answer": "Critical Point adalah titik kritis yang dapat mempengaruhi kehalalan produk:\n\n1. Penerimaan Bahan Baku - verifikasi status halal\n2. Penyimpanan - pisahkan bahan halal dan non-halal\n3. Produksi - hindari kontaminasi silang\n4. Pengemasan - gunakan wadah yang tidak terkontaminasi\n5. Distribusi - pisahkan dengan produk non-halal\n\nSetiap critical point harus didokumentasikan dalam SOP",
+      "keywords": ["critical point", "titik kritis", "kontaminasi", "produksi"],
+      "source": "HAS 23000"
+    }
+  ],
+  "halal_audit": [
+    {
+      "id": "ha-1",
+      "question": "Apa yang diperiksa saat audit halal?",
+      "answer": "Pemeriksaan saat audit halal LPH:\n\n1. DOKUMEN:\n- Kelengkapan SJPH\n- Sertifikat halal bahan baku\n- SOP Produksi\n\n2. FASILITAS:\n- Kebersihan area produksi\n- Pemisahan bahan dan alat\n- Tidak ada kontaminasi\n\n3. PROSES:\n- Kesesuaian SOP dengan praktik\n- Pencatatan dan traceability\n\n4. SDM:\n- Pengetahuan tim produksi tentang halal\n- Pelatihan yang telah diikuti",
+      "keywords": ["audit", "periksa", "lph", "inspeksi", "cek"],
+      "source": "BPJPH"
+    },
+    {
+      "id": "ha-2",
+      "question": "Bagaimana jika gagal audit halal?",
+      "answer": "Jika gagal audit halal:\n1. LPH akan memberikan laporan temuan\n2. Anda diberi waktu untuk perbaikan (biasanya 1-3 bulan)\n3. Perbaiki semua temuan sesuai rekomendasi\n4. Ajukan audit ulang\n5. Jika lulus audit ulang, sertifikat diterbitkan\n\nTips: Gunakan SAH-in Aja! untuk self-assessment sebelum audit resmi agar tidak gagal",
+      "keywords": ["gagal", "tidak lulus", "audit", "perbaikan", "ulang"],
+      "source": "BPJPH"
+    }
+  ],
+  "halal_facility": [
+    {
+      "id": "hf-1",
+      "question": "Bagaimana standar kebersihan dapur untuk sertifikasi halal?",
+      "answer": "Standar kebersihan untuk sertifikasi halal:\n\n1. LANTAI: Bersih, tidak licin, mudah dibersihkan\n2. DINDING: Cat food-grade, tidak mengelupas\n3. VENTILASI: Cukup sirkulasi udara\n4. PENCAHAYAAN: Terang untuk inspeksi\n5. TEMPAT SAMPAH: Tertutup, dibuang rutin\n6. CUCI TANGAN: Tersedia sabun dan air bersih\n7. HEWAN: Tidak ada hewan peliharaan di area produksi\n\nTips: Foto area produksi untuk dokumentasi SJPH",
+      "keywords": ["kebersihan", "dapur", "fasilitas", "standar", "hygiene"],
+      "source": "HAS 23000"
+    },
+    {
+      "id": "hf-2",
+      "question": "Apakah usaha rumahan bisa dapat sertifikat halal?",
+      "answer": "YA! Usaha rumahan bisa dapat sertifikat halal melalui:\n\n1. Program SEHATI (Sertifikasi Halal Gratis)\n- Untuk UMKM Mikro omset < 2 Miliar/tahun\n- Daftar di halal.go.id pilih SEHATI\n- GRATIS!\n\n2. Self-declare untuk produk berisiko rendah\n- Makanan kemasan sederhana\n- Minuman non-alkohol\n\nPersyaratan dapur rumahan:\n- Area produksi terpisah dari dapur pribadi\n- Bersih dan higienis\n- Tidak ada kontaminasi bahan haram",
+      "keywords": ["rumahan", "umkm", "mikro", "home industry", "sehati"],
+      "source": "halal.go.id"
+    }
+  ]
+}

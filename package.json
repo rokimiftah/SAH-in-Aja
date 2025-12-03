@@ -3,6 +3,8 @@
   "type": "module",
   "scripts": {
     "build": "rsbuild build",
+    "convex:deploy": "convex deploy",
+    "convex:dev": "convex dev",
     "dev": "rsbuild dev",
     "format": "prettier --write .",
     "format:lint:typecheck": "bun run format && bun run lint:typecheck",
@@ -12,9 +14,13 @@
     "typecheck": "tsc --noEmit && cd convex && tsc --noEmit"
   },
   "dependencies": {
+    "browser-image-compression": "^2.0.2",
     "clsx": "^2.1.1",
+    "convex": "^1.30.0",
     "lucide-react": "^0.555.0",
     "motion": "^12.23.25",
+    "nanoid": "^5.1.6",
+    "openai": "^6.9.1",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "wouter": "^3.8.1"
