@@ -406,7 +406,6 @@ Selalu cross-check dengan sumber resmi sebelum submit aplikasi.
     ✅ Foto dapur → Dapat laporan kesiapan halal<br />
     ✅ Generate dokumen wajib SJPH<br />
     ✅ Tanya jawab proses sertifikasi<br />
-    ✅ Gratis, mudah, cepat
   </p>
 
   <button class="cta-primary">Cek Kesiapan Halal Gratis</button>
@@ -506,7 +505,6 @@ SAH-in Aja! - Siap Halal dari Dapur hingga Sertifikat
 ✅ Tanya jawab proses sertifikasi 24/7
 
 Kami bantu kamu SIAP sebelum audit resmi BPJPH!
-Gratis, mudah, cepat. 💪
 
 Paham Dulu, Baru Usahamu SAH!
 
@@ -663,10 +661,7 @@ Selalu cross-check dengan BPJPH sebelum submit aplikasi.
 
 ```html
 <!-- Good: Clear about what user gets -->
-<button>
-  Cek Kesiapan Halal Dapurmu
-  <small>Gratis • 5 menit • Hasil instant</small>
-</button>
+<button>Cek Kesiapan Halal Dapurmu</button>
 
 <!-- Bad: Over-promising -->
 <button>Dapatkan Sertifikat Halal ❌</button>
