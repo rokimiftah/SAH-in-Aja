@@ -1,0 +1,1 @@
+export { SiapHalalPage } from "./SiapHalalPage";
