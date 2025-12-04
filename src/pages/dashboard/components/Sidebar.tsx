@@ -76,10 +76,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         onClick={onClose}
       />
 
-      {/* Sidebar - Floating */}
+      {/* Sidebar - Floating on mobile, static on desktop */}
       <aside
         className={cn(
-          "fixed inset-3 z-50 flex flex-col rounded-2xl bg-white shadow-2xl transition-transform duration-300 lg:inset-auto lg:top-4 lg:right-auto lg:bottom-4 lg:left-4 lg:w-72 lg:border lg:border-gray-200 lg:shadow-md",
+          "fixed inset-3 z-50 flex flex-col rounded-2xl bg-white shadow-2xl transition-transform duration-300 lg:static lg:inset-auto lg:z-auto lg:h-full lg:w-72 lg:shrink-0 lg:border lg:border-gray-200 lg:shadow-sm",
           isOpen ? "translate-x-0" : "-translate-x-[150%] lg:translate-x-0",
         )}
       >
