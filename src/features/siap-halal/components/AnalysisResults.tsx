@@ -243,7 +243,7 @@ https://sahin.biz.id`;
   };
 
   return (
-    <div className="mx-auto max-w-3xl pb-2">
+    <div className="mx-auto max-w-3xl pb-1">
       {/* Score */}
       <ScoreBadge score={score} />
 
