@@ -1,7 +1,7 @@
 import { Route, Switch } from "wouter";
 
+import { DashboardLayout } from "@pages/dashboard";
 import { LandingPage } from "@pages/landing";
-import { SiapHalalPage } from "@pages/siap-halal";
 
 import "./styles/global.css";
 
@@ -9,7 +9,8 @@ export const App = () => {
   return (
     <Switch>
       <Route path="/" component={LandingPage} />
-      <Route path="/siap-halal" component={SiapHalalPage} />
+      <Route path="/dashboard" component={DashboardLayout} />
+      <Route path="/dashboard/:rest*" component={DashboardLayout} />
       <Route>
         {/* 404 fallback */}
         <div className="flex min-h-screen items-center justify-center">

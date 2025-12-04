@@ -1,4 +1,19 @@
-import { AlertTriangle, Award, Check, CheckCircle, ChevronRight, FileText, Info, MapPin, Share2, XCircle } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+import {
+  AlertTriangle,
+  Award,
+  Check,
+  CheckCircle,
+  ChevronRight,
+  FileText,
+  Info,
+  MapPin,
+  Share2,
+  ShieldCheck,
+  ShieldX,
+  XCircle,
+} from "lucide-react";
 
 import { FEATURES } from "@shared/config/branding";
 import { cn } from "@shared/lib";
@@ -21,30 +36,40 @@ interface AnalysisResultsProps {
 }
 
 function ScoreBadge({ score }: { score: number }) {
-  const getScoreConfig = () => {
+  const getScoreConfig = (): {
+    bg: string;
+    label: string;
+    icon: LucideIcon;
+    iconColor: string;
+    desc: string;
+  } => {
     if (score >= 80)
       return {
         bg: "from-green-500 to-emerald-600",
         label: "Siap Audit",
-        emoji: "🎉",
+        icon: ShieldCheck,
+        iconColor: "text-green-600",
         desc: "Area produksi Anda sudah siap untuk audit resmi!",
       };
     if (score >= 60)
       return {
         bg: "from-yellow-500 to-orange-500",
         label: "Perlu Perbaikan",
-        emoji: "⚠️",
+        icon: AlertTriangle,
+        iconColor: "text-yellow-600",
         desc: "Ada beberapa hal yang perlu diperbaiki sebelum audit.",
       };
     return {
       bg: "from-red-500 to-rose-600",
       label: "Belum Siap",
-      emoji: "🚨",
+      icon: ShieldX,
+      iconColor: "text-red-600",
       desc: "Perlu perbaikan signifikan sebelum mengajukan audit.",
     };
   };
 
   const config = getScoreConfig();
+  const Icon = config.icon;
 
   return (
     <div className="mb-8 text-center">
@@ -63,7 +88,7 @@ function ScoreBadge({ score }: { score: number }) {
         </div>
       </div>
       <div className="flex items-center justify-center gap-2">
-        <span className="text-2xl">{config.emoji}</span>
+        <Icon className={cn("h-6 w-6", config.iconColor)} />
         <h2 className="text-text-dark text-2xl font-bold">{config.label}</h2>
       </div>
       <p className="mt-2 text-sm text-gray-600">{config.desc}</p>
@@ -171,15 +196,15 @@ export function AnalysisResults({
   const passFindings = findings.filter((f) => f.type === "pass");
 
   const handleShare = async () => {
-    const shareText = `🎯 Skor Kesiapan Halal: ${score}/100
+    const shareText = `Skor Kesiapan Halal: ${score}/100
 
-📊 Hasil Analisis:
-• ${criticalFindings.length} temuan kritis
-• ${warningFindings.length} perlu perhatian  
-• ${passFindings.length} sudah sesuai
+Hasil Analisis:
+- ${criticalFindings.length} temuan kritis
+- ${warningFindings.length} perlu perhatian  
+- ${passFindings.length} sudah sesuai
 
 Dicek dengan SAH-in Aja! - Platform persiapan sertifikasi halal untuk UMKM
-🔗 https://sahin.biz.id`;
+https://sahin.biz.id`;
 
     if (navigator.share) {
       try {

@@ -6,7 +6,7 @@ export const FeaturesSection = () => {
     <div className="mb-8">
       <div className="space-y-4">
         {/* Siap Halal Card */}
-        <Link href="/siap-halal" className="block">
+        <Link href="/dashboard/siap-halal" className="block">
           <div className="bg-primary-green rounded-(--radius-card) border-4 border-white p-6 shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -43,7 +43,7 @@ export const FeaturesSection = () => {
         </Link>
 
         {/* Dokumen Halal Card */}
-        <Link href="/dokumen-halal" className="block">
+        <Link href="/dashboard/dokumen-halal" className="block">
           <div className="bg-primary-blue rounded-(--radius-card) border-4 border-white p-6 shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -75,7 +75,7 @@ export const FeaturesSection = () => {
         </Link>
 
         {/* Asisten Halal Card */}
-        <Link href="/asisten-halal" className="block">
+        <Link href="/dashboard/asisten-halal" className="block">
           <div className="bg-primary-orange rounded-(--radius-card) border-4 border-white p-6 shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
