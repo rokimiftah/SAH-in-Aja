@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { AnimatePresence, motion } from "motion/react";
+import { Link } from "wouter";
 
 import { SparklesText } from "@shared/components/ui";
 
@@ -65,9 +66,12 @@ export const HeroSection = () => {
           <br />
           Siap Halal dari Dapur hingga Sertifikat!
         </div>
-        <button className="rounded-button bg-primary-green mt-4 w-full cursor-pointer px-8 py-4 text-lg font-bold text-white shadow-lg transition hover:opacity-90 hover:shadow-xl active:scale-[0.98]">
+        <Link
+          href="/dashboard"
+          className="rounded-button bg-primary-green mt-4 block w-full cursor-pointer px-8 py-4 text-lg font-bold text-white shadow-lg transition hover:opacity-90 hover:shadow-xl active:scale-[0.98]"
+        >
           Cek Kesiapan Halal Gratis!
-        </button>
+        </Link>
       </div>
     </div>
   );
