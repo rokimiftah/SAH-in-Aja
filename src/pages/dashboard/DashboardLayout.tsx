@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { Menu } from "lucide-react";
-import { Route, Switch } from "wouter";
+import { Link, Route, Switch } from "wouter";
 
 import { BRANDING } from "@shared/config/branding";
 
@@ -23,6 +23,9 @@ export function DashboardLayout() {
       <main className="min-h-screen lg:ml-80">
         {/* Top Bar - Mobile only */}
         <header className="sticky top-0 z-30 flex items-center justify-between bg-gray-100 px-4 py-4 lg:hidden">
+          <Link href="/">
+            <img src="/logo.avif" alt={BRANDING.name} className="h-12 w-auto" />
+          </Link>
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
