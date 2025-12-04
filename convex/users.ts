@@ -1,6 +1,53 @@
-import { v } from "convex/values";
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { ConvexError, v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
+
+// Get current authenticated user
+export const getCurrentUser = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      return null;
+    }
+    return await ctx.db.get(userId);
+  },
+});
+
+// Generate upload URL for avatar
+export const generateUploadUrl = mutation(async (ctx) => {
+  return await ctx.storage.generateUploadUrl();
+});
+
+// Update user profile (for authenticated users)
+export const updateUserProfile = mutation({
+  args: {
+    name: v.optional(v.string()),
+    storageId: v.optional(v.id("_storage")),
+    businessName: v.optional(v.string()),
+    businessType: v.optional(v.string()),
+    address: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Not authenticated");
+
+    const { storageId, ...updates } = args;
+    let imageUrl: string | undefined;
+    if (storageId) {
+      const url = await ctx.storage.getUrl(storageId);
+      imageUrl = url ?? undefined;
+    }
+
+    const filteredUpdates = Object.fromEntries(Object.entries(updates).filter(([_, v]) => v !== undefined));
+
+    await ctx.db.patch(userId, {
+      ...filteredUpdates,
+      ...(imageUrl && { image: imageUrl, storageId }),
+    });
+  },
+});
 
 // Get user profile
 export const getProfile = query({
@@ -21,46 +68,6 @@ export const getByEmail = query({
   },
 });
 
-// Create new user
-export const create = mutation({
-  args: {
-    name: v.string(),
-    email: v.optional(v.string()),
-    phone: v.optional(v.string()),
-    businessName: v.optional(v.string()),
-    businessType: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const userId = await ctx.db.insert("users", {
-      name: args.name,
-      email: args.email,
-      phone: args.phone,
-      businessName: args.businessName,
-      businessType: args.businessType,
-      credits: 3, // Free tier gets 3 credits
-      tier: "free",
-      createdAt: Date.now(),
-    });
-    return userId;
-  },
-});
-
-// Update user profile
-export const update = mutation({
-  args: {
-    userId: v.id("users"),
-    name: v.optional(v.string()),
-    businessName: v.optional(v.string()),
-    businessType: v.optional(v.string()),
-    address: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const { userId, ...updates } = args;
-    const filteredUpdates = Object.fromEntries(Object.entries(updates).filter(([_, v]) => v !== undefined));
-    await ctx.db.patch(userId, filteredUpdates);
-  },
-});
-
 // Deduct credits
 export const deductCredits = mutation({
   args: {
@@ -70,10 +77,10 @@ export const deductCredits = mutation({
   handler: async (ctx, args) => {
     const user = await ctx.db.get(args.userId);
     if (!user) throw new Error("User not found");
-    if (user.credits < args.amount) throw new Error("Insufficient credits");
+    if ((user.credits ?? 0) < args.amount) throw new Error("Insufficient credits");
 
     await ctx.db.patch(args.userId, {
-      credits: user.credits - args.amount,
+      credits: (user.credits ?? 0) - args.amount,
     });
   },
 });

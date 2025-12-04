@@ -67,7 +67,7 @@ export const HeroSection = () => {
           Siap Halal dari Dapur hingga Sertifikat!
         </div>
         <Link
-          href="/dashboard"
+          href="/login"
           className="rounded-button bg-primary-green mt-4 block w-full cursor-pointer px-8 py-4 text-lg font-bold text-white shadow-lg transition hover:opacity-90 hover:shadow-xl active:scale-[0.98]"
         >
           Cek Kesiapan Halal Gratis!

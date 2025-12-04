@@ -9,11 +9,14 @@
  */
 
 import type * as analyzeHalal from "../analyzeHalal.js";
+import type * as auth from "../auth.js";
 import type * as consultHalal from "../consultHalal.js";
 import type * as generateDocument from "../generateDocument.js";
 import type * as halalConsultations from "../halalConsultations.js";
 import type * as halalDocuments from "../halalDocuments.js";
 import type * as halalScans from "../halalScans.js";
+import type * as http from "../http.js";
+import type * as lib_magicLink from "../lib/magicLink.js";
 import type * as lib_nvidia from "../lib/nvidia.js";
 import type * as storage from "../storage.js";
 import type * as users from "../users.js";
@@ -26,11 +29,14 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   analyzeHalal: typeof analyzeHalal;
+  auth: typeof auth;
   consultHalal: typeof consultHalal;
   generateDocument: typeof generateDocument;
   halalConsultations: typeof halalConsultations;
   halalDocuments: typeof halalDocuments;
   halalScans: typeof halalScans;
+  http: typeof http;
+  "lib/magicLink": typeof lib_magicLink;
   "lib/nvidia": typeof lib_nvidia;
   storage: typeof storage;
   users: typeof users;

@@ -1,18 +1,25 @@
+import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  ...authTables,
+
   // Users table
   users: defineTable({
     phone: v.optional(v.string()),
     email: v.optional(v.string()),
-    name: v.string(),
+    name: v.optional(v.string()),
+    image: v.optional(v.string()),
+    emailVerificationTime: v.optional(v.number()),
+    linkedProviders: v.optional(v.array(v.string())),
     businessName: v.optional(v.string()),
     businessType: v.optional(v.string()), // KBLI code
     address: v.optional(v.string()),
-    credits: v.number(), // Koin SAH
-    tier: v.union(v.literal("free"), v.literal("eceran"), v.literal("juragan")),
-    createdAt: v.number(),
+    credits: v.optional(v.number()), // Koin SAH
+    tier: v.optional(v.union(v.literal("free"), v.literal("eceran"), v.literal("juragan"))),
+    createdAt: v.optional(v.number()),
+    storageId: v.optional(v.string()),
   })
     .index("by_phone", ["phone"])
     .index("by_email", ["email"]),

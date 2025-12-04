@@ -1,16 +1,23 @@
+import { useQuery } from "convex/react";
 import { Camera, FileText, MessageCircle } from "lucide-react";
 
 import { FEATURES } from "@shared/config/branding";
 
+import { api } from "../../../convex/_generated/api";
 import { FeatureCard, StatsCard } from "./components";
 
 export function DashboardHomePage() {
+  const user = useQuery(api.users.getCurrentUser);
+  const name = (user?.name ?? "").trim();
+  const email = (user?.email ?? "").trim();
+  const displayName = name || email?.split("@")[0] || "Pengguna";
+
   return (
     <div className="h-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
       <div className="h-full overflow-y-auto p-6 lg:p-8">
         {/* Welcome */}
         <div className="mb-8">
-          <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-800 lg:text-3xl">Hai, Pengguna!</h1>
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-800 lg:text-3xl">Hai, {displayName}!</h1>
         </div>
 
         {/* Stats */}

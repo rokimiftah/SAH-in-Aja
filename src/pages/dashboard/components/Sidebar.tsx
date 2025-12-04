@@ -1,10 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
+import { useAuthActions } from "@convex-dev/auth/react";
+import { useQuery } from "convex/react";
 import { Camera, ChevronUp, ExternalLink, FileText, LayoutDashboard, LogOut, MessageCircle, UserPen, X } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 import { BRANDING, FEATURES } from "@shared/config/branding";
 import { cn } from "@shared/lib";
+
+import { api } from "../../../../convex/_generated/api";
 
 const NAV_ITEMS = [
   {
@@ -48,9 +52,41 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  const { signOut } = useAuthActions();
+  const user = useQuery(api.users.getCurrentUser);
+
+  const name = (user?.name ?? "").trim();
+  const email = (user?.email ?? "").trim();
+  const hasName = !!name;
+  const image = typeof user?.image === "string" ? user.image : undefined;
+
+  const initials = useMemo(() => {
+    const src = (name || email || "?").trim();
+    const parts = src.includes("@")
+      ? src
+          .split("@")[0]
+          .split(/[.\s_+-]+/)
+          .filter(Boolean)
+      : src.split(/\s+/).filter(Boolean);
+    const a = parts[0]?.[0] ?? "?";
+    const b = parts[1]?.[0] ?? "";
+    return (a + b).toUpperCase();
+  }, [name, email]);
+
+  const avatarUrl =
+    image || `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(initials)}&backgroundColor=10b981`;
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } finally {
+      navigate("/", { replace: true });
+    }
+  };
 
   useEffect(() => {
     if (!userMenuOpen) return;
@@ -170,7 +206,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <div className="border-t border-gray-100" />
             <button
               type="button"
-              onClick={() => setUserMenuOpen(false)}
+              onClick={handleSignOut}
               className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
             >
               <LogOut className="h-4 w-4" />
@@ -183,14 +219,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             onClick={() => setUserMenuOpen(!userMenuOpen)}
             className="flex w-full cursor-pointer items-center gap-3 rounded-xl bg-linear-to-br from-gray-50 to-gray-100 p-3 transition-all hover:shadow-md"
           >
-            <img
-              src="https://api.dicebear.com/9.x/initials/svg?seed=User&backgroundColor=10b981"
-              alt="Avatar"
-              className="h-10 w-10 rounded-full shadow-sm ring-2 ring-white"
-            />
+            <img src={avatarUrl} alt="Avatar" className="h-10 w-10 rounded-full shadow-sm ring-2 ring-white" />
             <div className="min-w-0 flex-1 text-left">
-              <p className="truncate text-sm font-semibold text-gray-800">Pengguna</p>
-              <p className="truncate text-xs text-gray-500">pengguna@email.com</p>
+              <p className="truncate text-sm font-semibold text-gray-800">{hasName ? name : "Pengguna"}</p>
+              <p className="truncate text-xs text-gray-500">{email || "pengguna@email.com"}</p>
             </div>
             <ChevronUp className={cn("h-4 w-4 text-gray-400 transition-transform", userMenuOpen ? "rotate-180" : "")} />
           </button>
