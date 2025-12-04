@@ -1,12 +1,36 @@
 import { useState } from "react";
 
-import { AlertCircle, ArrowLeft, RefreshCw } from "lucide-react";
+import { AlertCircle, ArrowLeft, Camera, CheckCircle2, Clock, RefreshCw, Sparkles, Target, Zap } from "lucide-react";
 import { useLocation } from "wouter";
 
 import { AnalysisResults, PhotoCapture, UploadProgress, useSiapHalal } from "@features/siap-halal";
 import { FEATURES } from "@shared/config/branding";
 
 type FlowState = "intro" | "capture" | "processing" | "results" | "error";
+
+const INTRO_FEATURES = [
+  {
+    icon: Camera,
+    title: "Foto 5 Area",
+    desc: "Kompor, rak bumbu, kulkas, wastafel, dan area produksi",
+    color: "text-blue-600",
+    bg: "bg-blue-50",
+  },
+  {
+    icon: Sparkles,
+    title: "Analisis AI",
+    desc: "Berdasarkan standar SJPH HAS 23000",
+    color: "text-purple-600",
+    bg: "bg-purple-50",
+  },
+  {
+    icon: Target,
+    title: "Laporan Detail",
+    desc: "Temuan kritis, peringatan, dan yang sudah sesuai",
+    color: "text-green-600",
+    bg: "bg-green-50",
+  },
+];
 
 export function SiapHalalPage() {
   const [, navigate] = useLocation();
@@ -53,102 +77,150 @@ export function SiapHalalPage() {
 
   const displayState = currentFlowState();
 
+  const needsCentering =
+    displayState === "intro" || displayState === "capture" || displayState === "processing" || displayState === "error";
+
   return (
-    <div className="px-4 pt-4 pb-20 lg:px-8 lg:pt-8">
-      <div className="mx-auto max-w-5xl">
-        {/* Back button for non-intro states */}
-        {displayState !== "intro" && displayState !== "processing" && (
-          <button
-            type="button"
-            onClick={handleCancel}
-            className="mb-4 flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Kembali
-          </button>
-        )}
-
-        {/* Intro State */}
-        {displayState === "intro" && (
-          <div className="mx-auto max-w-lg text-center">
-            <h1 className="text-text-dark mb-2 text-2xl font-bold">{FEATURES.siapHalal.name}</h1>
-            <p className="text-primary-green mb-4 font-medium">{FEATURES.siapHalal.tagline}</p>
-            <p className="mb-8 text-gray-600">{FEATURES.siapHalal.description}</p>
-
-            <div className="mb-8 space-y-3 text-left">
-              {FEATURES.siapHalal.benefits.map((benefit, idx) => (
-                <div key={benefit} className="flex items-center gap-3 rounded-lg bg-white p-3 shadow-sm">
-                  <span className="bg-primary-green/10 text-primary-green flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold">
-                    {idx + 1}
-                  </span>
-                  <span className="text-text-dark text-sm font-medium">{benefit}</span>
-                </div>
-              ))}
-            </div>
-
+    <div
+      className={`h-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm ${
+        needsCentering ? "flex items-center justify-center" : ""
+      }`}
+    >
+      <div className={`w-full ${needsCentering ? "max-h-full overflow-y-auto p-6 lg:p-8" : "h-full overflow-y-auto p-6 lg:p-8"}`}>
+        <div className="mx-auto max-w-5xl">
+          {/* Back button for non-intro states */}
+          {displayState !== "intro" && displayState !== "processing" && (
             <button
               type="button"
-              onClick={handleStartCapture}
-              className="bg-primary-green w-full rounded-xl px-6 py-4 text-lg font-semibold text-white shadow-lg transition-all hover:shadow-xl active:scale-[0.98]"
+              onClick={handleCancel}
+              className="mb-5 flex items-center gap-2 text-sm text-gray-600 transition-colors hover:text-gray-800 lg:hidden"
             >
-              {FEATURES.siapHalal.cta.primary}
+              <ArrowLeft className="h-4 w-4" />
+              Kembali
             </button>
-          </div>
-        )}
+          )}
 
-        {/* Capture State */}
-        {displayState === "capture" && <PhotoCapture onPhotosComplete={handlePhotosComplete} onCancel={handleCancel} />}
-
-        {/* Processing State */}
-        {displayState === "processing" && (
-          <UploadProgress
-            stage={stage === "analyzing" ? "analyzing" : "uploading"}
-            progress={progress}
-            currentPhoto={currentPhoto}
-            totalPhotos={totalPhotos}
-          />
-        )}
-
-        {/* Error State */}
-        {displayState === "error" && (
-          <div className="mx-auto max-w-md py-12 text-center">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-100">
-              <AlertCircle className="h-10 w-10 text-red-500" />
-            </div>
-            <h3 className="text-text-dark mb-2 text-lg font-semibold">Terjadi Kesalahan</h3>
-            <p className="mb-6 text-sm text-gray-600">{error || "Gagal menganalisis foto. Silakan coba lagi."}</p>
-            <div className="flex justify-center gap-3">
+          {/* Intro State */}
+          {displayState === "intro" && (
+            <div className="mx-auto max-w-xl">
+              {/* Back button - Mobile only */}
               <button
                 type="button"
-                onClick={handleCancel}
-                className="rounded-xl border border-gray-300 px-6 py-3 font-medium text-gray-700"
+                onClick={() => navigate("/dashboard")}
+                className="mb-5 flex items-center gap-2 text-sm text-gray-600 transition-colors hover:text-gray-800 lg:hidden"
               >
-                Batal
+                <ArrowLeft className="h-4 w-4" />
+                Kembali
               </button>
-              <button
-                type="button"
-                onClick={handleRetry}
-                className="bg-primary-green flex items-center gap-2 rounded-xl px-6 py-3 font-semibold text-white"
-              >
-                <RefreshCw className="h-4 w-4" />
-                Coba Lagi
-              </button>
-            </div>
-          </div>
-        )}
 
-        {/* Results State */}
-        {displayState === "results" && result && (
-          <AnalysisResults
-            score={result.score}
-            findings={result.findings}
-            actionItems={result.actionItems}
-            summaryPoints={result.summaryPoints}
-            overallMessage={result.overallMessage}
-            onNewScan={handleNewScan}
-            onGenerateDocuments={handleGenerateDocuments}
-          />
-        )}
+              {/* Hero Section */}
+              <div className="mb-8 text-center">
+                <div className="bg-primary-green/10 mx-auto mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2">
+                  <Target className="text-primary-green h-4 w-4" />
+                  <span className="text-primary-green text-sm font-medium">{FEATURES.siapHalal.tagline}</span>
+                </div>
+                <h1 className="text-text-dark mb-3 text-3xl font-bold tracking-tight">{FEATURES.siapHalal.name}</h1>
+                <p className="mx-auto max-w-md text-gray-600">{FEATURES.siapHalal.description}</p>
+              </div>
+
+              {/* Feature Cards */}
+              <div className="mb-8 grid gap-4 sm:grid-cols-3">
+                {INTRO_FEATURES.map((feature) => (
+                  <div key={feature.title} className="rounded-2xl border border-gray-100 bg-gray-50 p-5">
+                    <div className={`${feature.bg} mb-3 inline-flex rounded-xl p-3`}>
+                      <feature.icon className={`h-6 w-6 ${feature.color}`} />
+                    </div>
+                    <h3 className="text-text-dark mb-1 font-semibold">{feature.title}</h3>
+                    <p className="text-sm text-gray-500">{feature.desc}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Benefits Pills */}
+              <div className="mb-8 flex flex-wrap justify-center gap-3">
+                {FEATURES.siapHalal.benefits.map((benefit, idx) => {
+                  const icons = [CheckCircle2, Zap, Clock];
+                  const Icon = icons[idx];
+                  return (
+                    <div
+                      key={benefit}
+                      className="flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 shadow-sm"
+                    >
+                      <Icon className="text-primary-green h-4 w-4" />
+                      <span className="text-text-dark text-sm font-medium">{benefit}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* CTA Button */}
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={handleStartCapture}
+                  className="bg-primary-green inline-flex cursor-pointer items-center gap-3 rounded-2xl px-8 py-4 text-lg font-semibold text-white shadow-md transition-shadow hover:shadow-xl"
+                >
+                  <Camera className="h-6 w-6" />
+                  {FEATURES.siapHalal.cta.primary}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Capture State */}
+          {displayState === "capture" && <PhotoCapture onPhotosComplete={handlePhotosComplete} onCancel={handleCancel} />}
+
+          {/* Processing State */}
+          {displayState === "processing" && (
+            <UploadProgress
+              stage={stage === "analyzing" ? "analyzing" : "uploading"}
+              progress={progress}
+              currentPhoto={currentPhoto}
+              totalPhotos={totalPhotos}
+            />
+          )}
+
+          {/* Error State */}
+          {displayState === "error" && (
+            <div className="mx-auto max-w-md text-center">
+              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-100">
+                <AlertCircle className="h-10 w-10 text-red-500" />
+              </div>
+              <h3 className="text-text-dark mb-2 text-lg font-semibold">Terjadi Kesalahan</h3>
+              <p className="mb-6 text-sm text-gray-600">{error || "Gagal menganalisis foto. Silakan coba lagi."}</p>
+              <div className="flex justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="rounded-xl border border-gray-300 px-6 py-3 font-medium text-gray-700"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleRetry}
+                  className="bg-primary-green flex items-center gap-2 rounded-xl px-6 py-3 font-semibold text-white"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Coba Lagi
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Results State */}
+          {displayState === "results" && result && (
+            <AnalysisResults
+              score={result.score}
+              findings={result.findings}
+              actionItems={result.actionItems}
+              summaryPoints={result.summaryPoints}
+              overallMessage={result.overallMessage}
+              onNewScan={handleNewScan}
+              onGenerateDocuments={handleGenerateDocuments}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
