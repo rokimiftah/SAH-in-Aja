@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { AlertCircle, ArrowLeft, Camera, CheckCircle2, Clock, RefreshCw, Sparkles, Target, Zap } from "lucide-react";
+import { AlertCircle, ArrowLeft, Camera, CheckCircle2, Clock, History, RefreshCw, Sparkles, Target, Zap } from "lucide-react";
 import { useLocation } from "wouter";
 
 import { AnalysisResults, PhotoCapture, UploadProgress, useSiapHalal } from "@features/siap-halal";
@@ -93,7 +93,7 @@ export function SiapHalalPage() {
             <button
               type="button"
               onClick={handleCancel}
-              className="mb-5 flex items-center gap-2 text-sm text-gray-600 transition-colors hover:text-gray-800 lg:hidden"
+              className="mb-5 flex cursor-pointer items-center gap-2 text-sm text-gray-600 transition-colors hover:text-gray-800 lg:hidden"
             >
               <ArrowLeft className="h-4 w-4" />
               Kembali
@@ -107,7 +107,7 @@ export function SiapHalalPage() {
               <button
                 type="button"
                 onClick={() => navigate("/dashboard")}
-                className="mb-5 flex items-center gap-2 text-sm text-gray-600 transition-colors hover:text-gray-800 lg:hidden"
+                className="mb-5 flex cursor-pointer items-center gap-2 text-sm text-gray-600 transition-colors hover:text-gray-800 lg:hidden"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Kembali
@@ -115,9 +115,11 @@ export function SiapHalalPage() {
 
               {/* Hero Section */}
               <div className="mb-8 text-center">
-                <div className="bg-primary-green/10 mx-auto mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2">
-                  <Target className="text-primary-green h-4 w-4" />
-                  <span className="text-primary-green text-sm font-medium">{FEATURES.siapHalal.tagline}</span>
+                <div className="mb-4 flex justify-center">
+                  <div className="bg-primary-green/10 inline-flex flex-nowrap items-center gap-2 rounded-full px-4 py-2">
+                    <Target className="text-primary-green h-4 w-4 shrink-0" />
+                    <span className="text-primary-green text-sm font-medium whitespace-nowrap">{FEATURES.siapHalal.tagline}</span>
+                  </div>
                 </div>
                 <h1 className="text-text-dark mb-3 text-3xl font-bold tracking-tight">{FEATURES.siapHalal.name}</h1>
                 <p className="mx-auto max-w-md text-gray-600">{FEATURES.siapHalal.description}</p>
@@ -144,24 +146,32 @@ export function SiapHalalPage() {
                   return (
                     <div
                       key={benefit}
-                      className="flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 shadow-sm"
+                      className="flex flex-nowrap items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 shadow-sm"
                     >
-                      <Icon className="text-primary-green h-4 w-4" />
-                      <span className="text-text-dark text-sm font-medium">{benefit}</span>
+                      <Icon className="text-primary-green h-4 w-4 shrink-0" />
+                      <span className="text-text-dark text-sm font-medium whitespace-nowrap">{benefit}</span>
                     </div>
                   );
                 })}
               </div>
 
-              {/* CTA Button */}
-              <div className="text-center">
+              {/* CTA Buttons */}
+              <div className="flex flex-col items-center gap-5">
                 <button
                   type="button"
                   onClick={handleStartCapture}
-                  className="bg-primary-green inline-flex cursor-pointer items-center gap-3 rounded-2xl px-8 py-4 text-lg font-semibold text-white shadow-md transition-shadow hover:shadow-xl"
+                  className="bg-primary-green inline-flex cursor-pointer flex-nowrap items-center gap-3 rounded-2xl px-4 py-2 text-lg font-semibold text-white shadow-md transition-shadow hover:shadow-xl lg:px-8 lg:py-4"
                 >
-                  <Camera className="h-6 w-6" />
-                  {FEATURES.siapHalal.cta.primary}
+                  <Camera className="h-6 w-6 shrink-0" />
+                  <span className="whitespace-nowrap">{FEATURES.siapHalal.cta.primary}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate("/dashboard/siap-halal/history")}
+                  className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-600 transition-colors hover:text-gray-800"
+                >
+                  <History className="h-4 w-4" />
+                  Lihat Riwayat Analisis
                 </button>
               </div>
             </div>

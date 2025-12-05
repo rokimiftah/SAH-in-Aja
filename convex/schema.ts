@@ -38,6 +38,8 @@ export default defineSchema({
     ),
     score: v.number(), // 0-100
     actionItems: v.array(v.string()),
+    summaryPoints: v.optional(v.array(v.string())),
+    overallMessage: v.optional(v.string()),
     creditsUsed: v.number(),
     createdAt: v.number(),
   }).index("by_user", ["userId"]),

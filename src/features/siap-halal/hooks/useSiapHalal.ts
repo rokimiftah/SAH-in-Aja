@@ -2,7 +2,7 @@ import type { Id } from "../../../../convex/_generated/dataModel";
 
 import { useState } from "react";
 
-import { useAction, useMutation } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 
 import { api } from "../../../../convex/_generated/api";
 
@@ -42,8 +42,10 @@ export function useSiapHalal(): UseSiapHalalReturn {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const user = useQuery(api.users.getCurrentUser);
   const generateUploadUrl = useMutation(api.storage.generateUploadUrl);
   const analyzeKitchen = useAction(api.analyzeHalal.analyzeKitchen);
+  const saveScan = useMutation(api.halalScans.create);
 
   const uploadFile = async (file: File): Promise<Id<"_storage">> => {
     const uploadUrl = await generateUploadUrl();
@@ -93,6 +95,29 @@ export function useSiapHalal(): UseSiapHalalReturn {
         summaryPoints: Array.isArray(analysisResult.summaryPoints) ? analysisResult.summaryPoints : [],
         overallMessage: analysisResult.overallMessage ?? "",
       };
+
+      // Save to history if user is logged in
+      if (user?._id) {
+        try {
+          await saveScan({
+            userId: user._id,
+            photoUrls: analysisResult.photoUrls ?? [],
+            findings: normalizedResult.findings.map((f) => ({
+              type: f.type,
+              item: f.item,
+              location: f.location,
+              confidence: f.confidence,
+            })),
+            score: normalizedResult.score,
+            actionItems: normalizedResult.actionItems,
+            summaryPoints: normalizedResult.summaryPoints,
+            overallMessage: normalizedResult.overallMessage,
+            creditsUsed: 1,
+          });
+        } catch (saveError) {
+          console.error("Failed to save scan to history:", saveError);
+        }
+      }
 
       setResult(normalizedResult);
       setStage("complete");

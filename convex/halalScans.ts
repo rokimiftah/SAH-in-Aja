@@ -1,6 +1,22 @@
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
+
+// Get current user's scans
+export const getMyScans = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+
+    return await ctx.db
+      .query("halal_scans")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .order("desc")
+      .collect();
+  },
+});
 
 // Get scans by user
 export const getByUser = query({
@@ -49,6 +65,8 @@ export const create = mutation({
     ),
     score: v.number(),
     actionItems: v.array(v.string()),
+    summaryPoints: v.optional(v.array(v.string())),
+    overallMessage: v.optional(v.string()),
     creditsUsed: v.number(),
   },
   handler: async (ctx, args) => {
@@ -58,6 +76,8 @@ export const create = mutation({
       findings: args.findings,
       score: args.score,
       actionItems: args.actionItems,
+      summaryPoints: args.summaryPoints,
+      overallMessage: args.overallMessage,
       creditsUsed: args.creditsUsed,
       createdAt: Date.now(),
     });

@@ -84,6 +84,7 @@ export const analyzeKitchen = action({
         actionItems: result.actionItems || [],
         summaryPoints: result.summaryPoints || [],
         overallMessage: result.overallMessage || "",
+        photoUrls,
       };
     } catch {
       // If JSON parsing fails, return raw content
@@ -93,6 +94,7 @@ export const analyzeKitchen = action({
         actionItems: [],
         summaryPoints: [],
         overallMessage: content,
+        photoUrls,
       };
     }
   },

@@ -16,7 +16,7 @@ export const NotFoundPage = () => {
 
         <Link
           href="/"
-          className="bg-primary-green hover:bg-primary-green/90 inline-flex items-center justify-center rounded-full px-8 py-3 font-semibold text-white transition-all duration-200"
+          className="bg-primary-green hover:bg-primary-green/90 inline-flex cursor-pointer items-center justify-center rounded-full px-8 py-3 font-semibold text-white transition-all duration-200"
         >
           Kembali ke Beranda
         </Link>

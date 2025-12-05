@@ -46,19 +46,7 @@ export const App = () => {
       </Route>
 
       {/* Protected Dashboard Routes */}
-      <Route path="/dashboard">
-        {() => (
-          <>
-            <Authenticated>
-              <DashboardLayout />
-            </Authenticated>
-            <Unauthenticated>
-              <Redirect to="/login" />
-            </Unauthenticated>
-          </>
-        )}
-      </Route>
-      <Route path="/dashboard/:rest*">
+      <Route path="/dashboard/*?">
         {() => (
           <>
             <Authenticated>

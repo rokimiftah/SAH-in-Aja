@@ -2,7 +2,19 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useQuery } from "convex/react";
-import { Camera, ChevronUp, ExternalLink, FileText, LayoutDashboard, LogOut, MessageCircle, UserPen, X } from "lucide-react";
+import {
+  Camera,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
+  FileText,
+  History,
+  LayoutDashboard,
+  LogOut,
+  MessageCircle,
+  UserPen,
+  X,
+} from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 import { BRANDING, FEATURES } from "@shared/config/branding";
@@ -24,6 +36,14 @@ const NAV_ITEMS = [
     icon: Camera,
     href: "/dashboard/siap-halal",
     available: true,
+    subItems: [
+      {
+        id: "siap-halal-history",
+        label: "Riwayat",
+        icon: History,
+        href: "/dashboard/siap-halal/history",
+      },
+    ],
   },
   {
     id: "dokumen-halal",
@@ -39,7 +59,7 @@ const NAV_ITEMS = [
     href: "/dashboard/asisten-halal",
     available: false,
   },
-] as const;
+];
 
 const EXTERNAL_LINKS = [
   { label: "BPJPH", url: "https://halal.go.id" },
@@ -54,6 +74,7 @@ interface SidebarProps {
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [location, navigate] = useLocation();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [expandedMenu, setExpandedMenu] = useState<string | null>("siap-halal");
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   const { signOut } = useAuthActions();
@@ -136,27 +157,86 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto p-4">
           <div className="mb-2 text-xs font-semibold tracking-wider text-gray-400 uppercase">Menu</div>
-          <ul className="space-y-1">
+          <ul className="space-y-2">
             {NAV_ITEMS.map((item) => {
+              const hasSubItems = "subItems" in item && item.subItems && item.subItems.length > 0;
               const isActive = location === item.href || (item.href !== "/dashboard" && location.startsWith(item.href));
+              const isExpanded = expandedMenu === item.id;
               const isAvailable = item.available !== false;
 
               return (
                 <li key={item.id}>
                   {isAvailable ? (
-                    <Link
-                      href={item.href}
-                      onClick={onClose}
-                      className={cn(
-                        "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all",
-                        isActive
-                          ? "bg-primary-green text-white shadow-md"
-                          : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+                    <>
+                      {hasSubItems ? (
+                        <Link
+                          href={item.href}
+                          onClick={() => {
+                            setExpandedMenu(item.id);
+                            onClose();
+                          }}
+                          className={cn(
+                            "flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all",
+                            isActive
+                              ? "bg-primary-green/10 text-primary-green font-semibold"
+                              : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+                          )}
+                        >
+                          <item.icon className="h-5 w-5" />
+                          {item.label}
+                          <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", isExpanded ? "rotate-180" : "")} />
+                        </Link>
+                      ) : (
+                        <Link
+                          href={item.href}
+                          onClick={onClose}
+                          className={cn(
+                            "flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all",
+                            isActive
+                              ? "bg-primary-green text-white shadow-md"
+                              : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+                          )}
+                        >
+                          <item.icon className="h-5 w-5" />
+                          {item.label}
+                        </Link>
                       )}
-                    >
-                      <item.icon className="h-5 w-5" />
-                      {item.label}
-                    </Link>
+                      {/* Submenu */}
+                      {hasSubItems && isExpanded && (
+                        <div className="mt-2 flex flex-col gap-1 px-4">
+                          <Link
+                            href={item.href}
+                            onClick={onClose}
+                            className={cn(
+                              "flex cursor-pointer items-center gap-3 rounded-xl px-4 py-2 text-sm font-medium transition-all",
+                              location === item.href
+                                ? "bg-primary-green text-white"
+                                : "bg-gray-100 text-gray-600 hover:bg-gray-200",
+                            )}
+                          >
+                            <Camera className="h-4 w-4" />
+                            Analisis Baru
+                          </Link>
+                          {item.subItems.map((subItem) => {
+                            const isSubActive = location === subItem.href;
+                            return (
+                              <Link
+                                key={subItem.id}
+                                href={subItem.href}
+                                onClick={onClose}
+                                className={cn(
+                                  "flex cursor-pointer items-center gap-3 rounded-xl px-4 py-2 text-sm font-medium transition-all",
+                                  isSubActive ? "bg-primary-green text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200",
+                                )}
+                              >
+                                <subItem.icon className="h-4 w-4" />
+                                {subItem.label}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <div className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-400">
                       <item.icon className="h-5 w-5" />
@@ -177,7 +257,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-600 transition-all hover:bg-gray-100 hover:text-gray-900"
+                  className="flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-600 transition-all hover:bg-gray-100 hover:text-gray-900"
                 >
                   <ExternalLink className="h-4 w-4" />
                   {link.label}

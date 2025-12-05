@@ -10,6 +10,7 @@ import { Sidebar } from "./components";
 import { DashboardHomePage } from "./DashboardHomePage";
 import { DokumenHalalPage } from "./DokumenHalalPage";
 import { EditProfilePage } from "./EditProfilePage";
+import { SiapHalalHistoryPage } from "./SiapHalalHistoryPage";
 import { SiapHalalPage } from "./SiapHalalPage";
 
 export function DashboardLayout() {
@@ -40,6 +41,7 @@ export function DashboardLayout() {
         <div className="flex-1 overflow-hidden">
           <Switch>
             <Route path="/dashboard" component={DashboardHomePage} />
+            <Route path="/dashboard/siap-halal/history" component={SiapHalalHistoryPage} />
             <Route path="/dashboard/siap-halal" component={SiapHalalPage} />
             <Route path="/dashboard/dokumen-halal" component={DokumenHalalPage} />
             <Route path="/dashboard/asisten-halal" component={AsistenHalalPage} />

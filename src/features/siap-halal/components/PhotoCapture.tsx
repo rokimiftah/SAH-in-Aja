@@ -3,7 +3,20 @@ import type { LucideIcon } from "lucide-react";
 import { useRef, useState } from "react";
 
 import imageCompression from "browser-image-compression";
-import { Camera, Check, Droplets, Factory, Flame, Package, RotateCcw, Snowflake, Sparkles, X } from "lucide-react";
+import {
+  Camera,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Droplets,
+  Factory,
+  Flame,
+  Package,
+  RotateCcw,
+  Snowflake,
+  Sparkles,
+  X,
+} from "lucide-react";
 
 import { cn } from "@shared/lib";
 
@@ -78,6 +91,7 @@ export function PhotoCapture({ onPhotosComplete, onCancel }: PhotoCaptureProps) 
   const [capturedPhotos, setCapturedPhotos] = useState<CapturedPhoto[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [isCompressing, setIsCompressing] = useState(false);
+  const [sliderIndex, setSliderIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const currentGuide = PHOTO_GUIDES[currentStep];
@@ -156,7 +170,7 @@ export function PhotoCapture({ onPhotosComplete, onCancel }: PhotoCaptureProps) 
           onClick={onCancel}
           className="hidden rounded-full bg-gray-100 p-2 text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-700 lg:block"
         >
-          <X className="h-5 w-5" />
+          <X className="h-5 w-5 cursor-pointer" />
         </button>
       </div>
 
@@ -170,8 +184,8 @@ export function PhotoCapture({ onPhotosComplete, onCancel }: PhotoCaptureProps) 
         </div>
       </div>
 
-      {/* Photo Grid Preview - Enhanced */}
-      <div className="mb-6 grid grid-cols-5 gap-3">
+      {/* Photo Grid Preview - Desktop */}
+      <div className="mb-6 hidden sm:grid sm:grid-cols-5 sm:gap-3">
         {PHOTO_GUIDES.map((guide, idx) => {
           const photo = getPhotoForStep(guide.id);
           const isActive = idx === currentStep && !isComplete;
@@ -220,6 +234,101 @@ export function PhotoCapture({ onPhotosComplete, onCancel }: PhotoCaptureProps) 
             </div>
           );
         })}
+      </div>
+
+      {/* Photo Slider Preview - Mobile */}
+      <div className="mb-6 sm:hidden">
+        <div className="relative">
+          {/* Slider Content */}
+          <div className="overflow-hidden rounded-xl">
+            {(() => {
+              const guide = PHOTO_GUIDES[sliderIndex];
+              const photo = getPhotoForStep(guide.id);
+              const isActive = sliderIndex === currentStep && !isComplete;
+              return (
+                <button
+                  type="button"
+                  onClick={() => photo && handleRetake(guide.id)}
+                  className={cn(
+                    "relative aspect-4/3 w-full overflow-hidden rounded-xl border-2 transition-all duration-200",
+                    photo
+                      ? "border-primary-green shadow-sm"
+                      : isActive
+                        ? "border-primary-blue border-dashed shadow-md"
+                        : "border-gray-200",
+                  )}
+                >
+                  {photo ? (
+                    <>
+                      <img src={photo.preview} alt={guide.area} className="h-full w-full object-cover" />
+                      <div className="bg-primary-green absolute top-2 right-2 rounded-full p-1.5 shadow-sm">
+                        <Check className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="absolute right-0 bottom-0 left-0 bg-linear-to-t from-black/60 to-transparent p-3">
+                        <p className="text-sm font-medium text-white">{guide.area}</p>
+                      </div>
+                    </>
+                  ) : (
+                    <div
+                      className={cn(
+                        "flex h-full flex-col items-center justify-center gap-2 p-4",
+                        isActive ? "bg-primary-blue/10" : "bg-gray-50",
+                      )}
+                    >
+                      <guide.icon className={cn("h-10 w-10", guide.color)} />
+                      <span className={cn("text-center text-base font-medium", isActive ? "text-primary-blue" : "text-gray-400")}>
+                        {guide.area}
+                      </span>
+                      <span className="text-xs text-gray-400">{guide.hint}</span>
+                    </div>
+                  )}
+                </button>
+              );
+            })()}
+          </div>
+
+          {/* Navigation Arrows */}
+          <button
+            type="button"
+            onClick={() => setSliderIndex((prev) => Math.max(0, prev - 1))}
+            disabled={sliderIndex === 0}
+            className={cn(
+              "absolute top-1/2 left-2 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow-md transition-opacity",
+              sliderIndex === 0 ? "opacity-30" : "opacity-100",
+            )}
+          >
+            <ChevronLeft className="h-5 w-5 text-gray-700" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setSliderIndex((prev) => Math.min(PHOTO_GUIDES.length - 1, prev + 1))}
+            disabled={sliderIndex === PHOTO_GUIDES.length - 1}
+            className={cn(
+              "absolute top-1/2 right-2 -translate-y-1/2 rounded-full bg-white/90 p-2 shadow-md transition-opacity",
+              sliderIndex === PHOTO_GUIDES.length - 1 ? "opacity-30" : "opacity-100",
+            )}
+          >
+            <ChevronRight className="h-5 w-5 text-gray-700" />
+          </button>
+        </div>
+
+        {/* Dots Indicator */}
+        <div className="mt-3 flex justify-center gap-2">
+          {PHOTO_GUIDES.map((guide, idx) => {
+            const photo = getPhotoForStep(guide.id);
+            return (
+              <button
+                key={guide.id}
+                type="button"
+                onClick={() => setSliderIndex(idx)}
+                className={cn(
+                  "h-2 rounded-full transition-all",
+                  sliderIndex === idx ? "bg-primary-green w-6" : photo ? "bg-primary-green/50 w-2" : "w-2 bg-gray-300",
+                )}
+              />
+            );
+          })}
+        </div>
       </div>
 
       {/* Current Capture Area */}
@@ -271,7 +380,7 @@ export function PhotoCapture({ onPhotosComplete, onCancel }: PhotoCaptureProps) 
                       <Camera className="h-8 w-8 text-white" />
                     </div>
                     <div>
-                      <span className="text-primary-blue text-lg font-semibold">Ambil Foto</span>
+                      <span className="text-primary-blue text-lg font-semibold">Pilih Foto</span>
                       <p className="mt-1 text-xs text-gray-500">Ketuk untuk membuka galeri</p>
                     </div>
                   </>

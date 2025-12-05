@@ -81,35 +81,48 @@ function ScoreBadge({ score }: { score: number }) {
   const Icon = config.icon;
 
   return (
-    <div className="mb-8 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
-      <div className="bg-linear-to-br from-gray-50 to-white p-8 text-center">
-        <div className="relative mx-auto mb-6">
+    <div className="mb-6 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm sm:mb-8">
+      <div className="bg-linear-to-br from-gray-50 to-white p-5 text-center sm:p-8">
+        <div className="relative mx-auto mb-4 sm:mb-6">
           {/* Glow effect */}
-          <div className={cn("absolute inset-0 mx-auto h-36 w-36 rounded-full bg-linear-to-br opacity-30 blur-2xl", config.bg)} />
+          <div
+            className={cn(
+              "absolute inset-0 mx-auto h-28 w-28 rounded-full bg-linear-to-br opacity-30 blur-2xl sm:h-36 sm:w-36",
+              config.bg,
+            )}
+          />
           {/* Outer ring */}
           <div
-            className={cn("relative mx-auto flex h-36 w-36 items-center justify-center rounded-full ring-8", config.ringColor)}
+            className={cn(
+              "relative mx-auto flex h-28 w-28 items-center justify-center rounded-full ring-4 sm:h-36 sm:w-36 sm:ring-8",
+              config.ringColor,
+            )}
           >
             {/* Score circle */}
             <div
               className={cn(
-                "flex h-28 w-28 flex-col items-center justify-center rounded-full bg-linear-to-br shadow-xl",
+                "flex h-20 w-20 flex-col items-center justify-center rounded-full bg-linear-to-br shadow-xl sm:h-28 sm:w-28",
                 config.bg,
               )}
             >
-              <span className="text-5xl font-bold tracking-tight text-white">{score}</span>
-              <span className="text-sm font-medium text-white/80">/100</span>
+              <span className="text-3xl font-bold tracking-tight text-white sm:text-5xl">{score}</span>
+              <span className="text-xs font-medium text-white/80 sm:text-sm">/100</span>
             </div>
           </div>
         </div>
 
         {/* Status Badge */}
-        <div className={cn("mx-auto mb-3 inline-flex items-center gap-2 rounded-full px-4 py-2", config.badgeBg)}>
-          <Icon className={cn("h-5 w-5", config.iconColor)} />
-          <span className={cn("text-lg font-bold", config.iconColor)}>{config.label}</span>
+        <div
+          className={cn(
+            "mx-auto mb-2 inline-flex items-center gap-2 rounded-full px-3 py-1.5 sm:mb-3 sm:px-4 sm:py-2",
+            config.badgeBg,
+          )}
+        >
+          <Icon className={cn("h-4 w-4 sm:h-5 sm:w-5", config.iconColor)} />
+          <span className={cn("text-base font-bold sm:text-lg", config.iconColor)}>{config.label}</span>
         </div>
 
-        <p className="mx-auto max-w-sm text-gray-600">{config.desc}</p>
+        <p className="mx-auto max-w-sm text-sm text-gray-600 sm:text-base">{config.desc}</p>
       </div>
     </div>
   );
@@ -121,21 +134,21 @@ function StatsSummary({ findings }: { findings: Finding[] }) {
   const pass = findings.filter((f) => f.type === "pass").length;
 
   return (
-    <div className="mb-6 grid grid-cols-3 gap-3">
-      <div className="overflow-hidden rounded-2xl border border-red-100 bg-linear-to-br from-red-50 to-white p-4 text-center shadow-sm transition-shadow hover:shadow-md">
-        <XCircle className="mx-auto mb-2 h-6 w-6 text-red-500" />
-        <div className="text-3xl font-bold text-red-600">{critical}</div>
-        <div className="text-xs font-medium text-red-600">Kritis</div>
+    <div className="mb-6 grid grid-cols-3 gap-2 sm:gap-3">
+      <div className="overflow-hidden rounded-xl border border-red-100 bg-linear-to-br from-red-50 to-white p-3 text-center shadow-sm transition-shadow hover:shadow-md sm:rounded-2xl sm:p-4">
+        <XCircle className="mx-auto mb-1 h-5 w-5 text-red-500 sm:mb-2 sm:h-6 sm:w-6" />
+        <div className="text-2xl font-bold text-red-600 sm:text-3xl">{critical}</div>
+        <div className="text-[10px] font-medium text-red-600 sm:text-xs">Kritis</div>
       </div>
-      <div className="overflow-hidden rounded-2xl border border-yellow-100 bg-linear-to-br from-yellow-50 to-white p-4 text-center shadow-sm transition-shadow hover:shadow-md">
-        <AlertTriangle className="mx-auto mb-2 h-6 w-6 text-yellow-500" />
-        <div className="text-3xl font-bold text-yellow-600">{warning}</div>
-        <div className="text-xs font-medium text-yellow-600">Peringatan</div>
+      <div className="overflow-hidden rounded-xl border border-yellow-100 bg-linear-to-br from-yellow-50 to-white p-3 text-center shadow-sm transition-shadow hover:shadow-md sm:rounded-2xl sm:p-4">
+        <AlertTriangle className="mx-auto mb-1 h-5 w-5 text-yellow-500 sm:mb-2 sm:h-6 sm:w-6" />
+        <div className="text-2xl font-bold text-yellow-600 sm:text-3xl">{warning}</div>
+        <div className="text-[10px] font-medium text-yellow-600 sm:text-xs">Peringatan</div>
       </div>
-      <div className="overflow-hidden rounded-2xl border border-green-100 bg-linear-to-br from-green-50 to-white p-4 text-center shadow-sm transition-shadow hover:shadow-md">
-        <CheckCircle className="mx-auto mb-2 h-6 w-6 text-green-500" />
-        <div className="text-3xl font-bold text-green-600">{pass}</div>
-        <div className="text-xs font-medium text-green-600">Sesuai</div>
+      <div className="overflow-hidden rounded-xl border border-green-100 bg-linear-to-br from-green-50 to-white p-3 text-center shadow-sm transition-shadow hover:shadow-md sm:rounded-2xl sm:p-4">
+        <CheckCircle className="mx-auto mb-1 h-5 w-5 text-green-500 sm:mb-2 sm:h-6 sm:w-6" />
+        <div className="text-2xl font-bold text-green-600 sm:text-3xl">{pass}</div>
+        <div className="text-[10px] font-medium text-green-600 sm:text-xs">Sesuai</div>
       </div>
     </div>
   );
@@ -321,20 +334,20 @@ https://sahin.biz.id`;
         </div>
       )}
 
-      {/* Pass Findings - Collapsible */}
+      {/* Pass Findings */}
       {passFindings.length > 0 && (
-        <details className="mb-6">
-          <summary className="mb-4 flex cursor-pointer items-center gap-2 text-lg font-bold text-green-600">
+        <div className="mb-6">
+          <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-green-600">
             <CheckCircle className="h-5 w-5" />
             Sudah Sesuai
             <span className="rounded-full bg-green-100 px-2 py-0.5 text-sm">{passFindings.length}</span>
-          </summary>
+          </h3>
           <div className="space-y-3">
             {passFindings.map((f, idx) => (
               <FindingCard key={idx} finding={f} />
             ))}
           </div>
-        </details>
+        </div>
       )}
 
       {/* Disclaimer */}
@@ -354,33 +367,33 @@ https://sahin.biz.id`;
       </div>
 
       {/* Action Buttons */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         <button
           type="button"
           onClick={onGenerateDocuments}
-          className="bg-primary-green flex w-full items-center justify-center gap-3 rounded-2xl px-6 py-5 text-lg font-semibold text-white shadow-md transition-shadow hover:shadow-xl"
+          className="bg-primary-green flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-4 text-base font-semibold text-white shadow-md transition-shadow hover:shadow-xl sm:gap-3 sm:rounded-2xl sm:px-6 sm:py-5 sm:text-lg"
         >
-          <FileText className="h-6 w-6" />
+          <FileText className="hidden h-5 w-5 sm:block sm:h-6 sm:w-6" />
           <span>Generate Dokumen SJPH</span>
-          <ChevronRight className="h-5 w-5" />
+          <ChevronRight className="hidden h-4 w-4 sm:block sm:h-5 sm:w-5" />
         </button>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
           <button
             type="button"
             onClick={onNewScan}
-            className="flex items-center justify-center gap-2 rounded-xl border-2 border-gray-200 bg-white px-4 py-3.5 font-medium text-gray-700 transition-all hover:border-gray-300 hover:bg-gray-50 hover:shadow-sm"
+            className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border-2 border-gray-200 bg-white px-3 py-3 text-sm font-medium text-gray-700 transition-all hover:border-gray-300 hover:bg-gray-50 hover:shadow-sm sm:gap-2 sm:px-4 sm:py-3.5 sm:text-base"
           >
-            <Camera className="h-4 w-4" />
-            Scan Ulang
+            <Camera className="hidden h-4 w-4 sm:block" />
+            <span>Scan Ulang</span>
           </button>
           <button
             type="button"
             onClick={handleShare}
-            className="flex items-center justify-center gap-2 rounded-xl border-2 border-gray-200 bg-white px-4 py-3.5 font-medium text-gray-700 transition-all hover:border-gray-300 hover:bg-gray-50 hover:shadow-sm"
+            className="flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border-2 border-gray-200 bg-white px-3 py-3 text-sm font-medium text-gray-700 transition-all hover:border-gray-300 hover:bg-gray-50 hover:shadow-sm sm:gap-2 sm:px-4 sm:py-3.5 sm:text-base"
           >
-            <Share2 className="h-4 w-4" />
-            Bagikan
+            <Share2 className="hidden h-4 w-4 sm:block" />
+            <span>Bagikan</span>
           </button>
         </div>
       </div>
