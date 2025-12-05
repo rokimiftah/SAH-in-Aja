@@ -7,7 +7,7 @@ import { Check, Github, Loader2, Mail, Upload } from "lucide-react";
 import { useLocation } from "wouter";
 
 import { useToast } from "@shared/components/ui";
-import { cn } from "@shared/lib";
+import { cn, compressImage } from "@shared/lib";
 
 import { api } from "../../../convex/_generated/api";
 import { PageContainer } from "./components";
@@ -54,7 +54,7 @@ export function EditProfilePage() {
 
   const [name, setName] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [compressedBlob, setCompressedBlob] = useState<Blob | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -78,9 +78,9 @@ export function EditProfilePage() {
   const avatarUrl =
     currentImage || `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(initials)}&backgroundColor=10b981`;
 
-  const hasChanges = name !== null || selectedFile !== null;
+  const hasChanges = name !== null || compressedBlob !== null;
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -89,13 +89,26 @@ export function EditProfilePage() {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Ukuran file maksimal 5MB");
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Ukuran file maksimal 10MB");
       return;
     }
 
-    setSelectedFile(file);
-    setPreviewUrl(URL.createObjectURL(file));
+    try {
+      // Compress to WebP, max 256x256, quality 0.8
+      const compressed = await compressImage(file, 256, 0.8);
+      setCompressedBlob(compressed);
+      setPreviewUrl(URL.createObjectURL(compressed));
+
+      // Log compression result
+      const reduction = ((1 - compressed.size / file.size) * 100).toFixed(1);
+      console.log(
+        `Image compressed: ${(file.size / 1024).toFixed(1)}KB → ${(compressed.size / 1024).toFixed(1)}KB (${reduction}% smaller)`,
+      );
+    } catch (err) {
+      console.error("Failed to compress image:", err);
+      toast.error("Gagal memproses gambar. Coba gambar lain.");
+    }
   };
 
   const handleSave = async () => {
@@ -107,12 +120,12 @@ export function EditProfilePage() {
     try {
       let storageId: Id<"_storage"> | undefined;
 
-      if (selectedFile) {
+      if (compressedBlob) {
         const uploadUrl = await generateUploadUrl();
         const response = await fetch(uploadUrl, {
           method: "POST",
-          headers: { "Content-Type": selectedFile.type },
-          body: selectedFile,
+          headers: { "Content-Type": "image/webp" },
+          body: compressedBlob,
         });
 
         if (!response.ok) throw new Error("Failed to upload image");
@@ -128,7 +141,7 @@ export function EditProfilePage() {
 
       setSaved(true);
       setName(null);
-      setSelectedFile(null);
+      setCompressedBlob(null);
       setPreviewUrl(null);
       toast.success("Profil berhasil disimpan");
 

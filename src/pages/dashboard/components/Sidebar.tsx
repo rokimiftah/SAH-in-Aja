@@ -97,6 +97,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const email = (user?.email ?? "").trim();
   const hasName = !!name;
   const image = typeof user?.image === "string" ? user.image : undefined;
+  const storageId = user?.storageId;
 
   const initials = useMemo(() => {
     const src = (name || email || "?").trim();
@@ -113,6 +114,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const avatarUrl =
     image || `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(initials)}&backgroundColor=10b981`;
+
+  // Use storageId as key to force image element refresh when avatar changes
+  const avatarKey = storageId ? String(storageId) : initials;
 
   const handleSignOut = async () => {
     try {
@@ -302,7 +306,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             onClick={() => setUserMenuOpen(!userMenuOpen)}
             className="flex w-full cursor-pointer items-center gap-3 rounded-xl bg-linear-to-br from-gray-50 to-gray-100 p-3 transition-all hover:shadow-md"
           >
-            <img src={avatarUrl} alt="Avatar" className="h-10 w-10 rounded-full shadow-sm ring-2 ring-white" />
+            <img key={avatarKey} src={avatarUrl} alt="Avatar" className="h-10 w-10 rounded-full shadow-sm ring-2 ring-white" />
             <div className="min-w-0 flex-1 text-left">
               <p className="truncate text-sm font-semibold text-gray-800">{hasName ? name : "Pengguna"}</p>
               <p className="truncate text-xs text-gray-500">{email || "pengguna@email.com"}</p>
