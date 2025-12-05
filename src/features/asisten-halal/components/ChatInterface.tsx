@@ -16,7 +16,7 @@ const QUICK_QUESTIONS = [
 ];
 
 export function ChatInterface() {
-  const { messages, isLoading, isOffline, sendMessage, startNewChat } = useAsistenHalal();
+  const { messages, isLoading, isOffline, credits, sendMessage, startNewChat } = useAsistenHalal();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const user = useQuery(api.users.getCurrentUser);
 
@@ -111,7 +111,8 @@ export function ChatInterface() {
           <button
             type="button"
             onClick={startNewChat}
-            className="flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-orange-200 bg-white px-2 py-1.5 text-xs font-medium text-orange-600 shadow-sm transition-all hover:border-orange-300 hover:bg-orange-50 hover:shadow-md sm:gap-1.5 sm:rounded-xl sm:px-3 sm:py-2 sm:text-sm"
+            disabled={!credits?.remaining}
+            className="flex shrink-0 cursor-pointer items-center gap-1 rounded-lg border border-orange-200 bg-white px-2 py-1.5 text-xs font-medium text-orange-600 shadow-sm transition-all hover:border-orange-300 hover:bg-orange-50 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-orange-200 disabled:hover:bg-white disabled:hover:shadow-sm sm:gap-1.5 sm:rounded-xl sm:px-3 sm:py-2 sm:text-sm"
           >
             <RefreshCw className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             <span className="hidden sm:inline md:hidden">Baru</span>

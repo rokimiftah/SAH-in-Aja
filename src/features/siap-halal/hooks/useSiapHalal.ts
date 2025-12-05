@@ -30,6 +30,7 @@ interface UseSiapHalalReturn {
   totalPhotos: number;
   result: AnalysisResult | null;
   error: string | null;
+  credits: { remaining: number; limit: number } | null;
   analyzePhotos: (photos: File[]) => Promise<void>;
   reset: () => void;
 }
@@ -43,6 +44,8 @@ export function useSiapHalal(): UseSiapHalalReturn {
   const [error, setError] = useState<string | null>(null);
 
   const user = useQuery(api.users.getCurrentUser);
+  const creditStatus = useQuery(api.credits.checkCredits, { feature: "siapHalal" });
+  const deductCredit = useMutation(api.credits.useSiapHalalCredit);
   const generateUploadUrl = useMutation(api.storage.generateUploadUrl);
   const analyzeKitchen = useAction(api.analyzeHalal.analyzeKitchen);
   const saveScan = useMutation(api.halalScans.create);
@@ -73,6 +76,13 @@ export function useSiapHalal(): UseSiapHalalReturn {
     setResult(null);
 
     try {
+      // Check and use credit first
+      if (!creditStatus?.hasCredits) {
+        throw new Error("Kredit Siap Halal habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
+      }
+
+      await deductCredit();
+
       const photoStorageIds: Id<"_storage">[] = [];
 
       // Upload photos sequentially (3G-friendly)
@@ -144,6 +154,7 @@ export function useSiapHalal(): UseSiapHalalReturn {
     totalPhotos,
     result,
     error,
+    credits: creditStatus ? { remaining: creditStatus.remaining, limit: creditStatus.limit } : null,
     analyzePhotos,
     reset,
   };

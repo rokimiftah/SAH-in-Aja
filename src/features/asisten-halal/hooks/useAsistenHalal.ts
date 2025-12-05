@@ -20,8 +20,9 @@ interface UseAsistenHalalReturn {
   error: string | null;
   consultationId: Id<"halal_consultations"> | null;
   isOffline: boolean;
+  credits: { remaining: number; limit: number } | null;
   sendMessage: (message: string) => Promise<void>;
-  startNewChat: () => void;
+  startNewChat: () => Promise<void>;
 }
 
 const WELCOME_MESSAGE: ChatMessage = {
@@ -47,6 +48,8 @@ export function useAsistenHalal(): UseAsistenHalalReturn {
   const [isOffline, setIsOffline] = useState(!isOnline());
 
   const user = useQuery(api.users.getCurrentUser);
+  const creditStatus = useQuery(api.credits.checkCredits, { feature: "asistenHalal" });
+  const deductCredit = useMutation(api.credits.useAsistenHalalCredit);
   const chatAction = useAction(api.consultHalal.chat);
   const createConsultation = useMutation(api.halalConsultations.create);
   const addMessage = useMutation(api.halalConsultations.addMessage);
@@ -98,14 +101,37 @@ export function useAsistenHalal(): UseAsistenHalalReturn {
           return;
         }
 
-        // Create consultation if first user message
+        // Create consultation if first user message (uses credit)
         let currentConsultationId = consultationId;
-        if (!currentConsultationId && user?._id) {
+        console.log("[AsistenHalal] consultationId:", consultationId, "user:", user?._id, "creditStatus:", creditStatus);
+
+        if (!currentConsultationId) {
+          console.log("[AsistenHalal] Creating new consultation...");
+
+          // Wait for user to be loaded
+          if (!user?._id) {
+            console.log("[AsistenHalal] User not loaded yet");
+            throw new Error("Silakan tunggu sebentar, sedang memuat data pengguna...");
+          }
+
+          // Check and use credit for new chat
+          if (!creditStatus?.hasCredits) {
+            console.log("[AsistenHalal] No credits available");
+            throw new Error("Kredit chat Asisten Halal habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
+          }
+
+          console.log("[AsistenHalal] Deducting credit...");
+          await deductCredit();
+          console.log("[AsistenHalal] Credit deducted!");
+
           currentConsultationId = await createConsultation({
             userId: user._id,
             initialMessage: message.trim(),
           });
           setConsultationId(currentConsultationId);
+          console.log("[AsistenHalal] Consultation created:", currentConsultationId);
+        } else {
+          console.log("[AsistenHalal] Using existing consultation:", currentConsultationId);
         }
 
         // Build conversation history for context
@@ -156,14 +182,31 @@ export function useAsistenHalal(): UseAsistenHalalReturn {
         setError(err instanceof Error ? err.message : "Terjadi kesalahan");
       }
     },
-    [isLoading, isOffline, consultationId, user, messages, chatAction, createConsultation, addMessage],
+    [
+      isLoading,
+      isOffline,
+      consultationId,
+      user,
+      messages,
+      chatAction,
+      createConsultation,
+      addMessage,
+      creditStatus,
+      deductCredit,
+    ],
   );
 
-  const startNewChat = useCallback(() => {
+  const startNewChat = useCallback(async () => {
+    // Check if user has credits for new chat
+    if (!creditStatus?.hasCredits) {
+      setError("Kredit chat Asisten Halal habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
+      return;
+    }
+
     setMessages([{ ...WELCOME_MESSAGE, timestamp: Date.now() }]);
     setConsultationId(null);
     setError(null);
-  }, []);
+  }, [creditStatus]);
 
   return {
     messages,
@@ -171,6 +214,7 @@ export function useAsistenHalal(): UseAsistenHalalReturn {
     error,
     consultationId,
     isOffline,
+    credits: creditStatus ? { remaining: creditStatus.remaining, limit: creditStatus.limit } : null,
     sendMessage,
     startNewChat,
   };

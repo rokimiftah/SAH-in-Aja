@@ -16,6 +16,7 @@ interface UseDokumenHalalReturn {
   stage: GenerationStage;
   result: GenerationResult | null;
   error: string | null;
+  credits: { remaining: number; limit: number } | null;
   generateDocument: (templateType: TemplateType, businessInfo: BusinessInfo, ingredients: Ingredient[]) => Promise<void>;
   reset: () => void;
 }
@@ -26,6 +27,8 @@ export function useDokumenHalal(): UseDokumenHalalReturn {
   const [error, setError] = useState<string | null>(null);
 
   const user = useQuery(api.users.getCurrentUser);
+  const creditStatus = useQuery(api.credits.checkCredits, { feature: "dokumenHalal" });
+  const deductCredit = useMutation(api.credits.useDokumenHalalCredit);
   const generateHalalDocument = useAction(api.generateDocument.generateHalalDocument);
   const saveDocument = useMutation(api.halalDocuments.create);
 
@@ -35,6 +38,13 @@ export function useDokumenHalal(): UseDokumenHalalReturn {
     setResult(null);
 
     try {
+      // Check and use credit first
+      if (!creditStatus?.hasCredits) {
+        throw new Error("Kredit Dokumen Halal habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
+      }
+
+      await deductCredit();
+
       const generationResult = await generateHalalDocument({
         templateType,
         businessInfo,
@@ -80,6 +90,7 @@ export function useDokumenHalal(): UseDokumenHalalReturn {
     stage,
     result,
     error,
+    credits: creditStatus ? { remaining: creditStatus.remaining, limit: creditStatus.limit } : null,
     generateDocument,
     reset,
   };

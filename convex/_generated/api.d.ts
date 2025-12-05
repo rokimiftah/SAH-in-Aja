@@ -11,6 +11,8 @@
 import type * as analyzeHalal from "../analyzeHalal.js";
 import type * as auth from "../auth.js";
 import type * as consultHalal from "../consultHalal.js";
+import type * as credits from "../credits.js";
+import type * as crons from "../crons.js";
 import type * as generateDocument from "../generateDocument.js";
 import type * as halalConsultations from "../halalConsultations.js";
 import type * as halalDocuments from "../halalDocuments.js";
@@ -31,6 +33,8 @@ declare const fullApi: ApiFromModules<{
   analyzeHalal: typeof analyzeHalal;
   auth: typeof auth;
   consultHalal: typeof consultHalal;
+  credits: typeof credits;
+  crons: typeof crons;
   generateDocument: typeof generateDocument;
   halalConsultations: typeof halalConsultations;
   halalDocuments: typeof halalDocuments;

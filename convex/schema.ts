@@ -24,6 +24,17 @@ export default defineSchema({
     .index("by_phone", ["phone"])
     .index("by_email", ["email"]),
 
+  // Daily credits table - reset every day at UTC+7
+  user_daily_credits: defineTable({
+    userId: v.id("users"),
+    date: v.string(), // Format: YYYY-MM-DD in UTC+7
+    siapHalalCredits: v.number(), // Max 3 per day
+    dokumenHalalCredits: v.number(), // Max 3 per day
+    asistenHalalChats: v.number(), // Max 20 new chats per day
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_date", ["userId", "date"]),
+
   // Halal scans table (Siap Halal history)
   halal_scans: defineTable({
     userId: v.id("users"),

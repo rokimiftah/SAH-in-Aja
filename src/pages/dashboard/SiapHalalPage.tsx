@@ -1,11 +1,13 @@
 import { useState } from "react";
 
+import { useQuery } from "convex/react";
 import { AlertCircle, Camera, CheckCircle2, Clock, History, RefreshCw, Sparkles, Target, Zap } from "lucide-react";
 import { useLocation } from "wouter";
 
 import { AnalysisResults, PhotoCapture, UploadProgress, useSiapHalal } from "@features/siap-halal";
 import { FEATURES } from "@shared/config/branding";
 
+import { api } from "../../../convex/_generated/api";
 import { PageContainer } from "./components";
 
 type FlowState = "intro" | "capture" | "processing" | "results" | "error";
@@ -39,6 +41,8 @@ export function SiapHalalPage() {
   const [flowState, setFlowState] = useState<FlowState>("intro");
 
   const { stage, progress, currentPhoto, totalPhotos, result, error, analyzePhotos, reset } = useSiapHalal();
+  const creditStatus = useQuery(api.credits.checkCredits, { feature: "siapHalal" });
+  const hasCredits = creditStatus?.hasCredits ?? false;
 
   const handleStartCapture = () => setFlowState("capture");
 
@@ -132,10 +136,17 @@ export function SiapHalalPage() {
           </div>
 
           <div className="flex flex-col items-center gap-5">
+            {!hasCredits && (
+              <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>Kredit habis untuk hari ini. Reset besok pukul 00:00 WIB.</span>
+              </div>
+            )}
             <button
               type="button"
               onClick={handleStartCapture}
-              className="bg-primary-green inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold text-white shadow-md transition-shadow hover:shadow-xl sm:w-auto sm:gap-3 sm:px-6 sm:text-base lg:px-8 lg:py-4 lg:text-lg"
+              disabled={!hasCredits}
+              className="bg-primary-green inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold text-white shadow-md transition-shadow hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none sm:w-auto sm:gap-3 sm:px-6 sm:text-base lg:px-8 lg:py-4 lg:text-lg"
             >
               <Camera className="h-6 w-6 shrink-0" />
               <span className="whitespace-nowrap">{FEATURES.siapHalal.cta.primary}</span>
@@ -171,20 +182,22 @@ export function SiapHalalPage() {
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-100">
             <AlertCircle className="h-10 w-10 text-red-500" />
           </div>
-          <h3 className="text-text-dark mb-2 text-lg font-semibold">Terjadi Kesalahan</h3>
+          <h3 className="text-text-dark mb-2 text-lg font-semibold">
+            {error?.includes("Kredit") ? "Kredit Habis" : "Terjadi Kesalahan"}
+          </h3>
           <p className="mb-6 text-sm text-gray-600">{error || "Gagal menganalisis foto. Silakan coba lagi."}</p>
-          <div className="flex justify-center gap-3">
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-center">
             <button
               type="button"
               onClick={handleCancel}
-              className="rounded-xl border border-gray-300 px-6 py-3 font-medium text-gray-700"
+              className="w-full cursor-pointer rounded-xl border border-gray-300 px-6 py-3 font-medium text-gray-700 hover:bg-gray-50 sm:w-auto"
             >
               Batal
             </button>
             <button
               type="button"
               onClick={handleRetry}
-              className="bg-primary-green flex items-center gap-2 rounded-xl px-6 py-3 font-semibold text-white"
+              className="bg-primary-green flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-6 py-3 font-semibold text-white hover:opacity-90 sm:w-auto"
             >
               <RefreshCw className="h-4 w-4" />
               Coba Lagi

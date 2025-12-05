@@ -2,6 +2,7 @@ import type { BusinessInfo, Ingredient, TemplateType } from "@features/dokumen-h
 
 import { useState } from "react";
 
+import { useQuery } from "convex/react";
 import { AlertCircle, ArrowRight, CheckCircle2, FileText, History, RefreshCw, Sparkles, Target, Zap } from "lucide-react";
 import { useLocation } from "wouter";
 
@@ -15,6 +16,7 @@ import {
 } from "@features/dokumen-halal";
 import { FEATURES } from "@shared/config/branding";
 
+import { api } from "../../../convex/_generated/api";
 import { PageContainer } from "./components";
 
 type FlowState = "intro" | "template" | "business" | "ingredients" | "generating" | "preview" | "error";
@@ -60,6 +62,8 @@ export function DokumenHalalPage() {
   const [ingredients, setIngredients] = useState<Ingredient[]>(INITIAL_INGREDIENTS);
 
   const { stage, result, error, generateDocument, reset } = useDokumenHalal();
+  const creditStatus = useQuery(api.credits.checkCredits, { feature: "dokumenHalal" });
+  const hasCredits = creditStatus?.hasCredits ?? false;
 
   const handleStartCreate = () => setFlowState("template");
   const handleSelectTemplate = (template: TemplateType) => setSelectedTemplate(template);
@@ -175,10 +179,17 @@ export function DokumenHalalPage() {
           </div>
 
           <div className="flex flex-col items-center gap-5">
+            {!hasCredits && (
+              <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>Kredit habis untuk hari ini. Reset besok pukul 00:00 WIB.</span>
+              </div>
+            )}
             <button
               type="button"
               onClick={handleStartCreate}
-              className="bg-primary-blue inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold text-white shadow-md transition-shadow hover:shadow-xl sm:w-auto sm:gap-3 sm:px-6 sm:text-base lg:px-8 lg:py-4 lg:text-lg"
+              disabled={!hasCredits}
+              className="bg-primary-blue inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold text-white shadow-md transition-shadow hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none sm:w-auto sm:gap-3 sm:px-6 sm:text-base lg:px-8 lg:py-4 lg:text-lg"
             >
               <FileText className="h-5 w-5 shrink-0" />
               <span className="whitespace-nowrap">{FEATURES.dokumenHalal.cta.primary}</span>
@@ -258,7 +269,9 @@ export function DokumenHalalPage() {
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-100">
             <AlertCircle className="h-10 w-10 text-red-500" />
           </div>
-          <h3 className="text-text-dark mb-2 text-lg font-semibold">Terjadi Kesalahan</h3>
+          <h3 className="text-text-dark mb-2 text-lg font-semibold">
+            {error?.includes("Kredit") ? "Kredit Habis" : "Terjadi Kesalahan"}
+          </h3>
           <p className="mb-6 text-sm text-gray-600">{error || "Gagal generate dokumen. Silakan coba lagi."}</p>
           <div className="flex justify-center gap-3">
             <button

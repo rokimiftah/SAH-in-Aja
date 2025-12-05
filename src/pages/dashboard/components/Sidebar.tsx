@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useQuery } from "convex/react";
@@ -20,6 +21,89 @@ import { BRANDING, FEATURES } from "@shared/config/branding";
 import { cn } from "@shared/lib";
 
 import { api } from "../../../../convex/_generated/api";
+
+interface CreditBadgeProps {
+  remaining: number;
+  limit: number;
+}
+
+function CreditBadge({ remaining, limit }: CreditBadgeProps) {
+  // Cap remaining to limit (in case old data has higher values)
+  const cappedRemaining = Math.min(remaining, limit);
+  const isLow = cappedRemaining <= 1;
+  const isEmpty = cappedRemaining === 0;
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0, position: "right" as "right" | "top" });
+  const badgeRef = useRef<HTMLSpanElement>(null);
+
+  const handleMouseEnter = useCallback(() => {
+    if (badgeRef.current) {
+      const rect = badgeRef.current.getBoundingClientRect();
+      const tooltipWidth = 180;
+
+      // Check if tooltip would go off-screen to the right
+      if (rect.right + tooltipWidth + 16 > window.innerWidth) {
+        // Position above the badge
+        setTooltipPos({
+          top: rect.top - 8,
+          left: rect.left + rect.width / 2,
+          position: "top",
+        });
+      } else {
+        // Position to the right
+        setTooltipPos({
+          top: rect.top + rect.height / 2,
+          left: rect.right + 8,
+          position: "right",
+        });
+      }
+      setShowTooltip(true);
+    }
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setShowTooltip(false);
+  }, []);
+
+  return (
+    <>
+      <span
+        ref={badgeRef}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onKeyDown={(e) => e.stopPropagation()}
+        className={cn(
+          "ml-auto inline-flex min-w-5 cursor-default items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold",
+          isEmpty ? "bg-red-100 text-red-600" : isLow ? "bg-amber-100 text-amber-600" : "bg-gray-300/80 text-gray-700",
+        )}
+      >
+        {cappedRemaining}/{limit}
+      </span>
+      {showTooltip &&
+        createPortal(
+          <div
+            style={{ top: tooltipPos.top, left: tooltipPos.left }}
+            className={cn(
+              "fixed z-9999 rounded-lg bg-gray-900 px-2.5 py-1.5 text-xs whitespace-nowrap text-white shadow-lg",
+              tooltipPos.position === "right" ? "-translate-y-1/2" : "-translate-x-1/2 -translate-y-full",
+            )}
+          >
+            Sisa kredit anda hari ini
+            {tooltipPos.position === "right" ? (
+              <div className="absolute top-1/2 right-full -translate-y-1/2 border-4 border-transparent border-r-gray-900" />
+            ) : (
+              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+            )}
+          </div>,
+          document.body,
+        )}
+    </>
+  );
+}
 
 const NAV_ITEMS = [
   {
@@ -100,6 +184,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const { signOut } = useAuthActions();
   const user = useQuery(api.users.getCurrentUser);
+  const dailyCredits = useQuery(api.credits.getMyDailyCredits);
 
   const name = (user?.name ?? "").trim();
   const email = (user?.email ?? "").trim();
@@ -231,6 +316,18 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                               : item.id === "asisten-halal"
                                 ? "Konsultasi Baru"
                                 : "Buat Dokumen"}
+                            {dailyCredits && item.id === "siap-halal" && (
+                              <CreditBadge remaining={dailyCredits.siapHalalCredits} limit={dailyCredits.limits.siapHalal} />
+                            )}
+                            {dailyCredits && item.id === "dokumen-halal" && (
+                              <CreditBadge
+                                remaining={dailyCredits.dokumenHalalCredits}
+                                limit={dailyCredits.limits.dokumenHalal}
+                              />
+                            )}
+                            {dailyCredits && item.id === "asisten-halal" && (
+                              <CreditBadge remaining={dailyCredits.asistenHalalChats} limit={dailyCredits.limits.asistenHalal} />
+                            )}
                           </Link>
                           {item.subItems.map((subItem) => {
                             const isSubActive = location === subItem.href;
