@@ -18,12 +18,12 @@ export function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="h-screen bg-gray-100 p-4 lg:flex lg:gap-4">
+    <div className="h-dvh bg-gray-100 p-4 lg:flex lg:gap-4">
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Main Content Area */}
-      <main className="flex h-[calc(100vh-32px)] flex-1 flex-col gap-4 lg:ml-0">
+      <main className="flex h-[calc(100dvh-32px)] flex-1 flex-col gap-4 lg:ml-0">
         {/* Top Bar - Mobile only */}
         <header className="flex items-center justify-between lg:hidden">
           <Link href="/">
