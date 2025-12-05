@@ -9,6 +9,7 @@ import { FeatureCard, StatsCard } from "./components";
 export function DashboardHomePage() {
   const user = useQuery(api.users.getCurrentUser);
   const scans = useQuery(api.halalScans.getMyScans);
+  const documents = useQuery(api.halalDocuments.getMyDocuments);
   const name = (user?.name ?? "").trim();
   const email = (user?.email ?? "").trim();
   const displayName = name || email?.split("@")[0] || "Pengguna";
@@ -24,7 +25,7 @@ export function DashboardHomePage() {
         {/* Stats */}
         <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3 lg:gap-6">
           <StatsCard label="Total Scan" value={scans?.length ?? 0} icon={Camera} variant="emerald" />
-          <StatsCard label="Dokumen" value={0} icon={FileText} variant="blue" />
+          <StatsCard label="Dokumen" value={documents?.length ?? 0} icon={FileText} variant="blue" />
           <StatsCard label="Konsultasi" value={0} icon={MessageCircle} variant="orange" />
         </div>
 
@@ -50,7 +51,7 @@ export function DashboardHomePage() {
               ctaText={FEATURES.dokumenHalal.cta.primary}
               href="/dashboard/dokumen-halal"
               gradient="bg-gradient-to-br from-blue-500 to-indigo-600"
-              available={false}
+              available={true}
             />
             <FeatureCard
               icon={<MessageCircle className="h-6 w-6 text-white" />}

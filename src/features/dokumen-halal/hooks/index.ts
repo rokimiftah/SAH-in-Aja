@@ -1,0 +1,1 @@
+export { useDokumenHalal } from "./useDokumenHalal";

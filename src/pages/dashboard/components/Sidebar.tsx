@@ -52,9 +52,17 @@ const NAV_ITEMS = [
     label: FEATURES.dokumenHalal.name,
     icon: FileText,
     href: "/dashboard/dokumen-halal",
-    available: false,
+    available: true,
     activeClass: "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md",
     activeLightClass: "bg-blue-50 text-blue-700",
+    subItems: [
+      {
+        id: "dokumen-halal-history",
+        label: "Riwayat",
+        icon: History,
+        href: "/dashboard/dokumen-halal/history",
+      },
+    ],
   },
   {
     id: "asisten-halal",
@@ -206,8 +214,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                               location === item.href ? item.activeClass : "bg-gray-100 text-gray-600 hover:bg-gray-200",
                             )}
                           >
-                            <Camera className="h-4 w-4" />
-                            Analisis Baru
+                            <item.icon className="h-4 w-4" />
+                            {item.id === "siap-halal" ? "Analisis Baru" : "Buat Dokumen"}
                           </Link>
                           {item.subItems.map((subItem) => {
                             const isSubActive = location === subItem.href;

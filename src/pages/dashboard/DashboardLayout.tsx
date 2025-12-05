@@ -8,6 +8,7 @@ import { BRANDING } from "@shared/config/branding";
 import { AsistenHalalPage } from "./AsistenHalalPage";
 import { Sidebar } from "./components";
 import { DashboardHomePage } from "./DashboardHomePage";
+import { DokumenHalalHistoryPage } from "./DokumenHalalHistoryPage";
 import { DokumenHalalPage } from "./DokumenHalalPage";
 import { EditProfilePage } from "./EditProfilePage";
 import { SiapHalalHistoryPage } from "./SiapHalalHistoryPage";
@@ -43,6 +44,7 @@ export function DashboardLayout() {
             <Route path="/dashboard" component={DashboardHomePage} />
             <Route path="/dashboard/siap-halal/history" component={SiapHalalHistoryPage} />
             <Route path="/dashboard/siap-halal" component={SiapHalalPage} />
+            <Route path="/dashboard/dokumen-halal/history" component={DokumenHalalHistoryPage} />
             <Route path="/dashboard/dokumen-halal" component={DokumenHalalPage} />
             <Route path="/dashboard/asisten-halal" component={AsistenHalalPage} />
             <Route path="/dashboard/profile" component={EditProfilePage} />

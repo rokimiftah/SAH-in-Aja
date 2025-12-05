@@ -18,7 +18,7 @@ export function FeatureCard({ icon, name, tagline, description, ctaText, href, g
   const content = (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-2xl p-6 text-white transition-all duration-500",
+        "group relative h-full overflow-hidden rounded-2xl p-6 text-white transition-all duration-500",
         gradient,
         available ? "cursor-pointer hover:shadow-2xl" : "opacity-60",
       )}
@@ -62,11 +62,11 @@ export function FeatureCard({ icon, name, tagline, description, ctaText, href, g
 
   if (available) {
     return (
-      <Link href={href} className="block">
+      <Link href={href} className="block h-full">
         {content}
       </Link>
     );
   }
 
-  return content;
+  return <div className="h-full">{content}</div>;
 }

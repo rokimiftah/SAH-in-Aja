@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 
 import { action } from "./_generated/server";
-import { createNvidiaClient, NVIDIA_MODELS, SYSTEM_PROMPTS } from "./lib/nvidia";
+import { SYSTEM_PROMPTS } from "./lib/nvidia";
 
 const TEMPLATE_PROMPTS: Record<string, string> = {
   sop_produksi: `Buat SOP Produksi Halal yang mencakup:
@@ -76,19 +76,9 @@ export const generateHalalDocument = action({
       throw new Error("NVIDIA_API_KEY not configured");
     }
 
-    const nvidia = createNvidiaClient(apiKey);
     const templatePrompt = TEMPLATE_PROMPTS[args.templateType] || TEMPLATE_PROMPTS.sop_produksi;
 
-    const response = await nvidia.chat.completions.create({
-      model: NVIDIA_MODELS.TEXT,
-      messages: [
-        {
-          role: "system",
-          content: SYSTEM_PROMPTS.DOCUMENT_GENERATOR,
-        },
-        {
-          role: "user",
-          content: `${templatePrompt}
+    const userContent = `${templatePrompt}
 
 DATA USAHA:
 - Nama Usaha: ${args.businessInfo.name}
@@ -99,18 +89,63 @@ DATA USAHA:
 DAFTAR BAHAN:
 ${args.ingredients.map((i) => `- ${i.name} (Supplier: ${i.supplier}, Status: ${i.halalStatus})`).join("\n")}
 
-Buat dokumen lengkap dalam bahasa Indonesia formal.`,
+TANGGAL HARI INI: ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Jakarta" })}
+
+Buat dokumen lengkap dalam bahasa Indonesia formal. Gunakan tahun ${new Date().toLocaleDateString("id-ID", { year: "numeric", timeZone: "Asia/Jakarta" })} untuk nomor dokumen.`;
+
+    try {
+      const response = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
-      ],
-      temperature: 0.3,
-      max_tokens: 3000,
-    });
+        body: JSON.stringify({
+          model: "mistralai/mistral-large-3-675b-instruct-2512",
+          messages: [
+            {
+              role: "system",
+              content: SYSTEM_PROMPTS.DOCUMENT_GENERATOR,
+            },
+            {
+              role: "user",
+              content: userContent,
+            },
+          ],
+          temperature: 1,
+          top_p: 1,
+          frequency_penalty: 0,
+          presence_penalty: 0,
+          max_tokens: 4096,
+        }),
+      });
 
-    const content = response.choices[0]?.message?.content;
-    if (!content) {
-      throw new Error("No response from AI");
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("NVIDIA API error:", response.status, errorText);
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.choices || data.choices.length === 0) {
+        console.error("No choices in response");
+        throw new Error("No choices in API response");
+      }
+
+      const message = data.choices[0]?.message;
+
+      const content = message?.content;
+      if (!content || content.trim() === "") {
+        console.error("Content is empty or missing");
+        throw new Error("No content in API response");
+      }
+
+      return { content };
+    } catch (error) {
+      console.error("Error generating document:", error);
+      throw new Error(`Gagal generate dokumen: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
-
-    return { content };
   },
 });
