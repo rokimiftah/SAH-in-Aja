@@ -27,7 +27,7 @@ export function DashboardLayout() {
       <main className="flex h-[calc(100dvh-32px)] flex-1 flex-col gap-4 lg:ml-0">
         {/* Top Bar - Mobile only */}
         <header className="flex items-center justify-between lg:hidden">
-          <Link href="/">
+          <Link href="/dashboard">
             <img src="/logo.avif" alt={BRANDING.name} className="h-12 w-auto" />
           </Link>
           <button

@@ -166,7 +166,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       >
         {/* Logo */}
         <div className="flex items-center justify-between px-5 pt-5 pb-2">
-          <Link href="/" className="flex w-full items-center justify-center">
+          <Link href="/dashboard" className="flex w-full items-center justify-center">
             <img src="/logo.avif" alt={BRANDING.name} className="h-12 w-auto" />
           </Link>
           <button
