@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { AlertCircle, ArrowLeft, Camera, CheckCircle2, Clock, History, RefreshCw, Sparkles, Target, Zap } from "lucide-react";
+import { AlertCircle, Camera, CheckCircle2, Clock, History, RefreshCw, Sparkles, Target, Zap } from "lucide-react";
 import { useLocation } from "wouter";
 
 import { AnalysisResults, PhotoCapture, UploadProgress, useSiapHalal } from "@features/siap-halal";
@@ -52,6 +52,11 @@ export function SiapHalalPage() {
     setFlowState("intro");
   };
 
+  const handleBack = () => {
+    if (flowState === "intro") navigate("/dashboard");
+    else handleCancel();
+  };
+
   const handleNewScan = () => {
     reset();
     setFlowState("intro");
@@ -74,22 +79,18 @@ export function SiapHalalPage() {
   };
 
   const displayState = currentFlowState();
-  const showBackButton = displayState !== "intro" && displayState !== "processing";
+  const showBackButton = displayState !== "processing";
+  const isMobileOnlyBack = displayState === "intro";
 
   return (
-    <PageContainer backButton={showBackButton ? { onClick: handleCancel } : undefined} centered maxWidth="5xl">
+    <PageContainer
+      backButton={showBackButton ? { onClick: handleBack, mobileOnly: isMobileOnlyBack } : undefined}
+      centered
+      maxWidth="5xl"
+    >
       {/* Intro State */}
       {displayState === "intro" && (
         <div className="mx-auto max-w-xl">
-          <button
-            type="button"
-            onClick={() => navigate("/dashboard")}
-            className="mb-5 flex cursor-pointer items-center gap-2 text-sm text-gray-600 transition-colors hover:text-gray-800 lg:hidden"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Kembali
-          </button>
-
           <div className="mb-8 text-center">
             <div className="mb-4 flex justify-center">
               <div className="bg-primary-green/10 inline-flex flex-nowrap items-center gap-2 rounded-full px-4 py-2">
@@ -133,7 +134,7 @@ export function SiapHalalPage() {
             <button
               type="button"
               onClick={handleStartCapture}
-              className="bg-primary-green inline-flex cursor-pointer flex-nowrap items-center gap-3 rounded-2xl px-4 py-2 text-lg font-semibold text-white shadow-md transition-shadow hover:shadow-xl lg:px-8 lg:py-4"
+              className="bg-primary-green inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold text-white shadow-md transition-shadow hover:shadow-xl sm:w-auto sm:gap-3 sm:px-6 sm:text-base lg:px-8 lg:py-4 lg:text-lg"
             >
               <Camera className="h-6 w-6 shrink-0" />
               <span className="whitespace-nowrap">{FEATURES.siapHalal.cta.primary}</span>
