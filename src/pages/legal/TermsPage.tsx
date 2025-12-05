@@ -1,8 +1,14 @@
+import { useEffect } from "react";
+
 import { Link } from "wouter";
 
 import { Footer, Header } from "@shared/components/layout";
 
 export const TermsPage = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="bg-bg-cream font-poppins text-text-dark min-h-screen">
       <Header />
