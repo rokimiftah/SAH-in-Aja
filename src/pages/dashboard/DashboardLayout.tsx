@@ -51,7 +51,7 @@ export function DashboardLayout() {
         </div>
 
         {/* Disclaimer - Bento tile */}
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-center">
+        <div className="rounded-2xl border border-amber-300 bg-amber-200 px-4 py-3 text-center">
           <p className="text-text-muted text-sm">
             <strong>{BRANDING.name}</strong> adalah platform persiapan sertifikasi halal.{" "}
             <a
