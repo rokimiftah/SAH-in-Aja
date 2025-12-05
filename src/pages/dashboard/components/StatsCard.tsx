@@ -36,7 +36,7 @@ export function StatsCard({ label, value, icon: Icon, variant }: StatsCardProps)
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all duration-300",
+        "group relative overflow-hidden rounded-2xl border border-gray-200 bg-neutral-50 p-6 shadow-sm transition-all duration-300",
         style.border,
       )}
     >

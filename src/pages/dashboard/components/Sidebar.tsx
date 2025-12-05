@@ -4,7 +4,6 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { useQuery } from "convex/react";
 import {
   Camera,
-  ChevronDown,
   ChevronUp,
   ExternalLink,
   FileText,
@@ -29,6 +28,7 @@ const NAV_ITEMS = [
     icon: LayoutDashboard,
     href: "/dashboard",
     available: true,
+    activeClass: "bg-primary-green text-white shadow-md",
   },
   {
     id: "siap-halal",
@@ -36,6 +36,8 @@ const NAV_ITEMS = [
     icon: Camera,
     href: "/dashboard/siap-halal",
     available: true,
+    activeClass: "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md",
+    activeLightClass: "bg-emerald-50 text-emerald-700",
     subItems: [
       {
         id: "siap-halal-history",
@@ -51,6 +53,8 @@ const NAV_ITEMS = [
     icon: FileText,
     href: "/dashboard/dokumen-halal",
     available: false,
+    activeClass: "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md",
+    activeLightClass: "bg-blue-50 text-blue-700",
   },
   {
     id: "asisten-halal",
@@ -58,6 +62,8 @@ const NAV_ITEMS = [
     icon: MessageCircle,
     href: "/dashboard/asisten-halal",
     available: false,
+    activeClass: "bg-gradient-to-r from-orange-500 to-rose-500 text-white shadow-md",
+    activeLightClass: "bg-orange-50 text-orange-700",
   },
 ];
 
@@ -74,7 +80,6 @@ interface SidebarProps {
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [location, navigate] = useLocation();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [expandedMenu, setExpandedMenu] = useState<string | null>("siap-halal");
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   const { signOut } = useAuthActions();
@@ -161,7 +166,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             {NAV_ITEMS.map((item) => {
               const hasSubItems = "subItems" in item && item.subItems && item.subItems.length > 0;
               const isActive = location === item.href || (item.href !== "/dashboard" && location.startsWith(item.href));
-              const isExpanded = expandedMenu === item.id;
               const isAvailable = item.available !== false;
 
               return (
@@ -169,32 +173,22 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   {isAvailable ? (
                     <>
                       {hasSubItems ? (
-                        <Link
-                          href={item.href}
-                          onClick={() => {
-                            setExpandedMenu(item.id);
-                            onClose();
-                          }}
+                        <div
                           className={cn(
-                            "flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all",
-                            isActive
-                              ? "bg-primary-green/10 text-primary-green font-semibold"
-                              : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+                            "flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium",
+                            isActive ? `${item.activeLightClass} font-semibold` : "text-gray-600",
                           )}
                         >
                           <item.icon className="h-5 w-5" />
                           {item.label}
-                          <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", isExpanded ? "rotate-180" : "")} />
-                        </Link>
+                        </div>
                       ) : (
                         <Link
                           href={item.href}
                           onClick={onClose}
                           className={cn(
                             "flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all",
-                            isActive
-                              ? "bg-primary-green text-white shadow-md"
-                              : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+                            isActive ? item.activeClass : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
                           )}
                         >
                           <item.icon className="h-5 w-5" />
@@ -202,16 +196,14 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                         </Link>
                       )}
                       {/* Submenu */}
-                      {hasSubItems && isExpanded && (
+                      {hasSubItems && (
                         <div className="mt-2 flex flex-col gap-1 px-4">
                           <Link
                             href={item.href}
                             onClick={onClose}
                             className={cn(
                               "flex cursor-pointer items-center gap-3 rounded-xl px-4 py-2 text-sm font-medium transition-all",
-                              location === item.href
-                                ? "bg-primary-green text-white"
-                                : "bg-gray-100 text-gray-600 hover:bg-gray-200",
+                              location === item.href ? item.activeClass : "bg-gray-100 text-gray-600 hover:bg-gray-200",
                             )}
                           >
                             <Camera className="h-4 w-4" />
@@ -226,7 +218,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                                 onClick={onClose}
                                 className={cn(
                                   "flex cursor-pointer items-center gap-3 rounded-xl px-4 py-2 text-sm font-medium transition-all",
-                                  isSubActive ? "bg-primary-green text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200",
+                                  isSubActive ? item.activeClass : "bg-gray-100 text-gray-600 hover:bg-gray-200",
                                 )}
                               >
                                 <subItem.icon className="h-4 w-4" />
