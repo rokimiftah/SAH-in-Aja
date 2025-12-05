@@ -2,13 +2,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { useAuthActions } from "@convex-dev/auth/react";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import {
   Camera,
   ChevronUp,
   ExternalLink,
   FileText,
+  Gift,
   History,
+  Infinity as InfinityIcon,
   LayoutDashboard,
   LogOut,
   MessageCircle,
@@ -17,6 +19,7 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
+import { useToast } from "@shared/components/ui";
 import { BRANDING, FEATURES } from "@shared/config/branding";
 import { cn } from "@shared/lib";
 
@@ -28,9 +31,11 @@ interface CreditBadgeProps {
 }
 
 function CreditBadge({ remaining, limit }: CreditBadgeProps) {
-  // Cap remaining to limit (in case old data has higher values)
-  const cappedRemaining = Math.min(remaining, limit);
-  const isLow = cappedRemaining <= 1;
+  // Check if boosted (promo code applied) - credits > daily limit means boosted
+  const isBoosted = remaining > limit;
+  // Cap remaining to limit (in case old data has higher values) - unless boosted
+  const cappedRemaining = isBoosted ? remaining : Math.min(remaining, limit);
+  const isLow = !isBoosted && cappedRemaining <= 1;
   const isEmpty = cappedRemaining === 0;
   const [showTooltip, setShowTooltip] = useState(false);
   const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0, position: "right" as "right" | "top" });
@@ -78,10 +83,16 @@ function CreditBadge({ remaining, limit }: CreditBadgeProps) {
         onKeyDown={(e) => e.stopPropagation()}
         className={cn(
           "ml-auto inline-flex min-w-5 cursor-default items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold",
-          isEmpty ? "bg-red-100 text-red-600" : isLow ? "bg-amber-100 text-amber-600" : "bg-gray-300/80 text-gray-700",
+          isBoosted
+            ? "bg-linear-to-r from-purple-500 to-pink-500 text-white"
+            : isEmpty
+              ? "bg-red-100 text-red-600"
+              : isLow
+                ? "bg-amber-100 text-amber-600"
+                : "bg-gray-300/80 text-gray-700",
         )}
       >
-        {cappedRemaining}/{limit}
+        {isBoosted ? <InfinityIcon className="h-3 w-3" /> : `${cappedRemaining}/${limit}`}
       </span>
       {showTooltip &&
         createPortal(
@@ -183,8 +194,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   const { signOut } = useAuthActions();
+  const toast = useToast();
   const user = useQuery(api.users.getCurrentUser);
   const dailyCredits = useQuery(api.credits.getMyDailyCredits);
+  const applyPromoCode = useMutation(api.credits.applyPromoCode);
 
   const name = (user?.name ?? "").trim();
   const email = (user?.email ?? "").trim();
@@ -387,6 +400,48 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               userMenuOpen ? "translate-y-0 scale-100 opacity-100" : "pointer-events-none translate-y-2 scale-95 opacity-0",
             )}
           >
+            {/* Promo Code */}
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const form = e.target as HTMLFormElement;
+                const input = form.elements.namedItem("promoCode") as HTMLInputElement;
+                const code = input.value.trim();
+                if (!code) return;
+
+                input.value = "";
+                const btn = e.currentTarget.querySelector('button[type="submit"]') as HTMLButtonElement;
+                if (btn) btn.disabled = true;
+
+                try {
+                  const result = await applyPromoCode({ code });
+                  setUserMenuOpen(false);
+                  toast.success(result.message);
+                } catch {
+                  toast.error("Kode promo tidak valid");
+                }
+              }}
+              className="flex items-center gap-2 px-4 py-3"
+            >
+              <input
+                type="text"
+                name="promoCode"
+                placeholder="Kode promo"
+                onChange={(e) => {
+                  const btn = e.target.form?.querySelector('button[type="submit"]') as HTMLButtonElement;
+                  if (btn) btn.disabled = !e.target.value.trim();
+                }}
+                className="min-w-0 flex-1 rounded-lg border border-gray-200 px-2 py-1.5 text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none"
+              />
+              <button
+                type="submit"
+                disabled
+                className="shrink-0 cursor-pointer rounded-lg bg-linear-to-r from-purple-500 to-pink-500 p-1.5 text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Gift className="h-4 w-4" />
+              </button>
+            </form>
+            <div className="border-t border-gray-100" />
             <Link
               href="/dashboard/profile"
               onClick={() => {

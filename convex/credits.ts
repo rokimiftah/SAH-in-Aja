@@ -10,7 +10,7 @@ import { internalMutation, mutation, query } from "./_generated/server";
 const DAILY_LIMITS = {
   siapHalal: 3,
   dokumenHalal: 3,
-  asistenHalal: 3,
+  asistenHalal: 1,
 };
 
 // Get current date in UTC+7 (Asia/Jakarta)
@@ -74,11 +74,17 @@ export const getMyDailyCredits = query({
     const credits = await getDailyCredits(ctx, userId);
 
     // Return defaults if no record exists yet (will be created on first use)
-    // Cap values to current limits (in case old data has higher values)
+    // Only cap if value <= daily limit (not boosted by promo code)
+    const siapHalal = credits?.siapHalalCredits ?? DAILY_LIMITS.siapHalal;
+    const dokumenHalal = credits?.dokumenHalalCredits ?? DAILY_LIMITS.dokumenHalal;
+    const asistenHalal = credits?.asistenHalalChats ?? DAILY_LIMITS.asistenHalal;
+
     return {
-      siapHalalCredits: Math.min(credits?.siapHalalCredits ?? DAILY_LIMITS.siapHalal, DAILY_LIMITS.siapHalal),
-      dokumenHalalCredits: Math.min(credits?.dokumenHalalCredits ?? DAILY_LIMITS.dokumenHalal, DAILY_LIMITS.dokumenHalal),
-      asistenHalalChats: Math.min(credits?.asistenHalalChats ?? DAILY_LIMITS.asistenHalal, DAILY_LIMITS.asistenHalal),
+      siapHalalCredits: siapHalal > DAILY_LIMITS.siapHalal ? siapHalal : Math.min(siapHalal, DAILY_LIMITS.siapHalal),
+      dokumenHalalCredits:
+        dokumenHalal > DAILY_LIMITS.dokumenHalal ? dokumenHalal : Math.min(dokumenHalal, DAILY_LIMITS.dokumenHalal),
+      asistenHalalChats:
+        asistenHalal > DAILY_LIMITS.asistenHalal ? asistenHalal : Math.min(asistenHalal, DAILY_LIMITS.asistenHalal),
       limits: DAILY_LIMITS,
     };
   },
@@ -101,15 +107,19 @@ export const checkCredits = query({
     switch (args.feature) {
       case "siapHalal":
         limit = DAILY_LIMITS.siapHalal;
-        remaining = Math.min(credits?.siapHalalCredits ?? limit, limit);
+        remaining = credits?.siapHalalCredits ?? limit;
+        // Only cap if value <= daily limit (not boosted by promo code)
+        if (remaining <= limit) remaining = Math.min(remaining, limit);
         break;
       case "dokumenHalal":
         limit = DAILY_LIMITS.dokumenHalal;
-        remaining = Math.min(credits?.dokumenHalalCredits ?? limit, limit);
+        remaining = credits?.dokumenHalalCredits ?? limit;
+        if (remaining <= limit) remaining = Math.min(remaining, limit);
         break;
       case "asistenHalal":
         limit = DAILY_LIMITS.asistenHalal;
-        remaining = Math.min(credits?.asistenHalalChats ?? limit, limit);
+        remaining = credits?.asistenHalalChats ?? limit;
+        if (remaining <= limit) remaining = Math.min(remaining, limit);
         break;
     }
 
@@ -178,8 +188,11 @@ export const useAsistenHalalCredit = mutation({
 
     const credits = await getOrCreateDailyCredits(ctx, userId);
 
-    // Cap to current limit (in case old data has higher values)
-    const currentCredits = Math.min(credits.asistenHalalChats, DAILY_LIMITS.asistenHalal);
+    // Only cap if not boosted (credits <= limit means not boosted)
+    const currentCredits =
+      credits.asistenHalalChats > DAILY_LIMITS.asistenHalal
+        ? credits.asistenHalalChats
+        : Math.min(credits.asistenHalalChats, DAILY_LIMITS.asistenHalal);
 
     if (currentCredits <= 0) {
       throw new ConvexError("Kredit chat Asisten Halal habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
@@ -193,6 +206,81 @@ export const useAsistenHalalCredit = mutation({
     return {
       remaining: newCredits,
       limit: DAILY_LIMITS.asistenHalal,
+    };
+  },
+});
+
+// Apply promo code
+export const applyPromoCode = mutation({
+  args: {
+    code: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Silakan login terlebih dahulu");
+
+    const code = args.code.trim();
+
+    // Find promo code in database
+    const promoCode = await ctx.db
+      .query("promo_codes")
+      .withIndex("by_code", (q) => q.eq("code", code))
+      .first();
+
+    if (!promoCode) {
+      throw new ConvexError("Kode promo tidak valid");
+    }
+
+    // Check if promo code is active
+    if (!promoCode.isActive) {
+      throw new ConvexError("Kode promo sudah tidak aktif");
+    }
+
+    // Check if promo code has expired
+    if (promoCode.expiresAt && promoCode.expiresAt < Date.now()) {
+      throw new ConvexError("Kode promo sudah kadaluarsa");
+    }
+
+    // Check if max usage reached
+    if (promoCode.maxUsage && promoCode.usageCount >= promoCode.maxUsage) {
+      throw new ConvexError("Kode promo sudah mencapai batas penggunaan");
+    }
+
+    // Check if user already used this promo code
+    const existingUsage = await ctx.db
+      .query("promo_code_usages")
+      .withIndex("by_user_code", (q) => q.eq("userId", userId).eq("promoCodeId", promoCode._id))
+      .first();
+
+    if (existingUsage) {
+      throw new ConvexError("Anda sudah pernah menggunakan kode promo ini");
+    }
+
+    // Get or create daily credits
+    const credits = await getOrCreateDailyCredits(ctx, userId);
+
+    // Add credits from promo code
+    await ctx.db.patch(credits._id, {
+      siapHalalCredits: credits.siapHalalCredits + promoCode.credits,
+      dokumenHalalCredits: credits.dokumenHalalCredits + promoCode.credits,
+      asistenHalalChats: credits.asistenHalalChats + promoCode.credits,
+    });
+
+    // Record usage
+    await ctx.db.insert("promo_code_usages", {
+      userId,
+      promoCodeId: promoCode._id,
+      usedAt: Date.now(),
+    });
+
+    // Increment usage count
+    await ctx.db.patch(promoCode._id, {
+      usageCount: promoCode.usageCount + 1,
+    });
+
+    return {
+      success: true,
+      message: `Kode promo berhasil!`,
     };
   },
 });

@@ -103,35 +103,25 @@ export function useAsistenHalal(): UseAsistenHalalReturn {
 
         // Create consultation if first user message (uses credit)
         let currentConsultationId = consultationId;
-        console.log("[AsistenHalal] consultationId:", consultationId, "user:", user?._id, "creditStatus:", creditStatus);
 
         if (!currentConsultationId) {
-          console.log("[AsistenHalal] Creating new consultation...");
-
           // Wait for user to be loaded
           if (!user?._id) {
-            console.log("[AsistenHalal] User not loaded yet");
             throw new Error("Silakan tunggu sebentar, sedang memuat data pengguna...");
           }
 
           // Check and use credit for new chat
           if (!creditStatus?.hasCredits) {
-            console.log("[AsistenHalal] No credits available");
             throw new Error("Kredit chat Asisten Halal habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
           }
 
-          console.log("[AsistenHalal] Deducting credit...");
           await deductCredit();
-          console.log("[AsistenHalal] Credit deducted!");
 
           currentConsultationId = await createConsultation({
             userId: user._id,
             initialMessage: message.trim(),
           });
           setConsultationId(currentConsultationId);
-          console.log("[AsistenHalal] Consultation created:", currentConsultationId);
-        } else {
-          console.log("[AsistenHalal] Using existing consultation:", currentConsultationId);
         }
 
         // Build conversation history for context

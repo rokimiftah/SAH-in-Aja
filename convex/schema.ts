@@ -35,6 +35,26 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_user_date", ["userId", "date"]),
 
+  // Promo codes table - manage via Convex dashboard
+  promo_codes: defineTable({
+    code: v.string(), // The promo code (case-sensitive)
+    credits: v.number(), // Credits to add (e.g., 100)
+    maxUsage: v.optional(v.number()), // Max total usages (null = unlimited)
+    usageCount: v.number(), // Current usage count
+    expiresAt: v.optional(v.number()), // Expiration timestamp (null = never)
+    isActive: v.boolean(), // Can be deactivated without deleting
+    createdAt: v.number(),
+  }).index("by_code", ["code"]),
+
+  // Track which users have used which promo codes
+  promo_code_usages: defineTable({
+    userId: v.id("users"),
+    promoCodeId: v.id("promo_codes"),
+    usedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_code", ["userId", "promoCodeId"]),
+
   // Halal scans table (Siap Halal history)
   halal_scans: defineTable({
     userId: v.id("users"),
