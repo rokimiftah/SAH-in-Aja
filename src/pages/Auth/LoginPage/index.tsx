@@ -17,6 +17,8 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  const getDashboardRedirect = () => (typeof window !== "undefined" ? `${window.location.origin}/dashboard` : "/dashboard");
+
   // Redirect when authenticated
   useEffect(() => {
     if (!isAuthLoading && isAuthenticated) {
@@ -38,6 +40,7 @@ export default function LoginPage() {
 
     const formData = new FormData();
     formData.set("email", trimmedEmail);
+    formData.set("redirectTo", getDashboardRedirect());
 
     try {
       await signIn("magic-link", formData);
@@ -59,7 +62,7 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
     try {
-      await signIn("google");
+      await signIn("google", { redirectTo: getDashboardRedirect() });
     } catch (err: unknown) {
       const errorMessage =
         err instanceof ConvexError
@@ -74,7 +77,7 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
     try {
-      await signIn("github");
+      await signIn("github", { redirectTo: getDashboardRedirect() });
     } catch (err: unknown) {
       const errorMessage =
         err instanceof ConvexError

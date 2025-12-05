@@ -1,15 +1,26 @@
 import { useEffect, useState } from "react";
 
 import { useAuthActions } from "@convex-dev/auth/react";
+import { useConvexAuth } from "convex/react";
 import { useLocation } from "wouter";
 
 export default function MagicLinkPage() {
   const { signIn } = useAuthActions();
+  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [, navigate] = useLocation();
+
+  const getDashboardRedirect = () => (typeof window !== "undefined" ? `${window.location.origin}/dashboard` : "/dashboard");
+
+  // Redirect when authenticated
+  useEffect(() => {
+    if (!isAuthLoading && isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, isAuthLoading, navigate]);
 
   useEffect(() => {
     const search = typeof window !== "undefined" ? window.location.search : "";
@@ -20,10 +31,10 @@ export default function MagicLinkPage() {
     if (tokenParam && emailParam) {
       setToken(tokenParam);
       setEmail(decodeURIComponent(emailParam));
-    } else {
-      navigate("/");
+    } else if (!isAuthLoading && !isAuthenticated) {
+      navigate("/login");
     }
-  }, [navigate]);
+  }, [navigate, isAuthLoading, isAuthenticated]);
 
   const handleSignIn = async () => {
     if (!token || !email) return;
@@ -35,6 +46,7 @@ export default function MagicLinkPage() {
       const formData = new FormData();
       formData.set("code", token);
       formData.set("email", email);
+      formData.set("redirectTo", getDashboardRedirect());
 
       await signIn("magic-link", formData);
     } catch (_err) {
