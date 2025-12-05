@@ -58,7 +58,7 @@ export function IngredientsForm({ data, onChange }: IngredientsFormProps) {
                 value={ingredient.name}
                 onChange={(e) => updateIngredient(index, "name", e.target.value)}
                 placeholder="Nama bahan (contoh: Tepung Terigu)"
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
               />
 
               <input
@@ -66,13 +66,13 @@ export function IngredientsForm({ data, onChange }: IngredientsFormProps) {
                 value={ingredient.supplier}
                 onChange={(e) => updateIngredient(index, "supplier", e.target.value)}
                 placeholder="Supplier (contoh: PT Bogasari)"
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
               />
 
               <select
                 value={ingredient.halalStatus}
                 onChange={(e) => updateIngredient(index, "halalStatus", e.target.value)}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
               >
                 {HALAL_STATUS_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -88,7 +88,7 @@ export function IngredientsForm({ data, onChange }: IngredientsFormProps) {
       <button
         type="button"
         onClick={addIngredient}
-        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 py-3 text-sm font-medium text-gray-600 transition-colors hover:border-green-400 hover:text-green-600"
+        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 py-3 text-sm font-medium text-gray-600 transition-colors hover:border-blue-400 hover:text-blue-600"
       >
         <Plus className="h-4 w-4" />
         Tambah Bahan Lainnya

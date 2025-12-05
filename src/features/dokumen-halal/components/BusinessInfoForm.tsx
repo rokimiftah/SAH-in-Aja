@@ -30,7 +30,7 @@ export function BusinessInfoForm({ data, onChange }: BusinessInfoFormProps) {
             value={data.name}
             onChange={(e) => updateField("name", e.target.value)}
             placeholder="contoh: Warung Makan Bu Tini"
-            className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
+            className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
           />
         </label>
 
@@ -44,7 +44,7 @@ export function BusinessInfoForm({ data, onChange }: BusinessInfoFormProps) {
             value={data.owner}
             onChange={(e) => updateField("owner", e.target.value)}
             placeholder="contoh: Tini Sumarni"
-            className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
+            className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
           />
         </label>
 
@@ -58,7 +58,7 @@ export function BusinessInfoForm({ data, onChange }: BusinessInfoFormProps) {
             onChange={(e) => updateField("address", e.target.value)}
             placeholder="contoh: Jl. Pasar Baru No. 123, Bandung"
             rows={2}
-            className="w-full resize-none rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
+            className="w-full resize-none rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
           />
         </label>
 
@@ -72,7 +72,7 @@ export function BusinessInfoForm({ data, onChange }: BusinessInfoFormProps) {
             value={data.productType}
             onChange={(e) => updateField("productType", e.target.value)}
             placeholder="contoh: Makanan Siap Saji, Kue Basah, dll"
-            className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
+            className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
           />
         </label>
       </div>
