@@ -122,10 +122,10 @@ export function SiapHalalPage() {
               return (
                 <div
                   key={benefit}
-                  className="flex flex-nowrap items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 shadow-sm"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 shadow-sm sm:rounded-full"
                 >
                   <Icon className="text-primary-green h-4 w-4 shrink-0" />
-                  <span className="text-text-dark text-sm font-medium whitespace-nowrap">{benefit}</span>
+                  <span className="text-text-dark text-center text-sm font-medium sm:whitespace-nowrap">{benefit}</span>
                 </div>
               );
             })}
