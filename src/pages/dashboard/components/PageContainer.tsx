@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 interface BackButtonConfig {
   label?: string;
   onClick: () => void;
+  mobileOnly?: boolean;
 }
 
 interface PageContainerProps {
@@ -30,7 +31,7 @@ export function PageContainer({ children, backButton, centered = false, maxWidth
     <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
       {/* Back button area - sticky, tidak scroll */}
       {backButton && (
-        <div className="shrink-0 px-1 pt-1">
+        <div className={`shrink-0 px-1 pt-1 ${backButton.mobileOnly ? "lg:hidden" : ""}`}>
           <div className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
             <button
               type="button"
