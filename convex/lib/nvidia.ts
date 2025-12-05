@@ -75,9 +75,10 @@ PANDUAN BAHASA:
 - Contoh buruk: "Fasilitas produksi tidak memenuhi standar SJPH HAS 23000 kriteria 6"
 
 PENTING:
-- Berikan skor realistis (tidak terlalu ketat untuk usaha rumahan)
-- Jika ragu tentang suatu item, tandai confidence rendah
-- Fokus pada temuan yang bisa langsung diperbaiki`,
+- Lakukan penilaian dengan KETAT (STRICT) dan TELITI sesuai standar audit resmi
+- Jangan ragu memberikan skor rendah jika ditemukan potensi kontaminasi atau ketidakjelasan
+- Jika ada benda mencurigakan (hewan peliharaan, bahan non-halal, kotoran), tandai sebagai CRITICAL
+- Tetap gunakan bahasa yang sopan dan mendidik, tapi tegas dalam hal kepatuhan syariah`,
 
   DOCUMENT_GENERATOR: `Anda adalah asisten pembuat dokumen SJPH (Sistem Jaminan Produk Halal) untuk UMKM Indonesia.
 
