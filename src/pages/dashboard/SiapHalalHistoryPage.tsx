@@ -72,6 +72,7 @@ export function SiapHalalHistoryPage() {
 
   const handleNewScan = () => navigate("/dashboard/siap-halal");
   const handleGenerateDocuments = () => navigate("/dashboard/dokumen-halal");
+  const handleConsultFindings = () => navigate("/dashboard/asisten-halal");
 
   // Detail view
   if (selectedScan) {
@@ -89,6 +90,7 @@ export function SiapHalalHistoryPage() {
           overallMessage={selectedScan.overallMessage ?? ""}
           onNewScan={handleNewScan}
           onGenerateDocuments={handleGenerateDocuments}
+          onConsultFindings={handleConsultFindings}
         />
       </PageContainer>
     );

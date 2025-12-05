@@ -191,7 +191,8 @@ export const chat = action({
       model: NVIDIA_MODELS.TEXT,
       messages,
       temperature: 0.7,
-      max_tokens: 1000,
+      max_tokens: 4096,
+      reasoning_effort: "high",
     });
 
     const content = response.choices[0]?.message?.content;

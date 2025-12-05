@@ -10,6 +10,7 @@ import {
   FileText,
   Info,
   MapPin,
+  MessageCircle,
   Share2,
   ShieldCheck,
   ShieldX,
@@ -34,6 +35,7 @@ interface AnalysisResultsProps {
   overallMessage: string;
   onNewScan: () => void;
   onGenerateDocuments: () => void;
+  onConsultFindings?: () => void;
 }
 
 function ScoreBadge({ score }: { score: number }) {
@@ -227,6 +229,7 @@ export function AnalysisResults({
   overallMessage,
   onNewScan,
   onGenerateDocuments,
+  onConsultFindings,
 }: AnalysisResultsProps) {
   const criticalFindings = findings.filter((f) => f.type === "critical");
   const warningFindings = findings.filter((f) => f.type === "warning");
@@ -396,6 +399,18 @@ https://sahin.biz.id`;
             <span>Bagikan</span>
           </button>
         </div>
+
+        {/* Consult Findings - Cross Feature */}
+        {onConsultFindings && (criticalFindings.length > 0 || warningFindings.length > 0) && (
+          <button
+            type="button"
+            onClick={onConsultFindings}
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-orange-200 bg-orange-50 px-4 py-3 text-sm font-medium text-orange-700 transition-all hover:border-orange-300 hover:bg-orange-100 sm:py-3.5 sm:text-base"
+          >
+            <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span>Tanya Cara Perbaiki Temuan</span>
+          </button>
+        )}
       </div>
 
       {/* Official Resources */}

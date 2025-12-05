@@ -5,6 +5,7 @@ import { Link, Route, Switch } from "wouter";
 
 import { BRANDING } from "@shared/config/branding";
 
+import { AsistenHalalHistoryPage } from "./AsistenHalalHistoryPage";
 import { AsistenHalalPage } from "./AsistenHalalPage";
 import { Sidebar } from "./components";
 import { DashboardHomePage } from "./DashboardHomePage";
@@ -46,6 +47,7 @@ export function DashboardLayout() {
             <Route path="/dashboard/siap-halal" component={SiapHalalPage} />
             <Route path="/dashboard/dokumen-halal/history" component={DokumenHalalHistoryPage} />
             <Route path="/dashboard/dokumen-halal" component={DokumenHalalPage} />
+            <Route path="/dashboard/asisten-halal/history" component={AsistenHalalHistoryPage} />
             <Route path="/dashboard/asisten-halal" component={AsistenHalalPage} />
             <Route path="/dashboard/profile" component={EditProfilePage} />
             <Route>

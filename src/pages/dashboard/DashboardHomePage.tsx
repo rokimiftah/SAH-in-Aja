@@ -10,6 +10,7 @@ export function DashboardHomePage() {
   const user = useQuery(api.users.getCurrentUser);
   const scans = useQuery(api.halalScans.getMyScans);
   const documents = useQuery(api.halalDocuments.getMyDocuments);
+  const consultations = useQuery(api.halalConsultations.getByUser, user?._id ? { userId: user._id } : "skip");
   const name = (user?.name ?? "").trim();
   const email = (user?.email ?? "").trim();
   const displayName = name || email?.split("@")[0] || "Pengguna";
@@ -26,7 +27,7 @@ export function DashboardHomePage() {
         <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3 lg:gap-6">
           <StatsCard label="Total Scan" value={scans?.length ?? 0} icon={Camera} variant="emerald" />
           <StatsCard label="Dokumen" value={documents?.length ?? 0} icon={FileText} variant="blue" />
-          <StatsCard label="Konsultasi" value={0} icon={MessageCircle} variant="orange" />
+          <StatsCard label="Konsultasi" value={consultations?.length ?? 0} icon={MessageCircle} variant="orange" />
         </div>
 
         {/* Features */}
@@ -61,7 +62,7 @@ export function DashboardHomePage() {
               ctaText={FEATURES.asistenHalal.cta.primary}
               href="/dashboard/asisten-halal"
               gradient="bg-gradient-to-br from-orange-500 to-rose-500"
-              available={false}
+              available={true}
             />
           </div>
         </div>

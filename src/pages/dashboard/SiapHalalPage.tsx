@@ -63,6 +63,7 @@ export function SiapHalalPage() {
   };
 
   const handleGenerateDocuments = () => navigate("/dashboard/dokumen-halal");
+  const handleConsultFindings = () => navigate("/dashboard/asisten-halal");
 
   const handleRetry = () => {
     reset();
@@ -202,6 +203,7 @@ export function SiapHalalPage() {
           overallMessage={result.overallMessage}
           onNewScan={handleNewScan}
           onGenerateDocuments={handleGenerateDocuments}
+          onConsultFindings={handleConsultFindings}
         />
       )}
     </PageContainer>

@@ -69,9 +69,17 @@ const NAV_ITEMS = [
     label: FEATURES.asistenHalal.name,
     icon: MessageCircle,
     href: "/dashboard/asisten-halal",
-    available: false,
+    available: true,
     activeClass: "bg-gradient-to-r from-orange-500 to-rose-500 text-white shadow-md",
     activeLightClass: "bg-orange-50 text-orange-700",
+    subItems: [
+      {
+        id: "asisten-halal-history",
+        label: "Riwayat",
+        icon: History,
+        href: "/dashboard/asisten-halal/history",
+      },
+    ],
   },
 ];
 
@@ -95,7 +103,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const name = (user?.name ?? "").trim();
   const email = (user?.email ?? "").trim();
-  const hasName = !!name;
   const image = typeof user?.image === "string" ? user.image : undefined;
   const storageId = user?.storageId;
 
@@ -113,7 +120,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   }, [name, email]);
 
   const avatarUrl =
-    image || `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(initials)}&backgroundColor=10b981`;
+    image || `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(initials)}&backgroundColor=525252`;
 
   // Use storageId as key to force image element refresh when avatar changes
   const avatarKey = storageId ? String(storageId) : initials;
@@ -219,7 +226,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                             )}
                           >
                             <item.icon className="h-4 w-4" />
-                            {item.id === "siap-halal" ? "Analisis Baru" : "Buat Dokumen"}
+                            {item.id === "siap-halal"
+                              ? "Analisis Baru"
+                              : item.id === "asisten-halal"
+                                ? "Konsultasi Baru"
+                                : "Buat Dokumen"}
                           </Link>
                           {item.subItems.map((subItem) => {
                             const isSubActive = location === subItem.href;
@@ -308,8 +319,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           >
             <img key={avatarKey} src={avatarUrl} alt="Avatar" className="h-10 w-10 rounded-full shadow-sm ring-2 ring-white" />
             <div className="min-w-0 flex-1 text-left">
-              <p className="truncate text-sm font-semibold text-gray-800">{hasName ? name : "Pengguna"}</p>
-              <p className="truncate text-xs text-gray-500">{email || "pengguna@email.com"}</p>
+              <p className="truncate text-sm font-semibold text-gray-800">{name}</p>
+              <p className="truncate text-xs text-gray-500">{email}</p>
             </div>
             <ChevronUp className={cn("h-4 w-4 text-gray-400 transition-transform", userMenuOpen ? "rotate-180" : "")} />
           </button>
