@@ -5,6 +5,7 @@ import LoginPage from "@pages/Auth/LoginPage";
 import MagicLinkPage from "@pages/Auth/MagicLinkPage";
 import { DashboardLayout } from "@pages/dashboard";
 import { LandingPage } from "@pages/landing";
+import { PrivacyPage, TermsPage } from "@pages/legal";
 
 import "./styles/global.css";
 
@@ -12,6 +13,8 @@ export const App = () => {
   return (
     <Switch>
       <Route path="/" component={LandingPage} />
+      <Route path="/terms" component={TermsPage} />
+      <Route path="/privacy" component={PrivacyPage} />
 
       {/* Login Page */}
       <Route path="/login">
