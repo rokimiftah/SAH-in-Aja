@@ -9,6 +9,7 @@ import { AsistenHalalPage } from "./AsistenHalalPage";
 import { Sidebar } from "./components";
 import { DashboardHomePage } from "./DashboardHomePage";
 import { DokumenHalalPage } from "./DokumenHalalPage";
+import { EditProfilePage } from "./EditProfilePage";
 import { SiapHalalPage } from "./SiapHalalPage";
 
 export function DashboardLayout() {
@@ -42,6 +43,7 @@ export function DashboardLayout() {
             <Route path="/dashboard/siap-halal" component={SiapHalalPage} />
             <Route path="/dashboard/dokumen-halal" component={DokumenHalalPage} />
             <Route path="/dashboard/asisten-halal" component={AsistenHalalPage} />
+            <Route path="/dashboard/profile" component={EditProfilePage} />
             <Route>
               <div className="flex h-full items-center justify-center rounded-2xl border border-gray-200 bg-white">
                 <h1 className="text-xl font-bold text-gray-600">Halaman tidak ditemukan</h1>

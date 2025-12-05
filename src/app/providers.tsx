@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { ToastProvider } from "@shared/components/ui";
 import { ConvexClientProvider } from "@shared/lib";
 
 interface ProvidersProps {
@@ -7,5 +8,9 @@ interface ProvidersProps {
 }
 
 export const Providers = ({ children }: ProvidersProps) => {
-  return <ConvexClientProvider>{children}</ConvexClientProvider>;
+  return (
+    <ConvexClientProvider>
+      <ToastProvider>{children}</ToastProvider>
+    </ConvexClientProvider>
+  );
 };

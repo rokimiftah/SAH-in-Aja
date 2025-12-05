@@ -110,9 +110,11 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         if (args.type === "oauth" && !existingUser.emailVerificationTime) {
           updates.emailVerificationTime = Date.now();
         }
-        if (image && !existingUser.image) {
+        // Only update image if user hasn't set a custom one (no storageId means using OAuth image)
+        if (image && !existingUser.image && !existingUser.storageId) {
           updates.image = image;
         }
+        // Only update name if user hasn't set a custom one
         if (name && !existingUser.name) {
           updates.name = name;
         }

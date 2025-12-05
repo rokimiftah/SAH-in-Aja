@@ -195,14 +195,17 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               userMenuOpen ? "translate-y-0 scale-100 opacity-100" : "pointer-events-none translate-y-2 scale-95 opacity-0",
             )}
           >
-            <button
-              type="button"
-              onClick={() => setUserMenuOpen(false)}
+            <Link
+              href="/dashboard/profile"
+              onClick={() => {
+                setUserMenuOpen(false);
+                onClose();
+              }}
               className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
             >
               <UserPen className="h-4 w-4" />
               Edit Profile
-            </button>
+            </Link>
             <div className="border-t border-gray-100" />
             <button
               type="button"
