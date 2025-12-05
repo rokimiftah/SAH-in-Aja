@@ -69,11 +69,21 @@ export const analyzeKitchen = action({
 
     // Strip markdown code blocks if present (```json ... ``` or ``` ... ```)
     let jsonContent = content.trim();
-    if (jsonContent.startsWith("```")) {
-      // Remove opening ```json or ```
-      jsonContent = jsonContent.replace(/^```(?:json)?\s*\n?/, "");
-      // Remove closing ```
-      jsonContent = jsonContent.replace(/\n?```\s*$/, "");
+
+    // Handle various markdown code block formats
+    // Match ```json, ```JSON, ``` followed by optional whitespace/newline
+    const codeBlockMatch = jsonContent.match(/^```(?:json|JSON)?\s*([\s\S]*?)\s*```$/);
+    if (codeBlockMatch) {
+      jsonContent = codeBlockMatch[1].trim();
+    } else if (jsonContent.startsWith("```")) {
+      // Fallback: remove opening and closing backticks
+      jsonContent = jsonContent.replace(/^```(?:json|JSON)?\s*/, "").replace(/\s*```$/, "");
+    }
+
+    // Also try to extract JSON object if there's extra text
+    const jsonObjectMatch = jsonContent.match(/\{[\s\S]*\}/);
+    if (jsonObjectMatch) {
+      jsonContent = jsonObjectMatch[0];
     }
 
     try {
