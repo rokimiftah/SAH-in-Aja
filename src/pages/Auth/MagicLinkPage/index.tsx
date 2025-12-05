@@ -60,7 +60,7 @@ export default function MagicLinkPage() {
   }
 
   return (
-    <div className="bg-bg-cream font-poppins flex min-h-screen items-center justify-center px-4 py-8">
+    <div className="bg-bg-cream font-poppins flex min-h-dvh items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
         {/* Card */}
         <div className="border-primary-green rounded-(--radius-card) border-4 bg-white p-6 shadow-lg sm:p-8">
