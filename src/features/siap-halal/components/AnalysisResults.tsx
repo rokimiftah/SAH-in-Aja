@@ -307,7 +307,7 @@ https://sahin.biz.id`;
         <div className="mb-6">
           <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-red-600">
             <XCircle className="h-5 w-5" />
-            Harus Diperbaiki
+            Wajib Diperbaiki
             <span className="rounded-full bg-red-100 px-2 py-0.5 text-sm">{criticalFindings.length}</span>
           </h3>
           <div className="space-y-3">
