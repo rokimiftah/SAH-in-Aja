@@ -3,13 +3,14 @@ import type { Id } from "../../../convex/_generated/dataModel";
 import { useRef, useState } from "react";
 
 import { useMutation, useQuery } from "convex/react";
-import { ArrowLeft, Check, Github, Loader2, Mail, Upload } from "lucide-react";
+import { Check, Github, Loader2, Mail, Upload } from "lucide-react";
 import { useLocation } from "wouter";
 
 import { useToast } from "@shared/components/ui";
 import { cn } from "@shared/lib";
 
 import { api } from "../../../convex/_generated/api";
+import { PageContainer } from "./components";
 
 const PROVIDER_ICONS: Record<string, React.ReactNode> = {
   github: <Github className="h-4 w-4" />,
@@ -94,8 +95,7 @@ export function EditProfilePage() {
     }
 
     setSelectedFile(file);
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
+    setPreviewUrl(URL.createObjectURL(file));
   };
 
   const handleSave = async () => {
@@ -115,9 +115,7 @@ export function EditProfilePage() {
           body: selectedFile,
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to upload image");
-        }
+        if (!response.ok) throw new Error("Failed to upload image");
 
         const { storageId: uploadedId } = (await response.json()) as { storageId: Id<"_storage"> };
         storageId = uploadedId;
@@ -152,116 +150,102 @@ export function EditProfilePage() {
   }
 
   return (
-    <div className="flex h-full items-center justify-center overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-      <div className="max-h-full w-full overflow-y-auto p-6 lg:p-8">
-        <div className="mx-auto max-w-xl">
-          {/* Back button - Mobile only */}
-          <button
-            type="button"
-            onClick={() => navigate("/dashboard")}
-            className="mb-5 flex items-center gap-2 text-sm text-gray-600 transition-colors hover:text-gray-800 lg:hidden"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Kembali
-          </button>
-
-          {/* Header */}
-          <div className="mb-8 text-center">
-            <h1 className="text-2xl font-bold text-gray-800 lg:text-3xl">Edit Profil</h1>
-            <p className="mt-2 text-gray-600">Perbarui foto dan nama Anda</p>
-          </div>
-
-          {/* Avatar Section */}
-          <div className="mb-8 flex flex-col items-center">
-            <div className="mb-4">
-              <img
-                src={avatarUrl}
-                alt="Avatar"
-                className="h-32 w-32 rounded-full border-4 border-white object-cover shadow-lg ring-2 ring-gray-200"
-              />
-              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
-            </div>
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="flex cursor-pointer items-center gap-2 text-sm font-medium text-emerald-600 transition-colors hover:text-emerald-700"
-            >
-              <Upload className="h-4 w-4" />
-              Ganti Foto
-            </button>
-          </div>
-
-          {/* Name Input */}
-          <div className="mb-8">
-            <label htmlFor="name" className="mb-2 block text-sm font-medium text-gray-700">
-              Nama
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={currentName}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Masukkan nama Anda"
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-800 transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
-            />
-          </div>
-
-          {/* Email (Read-only) */}
-          <div className="mb-8">
-            <span className="mb-2 block text-sm font-medium text-gray-700">Email</span>
-            <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-600">{user.email || "-"}</div>
-            <p className="mt-1.5 text-xs text-gray-500">Email tidak dapat diubah</p>
-          </div>
-
-          {/* Linked Providers */}
-          <div className="mb-8">
-            <span className="mb-2 block text-sm font-medium text-gray-700">Metode Login Terhubung</span>
-            <div className="space-y-2">
-              {linkedProviders.length > 0 ? (
-                linkedProviders.map((provider) => (
-                  <div key={provider} className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
-                    <span className="text-gray-600">{PROVIDER_ICONS[provider] || <Mail className="h-4 w-4" />}</span>
-                    <span className="text-sm font-medium text-gray-700">{PROVIDER_NAMES[provider] || provider}</span>
-                    <Check className="ml-auto h-4 w-4 text-emerald-500" />
-                  </div>
-                ))
-              ) : (
-                <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-center text-sm text-gray-500">
-                  Tidak ada provider terhubung
-                </div>
-              )}
-            </div>
-            <p className="mt-1.5 text-xs text-gray-500">Profil Anda akan tersinkronisasi di semua metode login</p>
-          </div>
-
-          {/* Save Button */}
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={!hasChanges || saving}
-            className={cn(
-              "flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 font-semibold transition-all",
-              hasChanges && !saving
-                ? "cursor-pointer bg-emerald-500 text-white shadow-md hover:bg-emerald-600 hover:shadow-lg"
-                : "cursor-not-allowed bg-gray-100 text-gray-400",
-            )}
-          >
-            {saving ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Menyimpan...
-              </>
-            ) : saved ? (
-              <>
-                <Check className="h-5 w-5" />
-                Tersimpan!
-              </>
-            ) : (
-              "Simpan Perubahan"
-            )}
-          </button>
-        </div>
+    <PageContainer backButton={{ onClick: () => navigate("/dashboard") }} centered maxWidth="xl">
+      {/* Header */}
+      <div className="mb-8 text-center">
+        <h1 className="text-2xl font-bold text-gray-800 lg:text-3xl">Edit Profil</h1>
+        <p className="mt-2 text-gray-600">Perbarui foto dan nama Anda</p>
       </div>
-    </div>
+
+      {/* Avatar Section */}
+      <div className="mb-8 flex flex-col items-center">
+        <div className="mb-4">
+          <img
+            src={avatarUrl}
+            alt="Avatar"
+            className="h-32 w-32 rounded-full border-4 border-white object-cover shadow-lg ring-2 ring-gray-200"
+          />
+          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
+        </div>
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="flex cursor-pointer items-center gap-2 text-sm font-medium text-emerald-600 transition-colors hover:text-emerald-700"
+        >
+          <Upload className="h-4 w-4" />
+          Ganti Foto
+        </button>
+      </div>
+
+      {/* Name Input */}
+      <div className="mb-8">
+        <label htmlFor="name" className="mb-2 block text-sm font-medium text-gray-700">
+          Nama
+        </label>
+        <input
+          id="name"
+          type="text"
+          value={currentName}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Masukkan nama Anda"
+          className="w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-800 transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
+        />
+      </div>
+
+      {/* Email (Read-only) */}
+      <div className="mb-8">
+        <span className="mb-2 block text-sm font-medium text-gray-700">Email</span>
+        <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-600">{user.email || "-"}</div>
+        <p className="mt-1.5 text-xs text-gray-500">Email tidak dapat diubah</p>
+      </div>
+
+      {/* Linked Providers */}
+      <div className="mb-8">
+        <span className="mb-2 block text-sm font-medium text-gray-700">Metode Login Terhubung</span>
+        <div className="space-y-2">
+          {linkedProviders.length > 0 ? (
+            linkedProviders.map((provider) => (
+              <div key={provider} className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+                <span className="text-gray-600">{PROVIDER_ICONS[provider] || <Mail className="h-4 w-4" />}</span>
+                <span className="text-sm font-medium text-gray-700">{PROVIDER_NAMES[provider] || provider}</span>
+                <Check className="ml-auto h-4 w-4 text-emerald-500" />
+              </div>
+            ))
+          ) : (
+            <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-center text-sm text-gray-500">
+              Tidak ada provider terhubung
+            </div>
+          )}
+        </div>
+        <p className="mt-1.5 text-xs text-gray-500">Profil Anda akan tersinkronisasi di semua metode login</p>
+      </div>
+
+      {/* Save Button */}
+      <button
+        type="button"
+        onClick={handleSave}
+        disabled={!hasChanges || saving}
+        className={cn(
+          "flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 font-semibold transition-all",
+          hasChanges && !saving
+            ? "cursor-pointer bg-emerald-500 text-white shadow-md hover:bg-emerald-600 hover:shadow-lg"
+            : "cursor-not-allowed bg-gray-100 text-gray-400",
+        )}
+      >
+        {saving ? (
+          <>
+            <Loader2 className="h-5 w-5 animate-spin" />
+            Menyimpan...
+          </>
+        ) : saved ? (
+          <>
+            <Check className="h-5 w-5" />
+            Tersimpan!
+          </>
+        ) : (
+          "Simpan Perubahan"
+        )}
+      </button>
+    </PageContainer>
   );
 }
