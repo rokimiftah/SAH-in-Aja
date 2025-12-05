@@ -15,7 +15,6 @@ import {
   RotateCcw,
   Snowflake,
   Sparkles,
-  X,
 } from "lucide-react";
 
 import { cn } from "@shared/lib";
@@ -87,7 +86,7 @@ interface CapturedPhoto {
   preview: string;
 }
 
-export function PhotoCapture({ onPhotosComplete, onCancel }: PhotoCaptureProps) {
+export function PhotoCapture({ onPhotosComplete }: PhotoCaptureProps) {
   const [capturedPhotos, setCapturedPhotos] = useState<CapturedPhoto[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [isCompressing, setIsCompressing] = useState(false);
@@ -165,13 +164,6 @@ export function PhotoCapture({ onPhotosComplete, onCancel }: PhotoCaptureProps) 
             {capturedPhotos.length}/{PHOTO_GUIDES.length} foto diambil
           </p>
         </div>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="hidden rounded-full bg-gray-100 p-2 text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-700 lg:block"
-        >
-          <X className="h-5 w-5 cursor-pointer" />
-        </button>
       </div>
 
       {/* Progress Bar */}
