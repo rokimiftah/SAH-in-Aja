@@ -6,6 +6,7 @@ import MagicLinkPage from "@pages/Auth/MagicLinkPage";
 import { DashboardLayout } from "@pages/dashboard";
 import { LandingPage } from "@pages/landing";
 import { PrivacyPage, TermsPage } from "@pages/legal";
+import { NotFoundPage } from "@pages/not-found";
 
 import "./styles/global.css";
 
@@ -72,9 +73,7 @@ export const App = () => {
 
       <Route>
         {/* 404 fallback */}
-        <div className="flex min-h-screen items-center justify-center">
-          <h1 className="text-2xl font-bold">404 - Halaman tidak ditemukan</h1>
-        </div>
+        <NotFoundPage />
       </Route>
     </Switch>
   );
