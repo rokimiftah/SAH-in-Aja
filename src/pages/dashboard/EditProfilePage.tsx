@@ -99,12 +99,6 @@ export function EditProfilePage() {
       const compressed = await compressImage(file, 256, 0.8);
       setCompressedBlob(compressed);
       setPreviewUrl(URL.createObjectURL(compressed));
-
-      // Log compression result
-      const reduction = ((1 - compressed.size / file.size) * 100).toFixed(1);
-      console.log(
-        `Image compressed: ${(file.size / 1024).toFixed(1)}KB → ${(compressed.size / 1024).toFixed(1)}KB (${reduction}% smaller)`,
-      );
     } catch (err) {
       console.error("Failed to compress image:", err);
       toast.error("Gagal memproses gambar. Coba gambar lain.");
