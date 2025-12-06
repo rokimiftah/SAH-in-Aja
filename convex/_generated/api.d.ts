@@ -18,8 +18,8 @@ import type * as halalConsultations from "../halalConsultations.js";
 import type * as halalDocuments from "../halalDocuments.js";
 import type * as halalScans from "../halalScans.js";
 import type * as http from "../http.js";
+import type * as lib_kolosal from "../lib/kolosal.js";
 import type * as lib_magicLink from "../lib/magicLink.js";
-import type * as lib_nvidia from "../lib/nvidia.js";
 import type * as storage from "../storage.js";
 import type * as users from "../users.js";
 
@@ -40,8 +40,8 @@ declare const fullApi: ApiFromModules<{
   halalDocuments: typeof halalDocuments;
   halalScans: typeof halalScans;
   http: typeof http;
+  "lib/kolosal": typeof lib_kolosal;
   "lib/magicLink": typeof lib_magicLink;
-  "lib/nvidia": typeof lib_nvidia;
   storage: typeof storage;
   users: typeof users;
 }>;

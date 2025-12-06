@@ -1,43 +1,65 @@
 import { v } from "convex/values";
 
 import { action } from "./_generated/server";
-import { createNvidiaClient, NVIDIA_MODELS, SYSTEM_PROMPTS } from "./lib/nvidia";
+import { createKolosalClient, KOLOSAL_MODELS, SYSTEM_PROMPTS } from "./lib/kolosal";
+
+// Helper function to convert ArrayBuffer to base64 (works in Convex runtime)
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+// Helper function to convert image URL to base64
+async function urlToBase64(url: string): Promise<string> {
+  const response = await fetch(url);
+  const arrayBuffer = await response.arrayBuffer();
+  const base64 = arrayBufferToBase64(arrayBuffer);
+  const contentType = response.headers.get("content-type") || "image/jpeg";
+  return `data:${contentType};base64,${base64}`;
+}
 
 export const analyzeKitchen = action({
   args: {
     photoStorageIds: v.array(v.id("_storage")),
   },
   handler: async (ctx, args) => {
-    const apiKey = process.env.NVIDIA_API_KEY;
+    const apiKey = process.env.KOLOSAL_API_KEY;
     if (!apiKey) {
-      throw new Error("NVIDIA_API_KEY not configured");
+      throw new Error("KOLOSAL_API_KEY not configured");
     }
 
-    // Convert storage IDs to URLs
+    // Convert storage IDs to URLs and then to base64
     const photoUrls: string[] = [];
+    const imageBase64List: string[] = [];
     for (const storageId of args.photoStorageIds) {
       const url = await ctx.storage.getUrl(storageId);
       if (url) {
         photoUrls.push(url);
+        const base64 = await urlToBase64(url);
+        imageBase64List.push(base64);
       }
     }
 
-    if (photoUrls.length === 0) {
+    if (imageBase64List.length === 0) {
       throw new Error("No valid photo URLs");
     }
 
-    const nvidia = createNvidiaClient(apiKey);
+    const kolosal = createKolosalClient(apiKey);
 
-    // Build message content with images
-    const imageContents = photoUrls.map((url) => ({
+    // Build message content with base64 images
+    const imageContents = imageBase64List.map((base64Url) => ({
       type: "image_url" as const,
-      image_url: { url },
+      image_url: { url: base64Url },
     }));
 
-    let response: Awaited<ReturnType<typeof nvidia.chat.completions.create>>;
+    let response: Awaited<ReturnType<typeof kolosal.chat.completions.create>>;
     try {
-      response = await nvidia.chat.completions.create({
-        model: NVIDIA_MODELS.VISION,
+      response = await kolosal.chat.completions.create({
+        model: KOLOSAL_MODELS.VISION,
         messages: [
           {
             role: "system",
@@ -58,7 +80,7 @@ export const analyzeKitchen = action({
         max_tokens: 2000,
       });
     } catch (apiError) {
-      console.error("NVIDIA API Error:", apiError);
+      console.error("Kolosal API Error:", apiError);
       throw new Error(`AI API Error: ${apiError instanceof Error ? apiError.message : "Unknown error"}`);
     }
 

@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 
 import { action } from "./_generated/server";
-import { createNvidiaClient, NVIDIA_MODELS, SYSTEM_PROMPTS } from "./lib/nvidia";
+import { createKolosalClient, KOLOSAL_MODELS, SYSTEM_PROMPTS } from "./lib/kolosal";
 
 // Comprehensive FAQ database for halal certification
 const HALAL_FAQS: Array<{ keywords: string[]; question: string; answer: string; category: string }> = [
@@ -1255,7 +1255,7 @@ export const chat = action({
     }
 
     // Fallback to LLM
-    const apiKey = process.env.NVIDIA_API_KEY;
+    const apiKey = process.env.KOLOSAL_API_KEY;
     if (!apiKey) {
       return {
         response: "Maaf, sistem sedang tidak tersedia. Silakan coba lagi nanti atau hubungi BPJPH di 1500-363.",
@@ -1264,7 +1264,7 @@ export const chat = action({
       };
     }
 
-    const nvidia = createNvidiaClient(apiKey);
+    const kolosal = createKolosalClient(apiKey);
 
     // Build context from user data
     let contextPrompt = "";
@@ -1297,12 +1297,11 @@ export const chat = action({
       content: args.message,
     });
 
-    const response = await nvidia.chat.completions.create({
-      model: NVIDIA_MODELS.TEXT,
+    const response = await kolosal.chat.completions.create({
+      model: KOLOSAL_MODELS.TEXT,
       messages,
       temperature: 0.7,
       max_tokens: 4096,
-      reasoning_effort: "high",
     });
 
     const content = response.choices[0]?.message?.content;

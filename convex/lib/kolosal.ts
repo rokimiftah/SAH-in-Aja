@@ -1,19 +1,31 @@
 import OpenAI from "openai";
 
-// NVIDIA API client (OpenAI-compatible)
-export const createNvidiaClient = (apiKey: string) => {
+/**
+ * Kolosal API Integration
+ *
+ * CATATAN: Sebelumnya menggunakan NVIDIA API (build.nvidia.com) selama development
+ * karena memiliki free credits yang cukup untuk testing. Kolosal API digunakan
+ * untuk production/demo agar kredit Kolosal tidak habis selama development.
+ *
+ * Jika ingin development dengan NVIDIA, gunakan branch terpisah atau
+ * set KOLOSAL_API_KEY dengan NVIDIA API key dan ubah baseURL ke:
+ * https://integrate.api.nvidia.com/v1
+ */
+
+// Kolosal API client (OpenAI-compatible)
+export const createKolosalClient = (apiKey: string) => {
   return new OpenAI({
     apiKey,
-    baseURL: "https://integrate.api.nvidia.com/v1",
+    baseURL: "https://api.kolosal.ai/v1",
   });
 };
 
 // Models
-export const NVIDIA_MODELS = {
-  // Vision AI - for Siap Halal photo analysis
-  VISION: "mistralai/mistral-large-3-675b-instruct-2512",
-  // Text AI - for Dokumen Halal & Asisten Halal
-  TEXT: "openai/gpt-oss-120b",
+export const KOLOSAL_MODELS = {
+  // Vision AI - for Siap Halal photo analysis (Claude Sonnet 4.5 supports vision)
+  VISION: "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+  // Text AI - for Dokumen Halal & Asisten Halal (cheapest option)
+  TEXT: "meta-llama/llama-4-maverick-17b-128e-instruct",
 } as const;
 
 // System prompts

@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 
 import { action } from "./_generated/server";
-import { SYSTEM_PROMPTS } from "./lib/nvidia";
+import { KOLOSAL_MODELS, SYSTEM_PROMPTS } from "./lib/kolosal";
 
 const TEMPLATE_PROMPTS: Record<string, string> = {
   sop_produksi: `Buat SOP Produksi Halal yang mencakup:
@@ -71,9 +71,9 @@ export const generateHalalDocument = action({
     ),
   },
   handler: async (_ctx, args) => {
-    const apiKey = process.env.NVIDIA_API_KEY;
+    const apiKey = process.env.KOLOSAL_API_KEY;
     if (!apiKey) {
-      throw new Error("NVIDIA_API_KEY not configured");
+      throw new Error("KOLOSAL_API_KEY not configured");
     }
 
     const templatePrompt = TEMPLATE_PROMPTS[args.templateType] || TEMPLATE_PROMPTS.sop_produksi;
@@ -94,7 +94,7 @@ TANGGAL HARI INI: ${new Date().toLocaleDateString("id-ID", { day: "numeric", mon
 Buat dokumen lengkap dalam bahasa Indonesia formal. Gunakan tahun ${new Date().toLocaleDateString("id-ID", { year: "numeric", timeZone: "Asia/Jakarta" })} untuk nomor dokumen.`;
 
     try {
-      const response = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+      const response = await fetch("https://api.kolosal.ai/v1/chat/completions", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
@@ -102,7 +102,7 @@ Buat dokumen lengkap dalam bahasa Indonesia formal. Gunakan tahun ${new Date().t
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "mistralai/mistral-large-3-675b-instruct-2512",
+          model: KOLOSAL_MODELS.TEXT,
           messages: [
             {
               role: "system",
@@ -123,7 +123,7 @@ Buat dokumen lengkap dalam bahasa Indonesia formal. Gunakan tahun ${new Date().t
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("NVIDIA API error:", response.status, errorText);
+        console.error("Kolosal API error:", response.status, errorText);
         throw new Error(`API error: ${response.status}`);
       }
 
