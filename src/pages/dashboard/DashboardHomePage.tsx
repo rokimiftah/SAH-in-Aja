@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useQuery } from "convex/react";
 import { Camera, FileText, MessageCircle } from "lucide-react";
@@ -26,8 +26,15 @@ export function DashboardHomePage() {
   const name = (user?.name ?? "").trim();
   const email = (user?.email ?? "").trim();
   const displayName = name || email?.split("@")[0] || "";
-  const isLoaded = user !== undefined;
   const timeGreeting = useMemo(() => getTimeBasedGreeting(), []);
+  const [showName, setShowName] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowName(true);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className="h-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
@@ -35,11 +42,11 @@ export function DashboardHomePage() {
         {/* Welcome */}
         <div className="mb-4">
           <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-800 lg:text-3xl">
-            <span className={`transition-opacity duration-500 ${isLoaded ? "absolute opacity-0" : "opacity-100"}`}>
+            <span className={`transition-opacity duration-500 ${showName ? "absolute opacity-0" : "opacity-100"}`}>
               {timeGreeting}!
             </span>
-            <span className={`transition-opacity duration-500 ${isLoaded ? "opacity-100" : "absolute opacity-0"}`}>
-              Hai, {displayName || "Pengguna"}!
+            <span className={`transition-opacity duration-500 ${showName ? "opacity-100" : "absolute opacity-0"}`}>
+              Hai, {displayName}!
             </span>
           </h1>
         </div>
