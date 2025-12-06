@@ -11,7 +11,7 @@ const generateMagicLinkHtml = (magicLink: string, minutesUntilExpiry: number) =>
     <div style="background:#fff;margin:0 auto;border-radius:16px;border:4px solid #00a884;box-shadow:0 4px 12px rgba(0,0,0,0.1);max-width:480px;padding:32px 24px;">
       <!-- Logo -->
       <div style="text-align:center;margin-bottom:24px;">
-        <img src="${process.env.SITE_URL}/logo.avif" alt="SAH-in Aja" style="height:56px;width:auto;">
+        <img src="https://cdn.sahin.biz.id/logo.avif" alt="SAH-in Aja" style="height:56px;width:auto;">
       </div>
       
       <!-- Email Icon -->
