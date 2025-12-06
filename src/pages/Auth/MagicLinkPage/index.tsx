@@ -60,12 +60,12 @@ export default function MagicLinkPage() {
   }
 
   return (
-    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-gray-50 px-4 py-8 font-poppins">
+    <div className="font-poppins relative flex min-h-dvh items-center justify-center overflow-hidden bg-gray-50 px-4 py-8">
       {/* Background abstract blur */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-0 left-1/4 h-96 w-96 -translate-x-1/2 rounded-full bg-primary-green/20 blur-[120px]" />
-        <div className="absolute top-1/3 right-0 h-96 w-96 translate-x-1/4 rounded-full bg-primary-blue/20 blur-[120px]" />
-        <div className="absolute bottom-0 left-1/2 h-96 w-96 -translate-x-1/2 translate-y-1/4 rounded-full bg-primary-orange/20 blur-[120px]" />
+        <div className="bg-primary-green/20 absolute top-0 left-1/4 h-96 w-96 -translate-x-1/2 rounded-full blur-[120px]" />
+        <div className="bg-primary-blue/20 absolute top-1/3 right-0 h-96 w-96 translate-x-1/4 rounded-full blur-[120px]" />
+        <div className="bg-primary-orange/20 absolute bottom-0 left-1/2 h-96 w-96 -translate-x-1/2 translate-y-1/4 rounded-full blur-[120px]" />
       </div>
 
       <div className="relative w-full max-w-md">
@@ -73,9 +73,9 @@ export default function MagicLinkPage() {
         <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.08)] sm:p-8">
           <div className="space-y-6">
             {/* Header with Logo */}
-            <div className="text-center">
+            <div className="mb-6 text-center">
               <Link href="/">
-                <img src="/logo.avif" alt="SAH-in Aja" className="mx-auto mb-6 h-12 w-auto sm:h-14" />
+                <img src="/logo.avif" alt="SAH-in Aja" className="mx-auto h-12 w-auto sm:h-16" />
               </Link>
             </div>
 
