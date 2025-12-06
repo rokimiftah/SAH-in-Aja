@@ -570,6 +570,10 @@ RESEND_API_KEY=re_your_api_key
 
 ## Screenshots
 
+### Landing Page
+
+![Landing](https://cdn.sahin.biz.id/landing.png)
+
 ### Dashboard
 
 ![Dashboard](https://cdn.sahin.biz.id/dashboard.png)
