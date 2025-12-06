@@ -401,13 +401,13 @@ export function PhotoCapture({ onPhotosComplete }: PhotoCaptureProps) {
             <p className="text-sm text-gray-600">Ketuk foto di atas jika ingin mengulang pengambilan</p>
           </div>
 
-          <div className="space-y-3 p-5">
+          <div className="space-y-2 p-4 sm:space-y-3 sm:p-5">
             <button
               type="button"
               onClick={handleSubmit}
-              className="bg-primary-green flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl px-4 py-4 font-semibold text-white shadow-md transition-shadow hover:shadow-xl"
+              className="bg-primary-green flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-3 text-sm font-semibold text-white shadow-md transition-shadow hover:shadow-xl sm:gap-3 sm:rounded-xl sm:px-4 sm:py-4 sm:text-base"
             >
-              <Sparkles className="h-5 w-5" />
+              <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
               Analisis Sekarang
             </button>
             <button
@@ -419,7 +419,7 @@ export function PhotoCapture({ onPhotosComplete }: PhotoCaptureProps) {
                 setCapturedPhotos([]);
                 setCurrentStep(0);
               }}
-              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 font-medium text-gray-600 transition-colors hover:bg-gray-50"
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 sm:rounded-xl sm:px-4 sm:py-3 sm:text-base"
             >
               <RotateCcw className="h-4 w-4" />
               Ulang Semua Foto
