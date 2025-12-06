@@ -723,7 +723,7 @@ function getHalalKnowledge(detectedItems: string[]) {
 │  │  1. Load photos from storage                         │   │
 │  │  2. Load knowledge base (ingredients.json)           │   │
 │  │  3. Build context-rich prompt                        │   │
-│  │  4. Call NVIDIA Vision API (Mistral Large 3)         │   │
+│  │  4. Call Kolosal Vision API (Claude Sonnet 4.5)      │   │
 │  │  5. Parse structured response                        │   │
 │  │  6. Match findings with knowledge base               │   │
 │  │  7. Calculate compliance score                       │   │
@@ -777,9 +777,9 @@ sequenceDiagram
     Convex Action->>Convex Storage: Fetch photos
     Convex Action->>Knowledge Base: Load ingredients.json
     Convex Action->>Convex Action: Build enriched prompt
-    Convex Action->>NVIDIA API: Send photos + prompt
+    Convex Action->>Kolosal API: Send photos + prompt (base64)
 
-    NVIDIA API-->>Convex Action: Stream vision analysis
+    Kolosal API-->>Convex Action: Stream vision analysis
 
     Convex Action->>Convex Action: Parse findings
     Convex Action->>Knowledge Base: Match items with halal DB
@@ -1209,13 +1209,13 @@ export default defineSchema({
 
 ### **6.1 Vision AI Selection**
 
-**Model:** `mistralai/mistral-large-3-675b-instruct-2512` (NVIDIA Build)
+**Model:** `global.anthropic.claude-sonnet-4-5-20250929-v1:0` (Kolosal API)
 
 **Why this model:**
 
 - ✅ **Multimodal** - Can process multiple images + text in single call
 - ✅ **Structured output** - Good at following JSON format instructions
-- ✅ **Free tier** - NVIDIA Build offers generous free quota
+- ✅ **Reliable** - Kolosal API with Claude Sonnet provides consistent results
 - ✅ **Fast inference** - ~5-10 seconds for 5-7 images
 - ✅ **High accuracy** - Excellent vision understanding capabilities
 
@@ -1553,14 +1553,14 @@ export const analyzeKitchen = action({
       const systemPrompt = SYSTEM_PROMPT_V1;
       const userPrompt = await buildUserPrompt(args.photoUrls, knowledge);
 
-      // 3. Call NVIDIA API
-      const nvidia = new OpenAI({
-        apiKey: process.env.NVIDIA_API_KEY!,
-        baseURL: "https://integrate.api.nvidia.com/v1",
+      // 3. Call Kolosal API
+      const kolosal = new OpenAI({
+        apiKey: process.env.KOLOSAL_API_KEY!,
+        baseURL: "https://api.kolosal.ai/v1",
       });
 
-      const response = await nvidia.chat.completions.create({
-        model: "mistralai/mistral-large-3-675b-instruct-2512",
+      const response = await kolosal.chat.completions.create({
+        model: "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
         messages: [
           { role: "system", content: systemPrompt },
           {
@@ -1895,15 +1895,15 @@ For critical items, use multiple AI models and vote:
 ```typescript
 async function ensembleAnalysis(photoUrls: string[]) {
   // Call 3 different vision models
-  const [nvidia, gpt4v, gemini] = await Promise.all([
-    analyzeWithNVIDIA(photoUrls),
+  const [kolosal, gpt4v, gemini] = await Promise.all([
+    analyzeWithKolosal(photoUrls),
     analyzeWithGPT4V(photoUrls),
     analyzeWithGemini(photoUrls),
   ]);
 
   // Combine results with weighted voting
   const combined = combineResults([
-    { result: nvidia, weight: 0.4 },
+    { result: kolosal, weight: 0.4 },
     { result: gpt4v, weight: 0.4 },
     { result: gemini, weight: 0.2 },
   ]);
@@ -2044,7 +2044,7 @@ async function uploadWithRetry(file: Blob, maxRetries = 3) {
 ```typescript
 async function callAIWithRateLimit(prompt: string, photos: string[]) {
   try {
-    const response = await nvidia.chat.completions.create({...});
+    const response = await kolosal.chat.completions.create({...});
     return response;
 
   } catch (error) {
@@ -2078,7 +2078,7 @@ async function callAIWithRateLimit(prompt: string, photos: string[]) {
     if (error.status === 503) {
       // Service unavailable
       // Fallback to backup model
-      console.log("NVIDIA API down, falling back to GPT-4V");
+      console.log("Kolosal API down, falling back to GPT-4V");
       return await callGPT4VFallback(prompt, photos);
     }
 
@@ -2504,9 +2504,9 @@ const apiKey = "nvapi-xxx..."; // ❌ NEVER do this!
 export const analyzeKitchen = action({
   handler: async (ctx, args) => {
     // API key is in server environment, never sent to client
-    const nvidia = new OpenAI({
-      apiKey: process.env.NVIDIA_API_KEY!, // Server-side only
-      baseURL: "https://integrate.api.nvidia.com/v1",
+    const kolosal = new OpenAI({
+      apiKey: process.env.KOLOSAL_API_KEY!, // Server-side only
+      baseURL: "https://api.kolosal.ai/v1",
     });
 
     // ... rest of code
@@ -4225,7 +4225,7 @@ function TrainingMode() {
 
 - [ ] Photo capture (7 photos)
 - [ ] Compression & upload
-- [ ] AI analysis (NVIDIA Mistral Large 3)
+- [ ] AI analysis (Kolosal Claude Sonnet 4.5)
 - [ ] Results display (score + findings)
 - [ ] Basic knowledge base (50 items)
 
@@ -4407,7 +4407,7 @@ DISCLAIMER TO ADD:
 #### **Risk 3: API Dependency Failure**
 
 **Impact:** HIGH - Service unavailable
-**Probability:** Low (2-3% with NVIDIA Build SLA)
+**Probability:** Low (2-3% with Kolosal API SLA)
 
 **Mitigation:**
 
@@ -4501,7 +4501,7 @@ DISCLAIMER TO ADD:
 
 1. **Review this document thoroughly**
 2. **Get API keys:**
-   - NVIDIA Build (vision AI)
+   - Kolosal API (vision AI)
    - Groq (audio transcription)
    - Convex (backend)
 3. **Setup development environment**

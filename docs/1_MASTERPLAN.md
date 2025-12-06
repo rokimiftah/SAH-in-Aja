@@ -148,10 +148,10 @@ Sequential Upload to Convex Storage (not parallel)
   - Upload 1 → Success → Upload 2 → etc.
   - Show progress: "Mengirim foto 1/5... 45%"
     ↓
-Convex Action → NVIDIA Mistral Large 3 Vision
-  - Model: mistralai/mistral-large-3-675b-instruct-2512
-  - Multimodal: Send all 5 photos in single request
-  - 128K context window
+Convex Action → Kolosal Claude Sonnet 4.5 Vision
+  - Model: global.anthropic.claude-sonnet-4-5-20250929-v1:0
+  - Multimodal: Send all 5 photos in single request (base64 encoded)
+  - 200K context window
     ↓
 System Prompt: "Analyze based on SJPH HAS 23000 criteria..."
     ↓
@@ -216,7 +216,7 @@ Form UI: User reviews & edits
   - Required fields validation
   - Real-time preview
     ↓
-Convex Action → NVIDIA GPT-OSS-120B
+Convex Action → Kolosal Llama 4 Maverick
     ↓
 System Prompt: "Generate dokumen SJPH berdasarkan template dan data berikut..."
     ↓
@@ -276,7 +276,7 @@ System Prompt:
 
    User context: Skor halal 85%, usaha keripik pisang, perlu ganti supplier kecap"
     ↓
-NVIDIA GPT-OSS-120B: Generate personalized answer
+Kolosal Llama 4 Maverick: Generate personalized answer
     ↓
 Response: Step-by-step guide + link ke BPJPH + checklist dokumen
 ```
@@ -406,54 +406,50 @@ FAQ Matching (keyword/similarity)
 
 #### 🤖 AI/ML Stack
 
-**Provider 1: NVIDIA Build (40 RPM - Strict)**
+**Provider: Kolosal API (api.kolosal.ai)**
+
+> **Note:** Selama development menggunakan NVIDIA API (build.nvidia.com) karena memiliki free credits untuk testing.
+> Kolosal API digunakan untuk production/demo agar kredit Kolosal tidak habis selama development.
 
 **Vision AI - Siap Halal:**
 
-- **Mistral Large 3 675B Instruct** (FREE - 40 rpm)
-  - Model ID: `mistralai/mistral-large-3-675b-instruct-2512`
-  - Architecture: 675B parameters
-  - Context: 128K tokens
-  - Capabilities: Native multimodal (text + images), tool use, JSON mode
+- **Claude Sonnet 4.5** (Kolosal)
+  - Model ID: `global.anthropic.claude-sonnet-4-5-20250929-v1:0`
+  - Context: 200K tokens
+  - Capabilities: Native multimodal (text + images), excellent reasoning
   - Performance: State-of-the-art vision understanding
-  - Rate Limit: 40 RPM (shared with text AI)
-  - API: OpenAI-compatible via build.nvidia.com
-  - **Why Mistral Large 3:**
+  - Pricing: $3.0/1M input, $15.0/1M output
+  - API: OpenAI-compatible via api.kolosal.ai
+  - **Why Claude Sonnet 4.5:**
     - ✅ Excellent multimodal capabilities
     - ✅ Strong reasoning and analysis
     - ✅ Good instruction following
     - ✅ Supports structured output
+    - ✅ Reliable vision API format
 
 **Text AI - Dokumen Halal + Asisten Halal:**
 
-- **GPT-OSS-120B** (FREE - 40 rpm, shared with vision)
-  - Model ID: `openai/gpt-oss-120b`
-  - Architecture: 116.8B total, 5.1B active (MoE)
-  - Context: 128K tokens
-  - Training: RL from OpenAI o3, o4 (state-of-the-art reasoning)
-  - Capabilities: Strong legal drafting, tool use, structured output
-  - Performance: Near o4-mini on reasoning benchmarks
-  - License: Apache 2.0 (fully open)
-  - **Why GPT-OSS-120B:**
-    - ✅ Best reasoning (trained by OpenAI)
-    - ✅ Excellent instruction following
-    - ✅ Strong structured output (JSON, function calling)
-    - ✅ Perfect for legal contracts
+- **Llama 4 Maverick 17B** (Kolosal - cheapest option)
+  - Model ID: `meta-llama/llama-4-maverick-17b-128e-instruct`
+  - Context: 131K tokens
+  - Capabilities: Strong legal drafting, structured output
+  - Performance: Cost-effective for text generation
+  - Pricing: $0.2/1M input, $0.6/1M output (very cheap!)
+  - **Why Llama 4 Maverick:**
+    - ✅ Most cost-effective option
+    - ✅ Large context window (131K)
+    - ✅ Good instruction following
+    - ✅ Perfect for document generation
 
-**Rate Limit Management:**
+**Alternative Models Available on Kolosal:**
 
-```
-NVIDIA (40 RPM strict):
-- Siap Halal: 1 scan = 1 API call (multimodal batch)
-  → Testing: ~5-10 scans/day = 0.08-0.16 RPM average
-- Dokumen Halal: 1 document template = 1 API call
-  → Testing: ~3-5 per day = 0.05 RPM average
-- Asisten Halal: 1 chat = 1 API call
-  → Testing: ~10-20 per day = 0.16 RPM average
-TOTAL: ~0.3 RPM average (massive headroom!)
-
-Conclusion: Rate limits are NON-ISSUE for development!
-```
+| Model | Context | Price (input/output per 1M) | Use Case |
+|-------|---------|----------------------------|----------|
+| Claude Sonnet 4.5 | 200K | $3.0 / $15.0 | Vision AI |
+| Llama 4 Maverick | 131K | $0.2 / $0.6 | Text (cheapest) |
+| Qwen 3 VL 30B | 262K | $0.3 / $1.0 | Vision (budget) |
+| Kimi K2 | 262K | $0.6 / $2.5 | Text (large context) |
+| GLM 4.6 | 200K | $0.6 / $2.2 | Text (alternative) |
 
 **Knowledge Base Strategy:**
 
@@ -464,7 +460,7 @@ Conclusion: Rate limits are NON-ISSUE for development!
 
 **AI SDKs:**
 
-- **openai** `^4.0.0` - For NVIDIA API (OpenAI-compatible)
+- **openai** `^4.0.0` - For Kolosal API (OpenAI-compatible)
 
 ---
 
@@ -587,7 +583,7 @@ Conclusion: Rate limits are NON-ISSUE for development!
     // EMAIL (~30KB)
     "resend": "^4.0.1", // ✅ Email provider for auth
     "@auth/core": "^0.37.2", // ✅ Auth providers (Google OAuth, etc)
-    "openai": "^4.0.0", // ~80KB (NVIDIA API)
+    "openai": "^4.0.0", // ~80KB (Kolosal API)
 
     // UI - ESSENTIAL ONLY (~10KB total)
     "clsx": "^2.1.1", // ~1KB ✅ Keep (conditional classnames)
@@ -685,8 +681,8 @@ Performance on 3G (Target Device):
 
 | Service                      | Purpose                           | Pricing   | Rate Limit                |
 | ---------------------------- | --------------------------------- | --------- | ------------------------- |
-| **NVIDIA - Mistral Large 3** | Vision AI (Siap Halal)            | ✅ FREE   | 40 RPM (shared)           |
-| **NVIDIA - GPT-OSS-120B**    | Text AI (Dokumen Halal + Asisten) | ✅ FREE   | 40 RPM (shared)           |
+| **Kolosal - Claude Sonnet 4.5** | Vision AI (Siap Halal)            | Pay-per-use | $3.0/$15.0 per 1M tokens |
+| **Kolosal - Llama 4 Maverick**  | Text AI (Dokumen Halal + Asisten) | Pay-per-use | $0.2/$0.6 per 1M tokens  |
 | **jsPDF (Server)**           | PDF generation for documents      | ✅ FREE   | Server-side only          |
 | **Convex Cloud**             | Backend + Database + Storage      | ✅ FREE   | 1GB, 1M actions/mo        |
 | **Cloudflare**               | CDN + DNS + R2 Storage            | ✅ FREE   | 100GB R2, unlimited CDN   |
@@ -903,7 +899,7 @@ function showInstallPrompt() {
                           │
                           ↓
               ┌──────────────────────┐
-              │ NVIDIA API           │
+              │ Kolosal API          │
               │ (Vision + Text Gen)  │
               └──────────────────────┘
 ```
@@ -1013,7 +1009,7 @@ function showInstallPrompt() {
 
 ```
 Cost per Request:
-- Siap Halal: ~$0.05 (NVIDIA Mistral Large 3) = Rp 750
+- Siap Halal: ~$0.05 (Kolosal Claude Sonnet 4.5) = Rp 750
 - Dokumen Halal: ~$0.05 (Template generation) = Rp 750
 - Chat Konsultasi: ~$0.01 (GPT-OSS-120B) = Rp 150
 
@@ -1062,16 +1058,16 @@ Margin:
 
 #### **Siang (6h): Prompt Engineering & API Testing**
 
-**Test Vision AI (NVIDIA Mistral Large 3):**
+**Test Vision AI (Kolosal Claude Sonnet 4.5):**
 
-- [ ] Create NVIDIA API client helper (OpenAI-compatible):
+- [ ] Create Kolosal API client helper (OpenAI-compatible):
 
   ```typescript
   import OpenAI from "openai";
 
-  const nvidia = new OpenAI({
-    apiKey: process.env.NVIDIA_API_KEY,
-    baseURL: "https://integrate.api.nvidia.com/v1",
+  const kolosal = new OpenAI({
+    apiKey: process.env.KOLOSAL_API_KEY,
+    baseURL: "https://api.kolosal.ai/v1",
   });
   ```
 
@@ -1175,9 +1171,9 @@ Margin:
   ```typescript
   import OpenAI from "openai";
 
-  const nvidia = new OpenAI({
-    apiKey: process.env.NVIDIA_API_KEY,
-    baseURL: "https://integrate.api.nvidia.com/v1",
+  const kolosal = new OpenAI({
+    apiKey: process.env.KOLOSAL_API_KEY,
+    baseURL: "https://api.kolosal.ai/v1",
   });
 
   export const analyzeKitchen = action({
@@ -1202,8 +1198,8 @@ Margin:
         },
       ];
 
-      const response = await nvidia.chat.completions.create({
-        model: "mistralai/mistral-large-3-675b-instruct-2512",
+      const response = await kolosal.chat.completions.create({
+        model: "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
         messages,
         temperature: 0.3, // More deterministic for compliance
         max_tokens: 2000,
@@ -1319,9 +1315,9 @@ Margin:
   ```typescript
   import OpenAI from "openai";
 
-  const nvidia = new OpenAI({
-    apiKey: process.env.NVIDIA_API_KEY,
-    baseURL: "https://integrate.api.nvidia.com/v1",
+  const kolosal = new OpenAI({
+    apiKey: process.env.KOLOSAL_API_KEY,
+    baseURL: "https://api.kolosal.ai/v1",
   });
 
   export const generateHalalDocument = action({
@@ -1331,8 +1327,8 @@ Margin:
       ingredients: v.array(v.object({...})),
     },
     handler: async (ctx, args) => {
-      const response = await nvidia.chat.completions.create({
-        model: "openai/gpt-oss-120b",
+      const response = await kolosal.chat.completions.create({
+        model: "meta-llama/llama-4-maverick-17b-128e-instruct",
         messages: [
           {
             role: "system",
@@ -1745,7 +1741,7 @@ Margin:
 ### Developer Tools
 
 - **Convex Dashboard:** [convex.dev](https://convex.dev)
-- **NVIDIA Build:** [build.nvidia.com](https://build.nvidia.com)
+- **Kolosal API:** [api.kolosal.ai](https://api.kolosal.ai)
 - **jsPDF:** [github.com/parallax/jsPDF](https://github.com/parallax/jsPDF)
 - **BPJPH Portal:** [halal.go.id](https://halal.go.id)
 
@@ -1773,7 +1769,7 @@ Margin:
 
 3. **Technical Execution (100%):**
    - ✅ All 3 features fully functional (not mocks)
-   - ✅ Real AI processing (NVIDIA Build: Mistral Large 3 + GPT-OSS-120B)
+   - ✅ Real AI processing (Kolosal: Claude Sonnet 4.5 + Llama 4 Maverick)
    - ✅ Production-ready: Error handling, edge cases, mobile-optimized
    - ✅ Smart architecture: Simplified RAG for realistic hackathon scope
    - ✅ Code quality: TypeScript, proper structure, maintainable
@@ -1868,18 +1864,18 @@ Margin:
 
 5. **How It Works - Siap Halal**
    - Screenshot of photo analysis
-   - Brief tech explanation (NVIDIA Mistral Large 3)
+   - Brief tech explanation (Kolosal Claude Sonnet 4.5)
 
 6. **How It Works - Dokumen Halal**
    - Screenshot of contract PDF
-   - Brief tech explanation (Web Speech + NVIDIA NIM)
+   - Brief tech explanation (Web Speech + Kolosal Llama 4)
 
 7. **How It Works - Asisten Halal**
    - Screenshot of chat interface
    - Explain smart FAQ approach (honest about no full RAG)
 
 8. **Tech Stack Highlight**
-   - Logos: NVIDIA Build, Convex, Cloudflare
+   - Logos: Kolosal, Convex, Cloudflare
    - Cost: $0.00 for development
 
 9. **Business Model**
@@ -1909,7 +1905,7 @@ Margin:
 ### Immediate Actions (TODAY):
 
 1. ✅ **Get API Keys:**
-   - [ ] NVIDIA Build API: https://build.nvidia.com (Free 40 RPM - vision + text)
+   - [ ] Kolosal API: https://api.kolosal.ai (Pay-per-use - vision + text)
    - [ ] BPJPH Portal: https://halal.go.id (Reference for SJPH requirements)
    - [ ] Save in .env.local
 
@@ -1928,8 +1924,8 @@ Margin:
    ```
 
 4. ✅ **Test APIs:**
-   - [ ] Test NVIDIA Mistral Large 3 with sample photos
-   - [ ] Test NVIDIA NIM with sample text
+   - [ ] Test Kolosal Claude Sonnet 4.5 with sample photos
+   - [ ] Test Kolosal Llama 4 Maverick with sample text
    - [ ] Verify rate limits work
 
 5. ✅ **Create Project Structure:**
@@ -1944,7 +1940,7 @@ Margin:
 **Major Architecture Decisions:**
 
 - ✅ **Photo-based ONLY (NO video support)** for Siap Halal: 20x lighter, works on old devices, 3G-friendly
-- ✅ **Single provider**: NVIDIA (vision + text) for simplicity
+- ✅ **Single provider**: Kolosal (vision + text) for simplicity
 - ✅ **Ultra-lean bundle**: Cut heavy libs (Radix, Framer, react-pdf), < 200KB gzipped
 - ✅ **PWA-first**: Offline capability, Add to Home Screen, feels native
 - ✅ **Performance-first**: Target 3G + 2GB RAM devices explicitly

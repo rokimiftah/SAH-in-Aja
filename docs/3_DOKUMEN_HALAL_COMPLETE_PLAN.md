@@ -744,8 +744,8 @@ function validateClauseSelection(selectedClauses: string[]): ValidationResult {
                     ┌────────┴────────┐
                     │                 │
          ┌──────────▼─────────┐ ┌─────▼──────────┐
-         │  NVIDIA NIM API    │ │  Groq API      │
-         │  (Mistral Large 3) │ │  (Llama 3.3)   │
+         │  Kolosal API       │ │  Groq API      │
+         │  (Llama 4 Maverick)│ │  (Llama 3.3)   │
          │  Vision + Text     │ │  Fast inference│
          └────────────────────┘ └────────────────┘
 ```
@@ -3821,7 +3821,7 @@ export default function PrivacyPolicy() {
 
       <section>
         <h2>6. AI & Otomasi</h2>
-        <p>Dokumen dibuat dengan bantuan AI (NVIDIA Llama, Groq). Data Anda:</p>
+        <p>Dokumen dibuat dengan bantuan AI (Kolosal Llama, Groq). Data Anda:</p>
         <ul>
           <li>✅ Dikirim ke AI API hanya untuk generate dokumen</li>
           <li>✅ TIDAK digunakan untuk training model AI</li>

@@ -905,7 +905,7 @@ KONTEKS USER:
 │  │  ┌──────────────────────────────────────────────────────┐ │  │
 │  │  │  FAQ Matching → LLM Fallback → Response Formatting   │ │  │
 │  │  │  ↓               ↓                  ↓                │ │  │
-│  │  │  Semantic       NVIDIA API         Disclaimer        │ │  │
+│  │  │  Semantic       Kolosal API        Disclaimer        │ │  │
 │  │  │  Search         Streaming          Addition          │ │  │
 │  │  └──────────────────────────────────────────────────────┘ │  │
 │  └───────────────────────────────────────────────────────────┘  │
@@ -930,7 +930,7 @@ KONTEKS USER:
 ┌─────────────────────────────────────────────────────────────────┐
 │                    EXTERNAL SERVICES                            │
 │  ┌──────────────┬──────────────┬──────────────┬─────────────┐   │
-│  │ NVIDIA API   │ OpenAI API   │ Resend       │ BPJPH API   │   │
+│  │ Kolosal API  │ OpenAI API   │ Resend       │ BPJPH API   │   │
 │  │ (LLM)        │ (Embeddings) │ (Email)      │ (Verify)    │   │
 │  └──────────────┴──────────────┴──────────────┴─────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
@@ -1325,10 +1325,10 @@ async function generateLLMResponse(query: string, assessmentContext: Assessment 
   const systemPrompt = buildSystemPrompt(assessmentContext);
   const contextPrompt = buildContextFromPartialMatches(partialMatches);
 
-  const response = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+  const response = await fetch("https://api.kolosal.ai/v1/chat/completions", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${process.env.NVIDIA_API_KEY}`,
+      Authorization: `Bearer ${process.env.KOLOSAL_API_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -1861,7 +1861,7 @@ Day 3: Ingredient Checker
 └── Ingredient check UI
 
 Day 4: LLM Integration
-├── NVIDIA API integration
+├── Kolosal API integration
 ├── Fallback logic implementation
 └── Disclaimer system
 
