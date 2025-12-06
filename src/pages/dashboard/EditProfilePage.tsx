@@ -159,18 +159,18 @@ export function EditProfilePage() {
   return (
     <PageContainer backButton={{ onClick: () => navigate("/dashboard") }} centered maxWidth="xl">
       {/* Header */}
-      <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold text-gray-800">Edit Profil</h1>
-        <p className="mt-2 text-gray-600">Perbarui foto dan nama Anda</p>
+      <div className="mb-5 text-center">
+        <h1 className="text-xl font-bold text-gray-800">Edit Profil</h1>
+        <p className="mt-1.5 text-sm text-gray-600">Perbarui foto dan nama Anda</p>
       </div>
 
       {/* Avatar Section */}
-      <div className="mb-6 flex flex-col items-center">
-        <div className="mb-3">
+      <div className="mb-5 flex flex-col items-center">
+        <div className="mb-2">
           <img
             src={avatarUrl}
             alt="Avatar"
-            className="h-28 w-28 rounded-full border-4 border-white object-cover shadow-lg ring-2 ring-gray-200"
+            className="h-20 w-20 rounded-full border-4 border-white object-cover shadow-lg ring-2 ring-gray-200"
           />
           <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
         </div>
@@ -185,8 +185,8 @@ export function EditProfilePage() {
       </div>
 
       {/* Name Input */}
-      <div className="mb-6">
-        <label htmlFor="name" className="mb-2 block text-sm font-medium text-gray-700">
+      <div className="mb-5">
+        <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-gray-700">
           Nama
         </label>
         <input
@@ -195,36 +195,37 @@ export function EditProfilePage() {
           value={currentName}
           onChange={(e) => setName(e.target.value)}
           placeholder="Masukkan nama Anda"
-          className="w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-800 transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
+          className="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-gray-800 transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
         />
       </div>
 
       {/* Email (Read-only) */}
-      <div className="mb-6">
-        <span className="mb-2 block text-sm font-medium text-gray-700">Email</span>
-        <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-600">{user.email || "-"}</div>
-        <p className="mt-1.5 text-xs text-gray-500">Email tidak dapat diubah</p>
+      <div className="mb-5">
+        <span className="mb-1.5 block text-sm font-medium text-gray-700">Email</span>
+        <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-600">{user.email || "-"}</div>
       </div>
 
       {/* Linked Providers */}
-      <div className="mb-8">
-        <span className="mb-2 block text-sm font-medium text-gray-700">Metode Login Terhubung</span>
-        <div className="space-y-2">
+      <div className="mb-6">
+        <span className="mb-1.5 block text-sm font-medium text-gray-700">Metode Login Terhubung</span>
+        <div className="flex gap-2">
           {linkedProviders.length > 0 ? (
             linkedProviders.map((provider) => (
-              <div key={provider} className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+              <div
+                key={provider}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-2 py-2 sm:gap-2"
+              >
                 <span className="text-gray-600">{PROVIDER_ICONS[provider] || <Mail className="h-4 w-4" />}</span>
-                <span className="text-sm font-medium text-gray-700">{PROVIDER_NAMES[provider] || provider}</span>
-                <Check className="ml-auto h-4 w-4 text-emerald-500" />
+                <span className="hidden text-sm font-medium text-gray-700 sm:inline">{PROVIDER_NAMES[provider] || provider}</span>
+                <Check className="h-3.5 w-3.5 text-emerald-500" />
               </div>
             ))
           ) : (
-            <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-center text-sm text-gray-500">
+            <div className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-center text-sm text-gray-500">
               Tidak ada provider terhubung
             </div>
           )}
         </div>
-        <p className="mt-1.5 text-xs text-gray-500">Profil Anda akan tersinkronisasi di semua metode login</p>
       </div>
 
       {/* Save Button */}
@@ -233,7 +234,7 @@ export function EditProfilePage() {
         onClick={handleSave}
         disabled={!hasChanges || saving}
         className={cn(
-          "flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 font-semibold transition-all",
+          "flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 font-semibold transition-all",
           hasChanges && !saving
             ? "cursor-pointer bg-emerald-500 text-white shadow-md hover:bg-emerald-600 hover:shadow-lg"
             : "cursor-not-allowed bg-gray-100 text-gray-400",
