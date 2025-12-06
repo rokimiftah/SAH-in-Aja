@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import { useQuery } from "convex/react";
 import { Camera, FileText, MessageCircle } from "lucide-react";
 
@@ -6,6 +8,16 @@ import { FEATURES } from "@shared/config/branding";
 import { api } from "../../../convex/_generated/api";
 import { FeatureCard, StatsCard, TipsCard } from "./components";
 
+function getTimeBasedGreeting(): string {
+  const now = new Date();
+  const utc7Hour = (now.getUTCHours() + 7) % 24;
+
+  if (utc7Hour >= 5 && utc7Hour < 11) return "Selamat Pagi";
+  if (utc7Hour >= 11 && utc7Hour < 15) return "Selamat Siang";
+  if (utc7Hour >= 15 && utc7Hour < 18) return "Selamat Sore";
+  return "Selamat Malam";
+}
+
 export function DashboardHomePage() {
   const user = useQuery(api.users.getCurrentUser);
   const scans = useQuery(api.halalScans.getMyScans);
@@ -13,14 +25,23 @@ export function DashboardHomePage() {
   const consultations = useQuery(api.halalConsultations.getByUser, user?._id ? { userId: user._id } : "skip");
   const name = (user?.name ?? "").trim();
   const email = (user?.email ?? "").trim();
-  const displayName = name || email?.split("@")[0] || "Pengguna";
+  const displayName = name || email?.split("@")[0] || "";
+  const isLoaded = user !== undefined;
+  const timeGreeting = useMemo(() => getTimeBasedGreeting(), []);
 
   return (
     <div className="h-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
       <div className="h-full overflow-y-auto p-6 lg:flex lg:flex-col lg:overflow-hidden lg:p-8">
         {/* Welcome */}
         <div className="mb-4">
-          <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-800 lg:text-3xl">Hai, {displayName}!</h1>
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-800 lg:text-3xl">
+            <span className={`transition-opacity duration-500 ${isLoaded ? "absolute opacity-0" : "opacity-100"}`}>
+              {timeGreeting}!
+            </span>
+            <span className={`transition-opacity duration-500 ${isLoaded ? "opacity-100" : "absolute opacity-0"}`}>
+              Hai, {displayName || "Pengguna"}!
+            </span>
+          </h1>
         </div>
 
         {/* Stats */}
