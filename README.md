@@ -572,19 +572,19 @@ RESEND_API_KEY=re_your_api_key
 
 ### Dashboard
 
-<img src="https://cdn.sahin.biz.id/dashboard.avif" alt="Dashboard" width="100%">
+![Dashboard](https://cdn.sahin.biz.id/dashboard.avif)
 
 ### Siap Halal - Vision AI Assessment
 
-<img src="https://cdn.sahin.biz.id/siap-halal.avif" alt="Siap Halal" width="100%">
+![Siap Halal](https://cdn.sahin.biz.id/siap-halal.avif)
 
 ### Dokumen Halal - AI Document Generator
 
-<img src="https://cdn.sahin.biz.id/dokumen-halal.avif" alt="Dokumen Halal" width="100%">
+![Dokumen Halal](https://cdn.sahin.biz.id/dokumen-halal.avif)
 
 ### Asisten Halal - AI Chatbot
 
-<img src="https://cdn.sahin.biz.id/asisten-halal.avif" alt="Asisten Halal" width="100%">
+![Asisten Halal](https://cdn.sahin.biz.id/asisten-halal.avif)
 
 ---
 
