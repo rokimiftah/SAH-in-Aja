@@ -159,18 +159,18 @@ export function EditProfilePage() {
   return (
     <PageContainer backButton={{ onClick: () => navigate("/dashboard") }} centered maxWidth="xl">
       {/* Header */}
-      <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold text-gray-800 lg:text-3xl">Edit Profil</h1>
+      <div className="mb-6 text-center">
+        <h1 className="text-2xl font-bold text-gray-800">Edit Profil</h1>
         <p className="mt-2 text-gray-600">Perbarui foto dan nama Anda</p>
       </div>
 
       {/* Avatar Section */}
-      <div className="mb-8 flex flex-col items-center">
-        <div className="mb-4">
+      <div className="mb-6 flex flex-col items-center">
+        <div className="mb-3">
           <img
             src={avatarUrl}
             alt="Avatar"
-            className="h-32 w-32 rounded-full border-4 border-white object-cover shadow-lg ring-2 ring-gray-200"
+            className="h-28 w-28 rounded-full border-4 border-white object-cover shadow-lg ring-2 ring-gray-200"
           />
           <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
         </div>
@@ -185,7 +185,7 @@ export function EditProfilePage() {
       </div>
 
       {/* Name Input */}
-      <div className="mb-8">
+      <div className="mb-6">
         <label htmlFor="name" className="mb-2 block text-sm font-medium text-gray-700">
           Nama
         </label>
@@ -200,7 +200,7 @@ export function EditProfilePage() {
       </div>
 
       {/* Email (Read-only) */}
-      <div className="mb-8">
+      <div className="mb-6">
         <span className="mb-2 block text-sm font-medium text-gray-700">Email</span>
         <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-600">{user.email || "-"}</div>
         <p className="mt-1.5 text-xs text-gray-500">Email tidak dapat diubah</p>
