@@ -2,16 +2,18 @@ import type { Ingredient } from "../types";
 
 import { Plus, Trash2 } from "lucide-react";
 
+import { Select } from "@shared/components/ui";
+
 interface IngredientsFormProps {
   data: Ingredient[];
   onChange: (data: Ingredient[]) => void;
 }
 
 const HALAL_STATUS_OPTIONS = [
-  { value: "halal", label: "Halal (Bersertifikat)" },
-  { value: "dalam_proses", label: "Dalam Proses Sertifikasi" },
-  { value: "perlu_verifikasi", label: "Perlu Verifikasi" },
-  { value: "alami", label: "Bahan Alami (Tanpa Proses)" },
+  { value: "halal", label: "Halal (Bersertifikat)", color: "bg-emerald-500" },
+  { value: "dalam_proses", label: "Dalam Proses Sertifikasi", color: "bg-amber-500" },
+  { value: "perlu_verifikasi", label: "Perlu Verifikasi", color: "bg-red-500" },
+  { value: "alami", label: "Bahan Alami (Tanpa Proses)", color: "bg-blue-500" },
 ];
 
 export function IngredientsForm({ data, onChange }: IngredientsFormProps) {
@@ -69,17 +71,12 @@ export function IngredientsForm({ data, onChange }: IngredientsFormProps) {
                 className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
               />
 
-              <select
+              <Select
                 value={ingredient.halalStatus}
-                onChange={(e) => updateIngredient(index, "halalStatus", e.target.value)}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
-              >
-                {HALAL_STATUS_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => updateIngredient(index, "halalStatus", value)}
+                options={HALAL_STATUS_OPTIONS}
+                placeholder="Pilih status halal"
+              />
             </div>
           </div>
         ))}
