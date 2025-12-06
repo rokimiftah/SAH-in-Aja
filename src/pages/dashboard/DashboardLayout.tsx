@@ -53,8 +53,18 @@ export function DashboardLayout() {
               <Route path="/dashboard/asisten-halal" component={AsistenHalalPage} />
               <Route path="/dashboard/profile" component={EditProfilePage} />
               <Route>
-                <div className="flex h-full items-center justify-center rounded-2xl border border-gray-200 bg-white">
-                  <h1 className="text-xl font-bold text-gray-600">Halaman tidak ditemukan</h1>
+                <div className="flex h-full flex-col items-center justify-center gap-4 rounded-2xl border border-gray-200 bg-white">
+                  <p className="text-6xl font-bold text-gray-200">404</p>
+                  <h1 className="text-lg font-semibold text-gray-900">Halaman tidak ditemukan</h1>
+                  <p className="max-w-sm text-center text-sm text-gray-500">
+                    Halaman yang Anda cari tidak tersedia di dashboard.
+                  </p>
+                  <Link
+                    href="/dashboard"
+                    className="bg-primary-green hover:bg-primary-green/90 mt-2 rounded-lg px-5 py-2.5 text-sm font-medium text-white transition"
+                  >
+                    Kembali ke Dashboard
+                  </Link>
                 </div>
               </Route>
             </Switch>
