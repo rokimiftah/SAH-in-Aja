@@ -540,7 +540,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Processing Warning Modal */}
       {showProcessingWarning &&
         createPortal(
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
+          <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/50 p-4">
             <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
               <div className="mb-4 flex justify-center">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
@@ -554,18 +554,18 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               <p className="mb-6 text-center text-sm font-medium text-red-600">
                 Meninggalkan halaman akan menghentikan proses dan kredit yang sudah dipakai tidak dapat dikembalikan.
               </p>
-              <div className="flex gap-3">
+              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:gap-3">
                 <button
                   type="button"
                   onClick={cancelNavigation}
-                  className="flex-1 cursor-pointer rounded-xl bg-gray-100 px-4 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-200"
+                  className="flex-1 cursor-pointer rounded-xl bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-200 sm:py-3"
                 >
                   Tetap di Sini
                 </button>
                 <button
                   type="button"
                   onClick={confirmNavigation}
-                  className="flex-1 cursor-pointer rounded-xl bg-red-500 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-red-600"
+                  className="flex-1 cursor-pointer rounded-xl bg-red-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-600 sm:py-3"
                 >
                   Tinggalkan
                 </button>
