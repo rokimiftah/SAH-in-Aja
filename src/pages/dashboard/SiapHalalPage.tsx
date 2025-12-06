@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useQuery } from "convex/react";
 import { AlertCircle, Camera, CheckCircle2, Clock, History, RefreshCw, Sparkles, Target, Zap } from "lucide-react";
@@ -6,6 +6,7 @@ import { useLocation } from "wouter";
 
 import { AnalysisResults, PhotoCapture, UploadProgress, useSiapHalal } from "@features/siap-halal";
 import { FEATURES } from "@shared/config/branding";
+import { useProcessing } from "@shared/contexts";
 
 import { api } from "../../../convex/_generated/api";
 import { PageContainer } from "./components";
@@ -43,6 +44,13 @@ export function SiapHalalPage() {
   const { stage, progress, currentPhoto, totalPhotos, result, error, analyzePhotos, reset } = useSiapHalal();
   const creditStatus = useQuery(api.credits.checkCredits, { feature: "siapHalal" });
   const hasCredits = creditStatus?.hasCredits ?? false;
+  const { setProcessing } = useProcessing();
+
+  useEffect(() => {
+    const isProcessing = flowState === "processing" && stage !== "complete" && stage !== "error";
+    setProcessing(isProcessing, "Analisis foto sedang berjalan...");
+    return () => setProcessing(false);
+  }, [flowState, stage, setProcessing]);
 
   const handleStartCapture = () => setFlowState("capture");
 

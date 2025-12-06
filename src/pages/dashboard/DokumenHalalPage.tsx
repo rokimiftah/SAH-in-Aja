@@ -1,6 +1,6 @@
 import type { BusinessInfo, Ingredient, TemplateType } from "@features/dokumen-halal";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useQuery } from "convex/react";
 import { AlertCircle, ArrowRight, CheckCircle2, FileText, History, RefreshCw, Sparkles, Target, Zap } from "lucide-react";
@@ -15,6 +15,7 @@ import {
   useDokumenHalal,
 } from "@features/dokumen-halal";
 import { FEATURES } from "@shared/config/branding";
+import { useProcessing } from "@shared/contexts";
 
 import { api } from "../../../convex/_generated/api";
 import { PageContainer } from "./components";
@@ -64,6 +65,13 @@ export function DokumenHalalPage() {
   const { stage, result, error, generateDocument, reset } = useDokumenHalal();
   const creditStatus = useQuery(api.credits.checkCredits, { feature: "dokumenHalal" });
   const hasCredits = creditStatus?.hasCredits ?? false;
+  const { setProcessing } = useProcessing();
+
+  useEffect(() => {
+    const isProcessing = flowState === "generating" && stage !== "complete" && stage !== "error";
+    setProcessing(isProcessing, "Pembuatan dokumen sedang berjalan...");
+    return () => setProcessing(false);
+  }, [flowState, stage, setProcessing]);
 
   const handleStartCreate = () => setFlowState("template");
   const handleSelectTemplate = (template: TemplateType) => setSelectedTemplate(template);

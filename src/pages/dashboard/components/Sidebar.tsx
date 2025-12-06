@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useMutation, useQuery } from "convex/react";
 import {
+  AlertTriangle,
   Camera,
   ChevronUp,
   ExternalLink,
@@ -17,10 +18,11 @@ import {
   UserPen,
   X,
 } from "lucide-react";
-import { Link, useLocation } from "wouter";
+import { useLocation } from "wouter";
 
 import { useToast } from "@shared/components/ui";
 import { BRANDING, FEATURES } from "@shared/config/branding";
+import { useProcessing } from "@shared/contexts";
 import { cn } from "@shared/lib";
 
 import { api } from "../../../../convex/_generated/api";
@@ -191,13 +193,42 @@ interface SidebarProps {
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [location, navigate] = useLocation();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [showProcessingWarning, setShowProcessingWarning] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   const { signOut } = useAuthActions();
   const toast = useToast();
+  const { isProcessing, processingMessage } = useProcessing();
   const user = useQuery(api.users.getCurrentUser);
   const dailyCredits = useQuery(api.credits.getMyDailyCredits);
   const applyPromoCode = useMutation(api.credits.applyPromoCode);
+
+  const handleNavigation = useCallback(
+    (href: string) => {
+      if (isProcessing) {
+        setPendingNavigation(href);
+        setShowProcessingWarning(true);
+        return false;
+      }
+      return true;
+    },
+    [isProcessing],
+  );
+
+  const confirmNavigation = useCallback(() => {
+    if (pendingNavigation) {
+      navigate(pendingNavigation);
+      onClose();
+    }
+    setShowProcessingWarning(false);
+    setPendingNavigation(null);
+  }, [pendingNavigation, navigate, onClose]);
+
+  const cancelNavigation = useCallback(() => {
+    setShowProcessingWarning(false);
+    setPendingNavigation(null);
+  }, []);
 
   const name = (user?.name ?? "").trim();
   const email = (user?.email ?? "").trim();
@@ -264,9 +295,18 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       >
         {/* Logo */}
         <div className="flex items-center justify-between px-5 pt-5 pb-2">
-          <Link href="/dashboard" className="flex w-full items-center justify-center">
+          <button
+            type="button"
+            onClick={() => {
+              if (handleNavigation("/dashboard")) {
+                navigate("/dashboard");
+                onClose();
+              }
+            }}
+            className="flex w-full cursor-pointer items-center justify-center"
+          >
             <img src="/logo.avif" alt={BRANDING.name} className="h-12 w-auto" />
-          </Link>
+          </button>
           <button
             type="button"
             onClick={onClose}
@@ -300,26 +340,36 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                           {item.label}
                         </div>
                       ) : (
-                        <Link
-                          href={item.href}
-                          onClick={onClose}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (handleNavigation(item.href)) {
+                              navigate(item.href);
+                              onClose();
+                            }
+                          }}
                           className={cn(
-                            "flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all",
+                            "flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all",
                             isActive ? item.activeClass : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
                           )}
                         >
                           <item.icon className="h-5 w-5" />
                           {item.label}
-                        </Link>
+                        </button>
                       )}
                       {/* Submenu */}
                       {hasSubItems && (
                         <div className="mt-2 flex flex-col gap-1 px-4">
-                          <Link
-                            href={item.href}
-                            onClick={onClose}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (handleNavigation(item.href)) {
+                                navigate(item.href);
+                                onClose();
+                              }
+                            }}
                             className={cn(
-                              "flex cursor-pointer items-center gap-3 rounded-xl px-4 py-2 text-sm font-medium transition-all",
+                              "flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-2 text-sm font-medium transition-all",
                               location === item.href ? item.activeClass : "bg-gray-100 text-gray-600 hover:bg-gray-200",
                             )}
                           >
@@ -341,22 +391,27 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                             {dailyCredits && item.id === "asisten-halal" && (
                               <CreditBadge remaining={dailyCredits.asistenHalalChats} limit={dailyCredits.limits.asistenHalal} />
                             )}
-                          </Link>
+                          </button>
                           {item.subItems.map((subItem) => {
                             const isSubActive = location === subItem.href;
                             return (
-                              <Link
+                              <button
                                 key={subItem.id}
-                                href={subItem.href}
-                                onClick={onClose}
+                                type="button"
+                                onClick={() => {
+                                  if (handleNavigation(subItem.href)) {
+                                    navigate(subItem.href);
+                                    onClose();
+                                  }
+                                }}
                                 className={cn(
-                                  "flex cursor-pointer items-center gap-3 rounded-xl px-4 py-2 text-sm font-medium transition-all",
+                                  "flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-2 text-sm font-medium transition-all",
                                   isSubActive ? item.activeClass : "bg-gray-100 text-gray-600 hover:bg-gray-200",
                                 )}
                               >
                                 <subItem.icon className="h-4 w-4" />
                                 {subItem.label}
-                              </Link>
+                              </button>
                             );
                           })}
                         </div>
@@ -442,17 +497,20 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               </button>
             </form>
             <div className="border-t border-gray-100" />
-            <Link
-              href="/dashboard/profile"
+            <button
+              type="button"
               onClick={() => {
-                setUserMenuOpen(false);
-                onClose();
+                if (handleNavigation("/dashboard/profile")) {
+                  navigate("/dashboard/profile");
+                  setUserMenuOpen(false);
+                  onClose();
+                }
               }}
               className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
             >
               <UserPen className="h-4 w-4" />
               Edit Profile
-            </Link>
+            </button>
             <div className="border-t border-gray-100" />
             <button
               type="button"
@@ -478,6 +536,44 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </button>
         </div>
       </aside>
+
+      {/* Processing Warning Modal */}
+      {showProcessingWarning &&
+        createPortal(
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
+            <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+              <div className="mb-4 flex justify-center">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
+                  <AlertTriangle className="h-6 w-6 text-amber-600" />
+                </div>
+              </div>
+              <h3 className="mb-2 text-center text-lg font-semibold text-gray-900">Proses Sedang Berjalan</h3>
+              <p className="mb-1 text-center text-sm text-gray-600">
+                {processingMessage || "Analisis atau pembuatan dokumen sedang berjalan."}
+              </p>
+              <p className="mb-6 text-center text-sm font-medium text-red-600">
+                Meninggalkan halaman akan menghentikan proses dan kredit yang sudah dipakai tidak dapat dikembalikan.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={cancelNavigation}
+                  className="flex-1 cursor-pointer rounded-xl bg-gray-100 px-4 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-200"
+                >
+                  Tetap di Sini
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmNavigation}
+                  className="flex-1 cursor-pointer rounded-xl bg-red-500 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-red-600"
+                >
+                  Tinggalkan
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </>
   );
 }
