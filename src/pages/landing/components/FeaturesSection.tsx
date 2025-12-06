@@ -1,111 +1,99 @@
-import { Camera, Check, ChevronRight, FileText, MessageCircle } from "lucide-react";
-import { Link } from "wouter";
+import { Camera, CheckCircle2, FileText, MessageCircle } from "lucide-react";
+import { motion } from "motion/react";
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5 },
+};
+
+const features = [
+  {
+    id: "siap-halal",
+    icon: Camera,
+    label: "Siap Halal",
+    title: "Cek Kesiapan dengan AI Vision",
+    description:
+      "Foto area produksimu, dan AI kami akan menganalisis kesiapan halal secara otomatis. Dapatkan skor dan rekomendasi perbaikan dalam hitungan menit.",
+    items: ["Analisis foto area produksi", "Skor kesiapan halal otomatis", "Rekomendasi perbaikan detail", "Hasil dalam 2 menit"],
+    image: "/landing/siap_halal.avif",
+    color: "text-primary-green",
+    shadow: "shadow-[0_6px_20px_rgba(0,168,132,0.15)]",
+    imagePosition: "right",
+  },
+  {
+    id: "dokumen-halal",
+    icon: FileText,
+    label: "Dokumen Halal",
+    title: "Generate Dokumen SJPH Otomatis",
+    description:
+      "Buat dokumen wajib untuk sertifikasi halal secara otomatis. Dari SOP produksi hingga daftar bahan baku, semua tersedia dalam format siap pakai.",
+    items: ["SOP Produksi Halal", "Manual SJPH lengkap", "Daftar Bahan Baku", "Template siap pakai"],
+    image: "/landing/dokumen_halal.avif",
+    color: "text-primary-blue",
+    shadow: "shadow-[0_6px_20px_rgba(61,127,255,0.15)]",
+    imagePosition: "left",
+  },
+  {
+    id: "asisten-halal",
+    icon: MessageCircle,
+    label: "Asisten Halal",
+    title: "Konsultasi AI 24/7",
+    description:
+      "Tanya jawab seputar sertifikasi halal kapan saja. Asisten AI kami siap membantu menjawab pertanyaan dan memberikan panduan step-by-step.",
+    items: ["Panduan BPJPH lengkap", "Jawaban real-time", "Rekomendasi supplier halal", "Tips lulus audit"],
+    image: "/landing/asisten_halal.avif",
+    color: "text-primary-orange",
+    shadow: "shadow-[0_6px_20px_rgba(245,166,35,0.15)]",
+    imagePosition: "right",
+  },
+];
 
 export const FeaturesSection = () => {
   return (
-    <div className="mb-8">
-      <div className="space-y-4">
-        {/* Siap Halal Card */}
-        <Link href="/dashboard/siap-halal" className="block">
-          <div className="bg-primary-green rounded-(--radius-card) border-4 border-white p-6 shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Camera className="h-8 w-8 text-white" />
-                <h3 className="flex items-center gap-2 text-2xl font-bold text-white">Siap Halal</h3>
+    <section id="features" className="bg-gray-50 py-12 sm:py-20">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <motion.div {...fadeInUp} className="mx-auto mb-10 max-w-2xl text-center sm:mb-16">
+          <h2 className="mb-2 text-xl font-semibold text-gray-900 sm:mb-3 sm:text-3xl">3 Fitur Utama</h2>
+          <p className="text-sm text-gray-500 sm:text-base">Semua yang kamu butuhkan untuk persiapan sertifikasi halal</p>
+        </motion.div>
+
+        <div className="space-y-12 sm:space-y-20">
+          {features.map((feature) => (
+            <motion.div
+              key={feature.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="grid items-center gap-6 sm:gap-10 lg:grid-cols-2"
+            >
+              <div className={feature.imagePosition === "right" ? "order-2 lg:order-1" : "order-2"}>
+                <div className={`mb-2 inline-flex items-center gap-1.5 text-xs font-medium sm:mb-3 sm:text-sm ${feature.color}`}>
+                  <feature.icon className="h-4 w-4" />
+                  {feature.label}
+                </div>
+                <h3 className="mb-2 text-lg font-semibold text-gray-900 sm:mb-3 sm:text-2xl">{feature.title}</h3>
+                <p className="mb-4 text-sm text-gray-500 sm:mb-5 sm:text-base">{feature.description}</p>
+                <ul className="space-y-2">
+                  {feature.items.map((item) => (
+                    <li key={item} className="flex items-center gap-2 text-xs text-gray-600 sm:text-sm">
+                      <CheckCircle2 className={`h-4 w-4 shrink-0 ${feature.color}`} />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ChevronRight className="h-6 w-6 text-white/70" />
-            </div>
-
-            <div className="mb-4 rounded-2xl bg-teal-50 p-4">
-              <p className="mb-3 font-medium text-gray-700">Foto dapurmu, AI kami cek kesiapannya.</p>
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Check className="text-primary-green h-5 w-5" />
-                  <span className="text-gray-800">Cek kesiapan sebelum audit</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="text-primary-green h-5 w-5" />
-                  <span className="text-gray-800">Hemat biaya konsultan</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="text-primary-green h-5 w-5" />
-                  <span className="text-gray-800">Hasil dalam 2 menit</span>
-                </div>
+              <div className={feature.imagePosition === "right" ? "order-1 lg:order-2" : "order-1"}>
+                <img
+                  src={feature.image}
+                  alt={`Fitur ${feature.label}`}
+                  className={`w-full rounded-lg border border-gray-200 sm:rounded-xl ${feature.shadow}`}
+                />
               </div>
-            </div>
-
-            <div className="flex items-center justify-center gap-2 rounded-xl bg-white/20 py-2 text-sm font-semibold text-white">
-              Mulai Cek Kesiapan
-              <ChevronRight className="h-4 w-4" />
-            </div>
-          </div>
-        </Link>
-
-        {/* Dokumen Halal Card */}
-        <Link href="/dashboard/dokumen-halal" className="block">
-          <div className="bg-primary-blue rounded-(--radius-card) border-4 border-white p-6 shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <FileText className="h-8 w-8 text-white" />
-                <h3 className="flex items-center gap-2 text-2xl font-bold text-white">Dokumen Halal</h3>
-              </div>
-              <span className="rounded-full bg-white/20 px-2 py-1 text-xs font-medium text-white">Segera</span>
-            </div>
-
-            <div className="mb-4 rounded-2xl bg-blue-50 p-4">
-              <p className="mb-3 font-medium text-gray-700">Generate dokumen wajib SJPH otomatis.</p>
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Check className="text-primary-blue h-5 w-5" />
-                  <span className="text-gray-800">SOP Produksi Halal</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="text-primary-blue h-5 w-5" />
-                  <span className="text-gray-800">Perjanjian Supplier</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="text-primary-blue h-5 w-5" />
-                  <span className="text-gray-800">Daftar Bahan Baku</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Link>
-
-        {/* Asisten Halal Card */}
-        <Link href="/dashboard/asisten-halal" className="block">
-          <div className="bg-primary-orange rounded-(--radius-card) border-4 border-white p-6 shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <MessageCircle className="h-8 w-8 text-white" />
-                <h3 className="flex items-center gap-2 text-2xl font-bold text-white">Asisten Halal</h3>
-              </div>
-              <span className="rounded-full bg-white/20 px-2 py-1 text-xs font-medium text-white">Segera</span>
-            </div>
-
-            <div className="mb-4 rounded-2xl bg-orange-50 p-4">
-              <p className="mb-3 font-medium text-gray-700">Tanya jawab seputar sertifikasi halal 24/7.</p>
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Check className="text-primary-orange h-5 w-5" />
-                  <span className="text-gray-800">Panduan BPJPH step-by-step</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="text-primary-orange h-5 w-5" />
-                  <span className="text-gray-800">Rekomendasi supplier halal</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="text-primary-orange h-5 w-5" />
-                  <span className="text-gray-800">Troubleshooting temuan audit</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Link>
+            </motion.div>
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
 };

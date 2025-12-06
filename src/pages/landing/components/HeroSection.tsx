@@ -1,78 +1,60 @@
-import { useState } from "react";
-
-import { AnimatePresence, motion } from "motion/react";
+import { ArrowRight } from "lucide-react";
+import { motion } from "motion/react";
 import { Link } from "wouter";
 
-import { SparklesText } from "@shared/components/ui";
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5 },
+};
 
 export const HeroSection = () => {
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
-    <div className="border-primary-green mb-6 rounded-(--radius-card) border-4 bg-white p-6 shadow-lg">
-      <div className="mb-4 flex justify-center sm:mb-2">
-        <img src="/hero.avif" alt="Sah-in Aja Hero" className="w-full rounded-(--radius-card) object-cover" />
-      </div>
+    <section className="pt-20 pb-12 sm:pt-24 sm:pb-16">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <motion.div {...fadeInUp} className="mx-auto max-w-3xl pt-6 text-center sm:pt-8">
+          <div className="border-primary-green/20 bg-primary-green/5 mb-4 inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs sm:mb-5 sm:px-4 sm:py-2 sm:text-sm">
+            <span className="text-primary-green">Powered by</span>
+            <span className="font-semibold text-gray-900">Kolosal.ai</span>
+          </div>
+          <h1 className="mb-4 text-3xl font-semibold tracking-tight text-gray-900 sm:mb-5 sm:text-5xl lg:text-6xl">
+            Persiapan Sertifikasi Halal Lebih Mudah
+          </h1>
+          <p className="mx-auto mb-6 max-w-2xl text-base text-gray-500 sm:mb-8 sm:text-lg">
+            Asisten AI yang membantu UMKM mempersiapkan sertifikasi halal. Dari pengecekan kesiapan hingga pembuatan dokumen.
+          </p>
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/login"
+              className="group bg-primary-green hover:bg-primary-green/90 flex w-full items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-medium text-white transition sm:w-auto"
+            >
+              Coba Gratis Sekarang
+              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+            </Link>
+            <a
+              href="#features"
+              className="w-full rounded-lg border border-gray-200 px-6 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 sm:w-auto"
+            >
+              Lihat Fitur
+            </a>
+          </div>
+        </motion.div>
 
-      <div className="px-4 text-center sm:p-8">
-        <div className="mb-2 flex flex-col justify-center pt-2">
-          <AnimatePresence mode="wait">
-            {!isHovered ? (
-              <motion.h1
-                key="original"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="text-text-dark text-2xl leading-tight font-bold sm:text-3xl"
-              >
-                <span className="whitespace-nowrap">Paham Dulu,</span>
-                <br className="block sm:hidden" />{" "}
-                <span>
-                  Baru Usahamu <span className="text-accent-pink">SAH!</span>
-                </span>
-              </motion.h1>
-            ) : (
-              <motion.h1
-                key="thankyou"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="text-2xl leading-tight font-bold sm:text-3xl"
-              >
-                <span className="text-text-muted">Terima kasih</span>{" "}
-                <span className="from-primary-blue to-accent-pink bg-linear-to-r via-purple-500 bg-clip-text text-transparent">
-                  IMPHNEN
-                </span>
-                <span className="bg-linear-to-r from-[#2E7D32] via-[#00838F] to-[#1565C0] bg-clip-text text-transparent"> &</span>{" "}
-                <span className="</span>">Kolosal.ai</span>
-              </motion.h1>
-            )}
-          </AnimatePresence>
-        </div>
-        <div className="text-text-muted mx-auto mb-2 max-w-md text-base sm:text-lg">
-          Asisten{" "}
-          <div
-            className="inline-block cursor-pointer align-bottom"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-          >
-            <SparklesText className="text-base sm:text-lg" colors={{ first: "#FF5D8F", second: "#00A896" }}>
-              <span className="underline underline-offset-3">AI</span>
-            </SparklesText>
-          </div>{" "}
-          untuk Persiapan Sertifikasi Halal.
-          <br />
-          Siap Halal dari Dapur hingga Sertifikat!
-        </div>
-        <Link
-          href="/login"
-          className="rounded-button bg-primary-green mt-4 block w-full cursor-pointer px-8 py-4 text-lg font-bold text-white shadow-lg transition hover:opacity-90 hover:shadow-xl active:scale-[0.98]"
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mt-8 sm:mt-12"
         >
-          Cek Kesiapan Halal Gratis!
-        </Link>
+          <div className="mx-auto">
+            <img
+              src="/landing/dashboard.avif"
+              alt="Dashboard SAH-in Aja"
+              className="w-full rounded-lg border border-gray-200 shadow-[0_15px_40px_-10px_rgba(0,168,132,0.3)] sm:rounded-xl sm:shadow-[0_25px_60px_-15px_rgba(0,168,132,0.35)]"
+            />
+          </div>
+        </motion.div>
       </div>
-    </div>
+    </section>
   );
 };
