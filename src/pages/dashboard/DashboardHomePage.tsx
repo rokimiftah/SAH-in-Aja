@@ -4,7 +4,7 @@ import { Camera, FileText, MessageCircle } from "lucide-react";
 import { FEATURES } from "@shared/config/branding";
 
 import { api } from "../../../convex/_generated/api";
-import { FeatureCard, StatsCard } from "./components";
+import { FeatureCard, StatsCard, TipsCard } from "./components";
 
 export function DashboardHomePage() {
   const user = useQuery(api.users.getCurrentUser);
@@ -17,23 +17,28 @@ export function DashboardHomePage() {
 
   return (
     <div className="h-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-      <div className="h-full overflow-y-auto p-6 lg:p-8">
+      <div className="h-full overflow-y-auto p-6 lg:flex lg:flex-col lg:overflow-hidden lg:p-8">
         {/* Welcome */}
-        <div className="mb-8">
+        <div className="mb-4">
           <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-800 lg:text-3xl">Hai, {displayName}!</h1>
         </div>
 
         {/* Stats */}
-        <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3 lg:gap-6">
+        <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
           <StatsCard label="Total Scan" value={scans?.length ?? 0} icon={Camera} variant="emerald" />
           <StatsCard label="Dokumen" value={documents?.length ?? 0} icon={FileText} variant="blue" />
           <StatsCard label="Konsultasi" value={consultations?.length ?? 0} icon={MessageCircle} variant="orange" />
         </div>
 
+        {/* Tips */}
+        <div className="mb-4">
+          <TipsCard />
+        </div>
+
         {/* Features */}
-        <div>
+        <div className="lg:flex lg:flex-1 lg:flex-col">
           <h2 className="mb-4 text-lg font-semibold text-gray-800">Fitur Utama</h2>
-          <div className="grid gap-6 md:grid-cols-3 xl:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-3 lg:flex-1">
             <FeatureCard
               icon={<Camera className="h-6 w-6 text-white" />}
               name={FEATURES.siapHalal.name}
