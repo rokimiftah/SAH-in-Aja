@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useConvexAuth } from "convex/react";
 import { ConvexError } from "convex/values";
-import { ArrowLeft, CheckCircle2, Loader2, XCircle } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { Link, useLocation } from "wouter";
+
+import { useToast } from "@shared/components/ui";
 
 const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -12,11 +14,10 @@ export default function LoginPage() {
   const { signIn } = useAuthActions();
   const [, navigate] = useLocation();
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
+  const toast = useToast();
 
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showSuccess, setShowSuccess] = useState(false);
 
   const getDashboardRedirect = () => (typeof window !== "undefined" ? `${window.location.origin}/dashboard` : "/dashboard");
 
@@ -31,12 +32,11 @@ export default function LoginPage() {
     const trimmedEmail = email.trim().toLowerCase();
 
     if (!isValidEmail(trimmedEmail)) {
-      setError("Masukkan alamat email yang valid");
+      toast.error("Masukkan alamat email yang valid");
       return;
     }
 
     setIsLoading(true);
-    setError(null);
 
     const formData = new FormData();
     formData.set("email", trimmedEmail);
@@ -44,15 +44,14 @@ export default function LoginPage() {
 
     try {
       await signIn("magic-link", formData);
-      setShowSuccess(true);
+      toast.success("Email terkirim! Cek inbox Anda.");
       setEmail("");
-      setTimeout(() => setShowSuccess(false), 7000);
     } catch (err: unknown) {
       const errorMessage =
         err instanceof ConvexError
           ? (err.data as { message: string }).message || "Gagal mengirim magic link"
           : "Gagal mengirim magic link";
-      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +59,6 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
-    setError(null);
     try {
       await signIn("google", { redirectTo: getDashboardRedirect() });
     } catch (err: unknown) {
@@ -68,14 +66,13 @@ export default function LoginPage() {
         err instanceof ConvexError
           ? (err.data as { message: string }).message || "Gagal masuk dengan Google"
           : "Gagal masuk dengan Google";
-      setError(errorMessage);
+      toast.error(errorMessage);
       setIsLoading(false);
     }
   };
 
   const handleGitHubLogin = async () => {
     setIsLoading(true);
-    setError(null);
     try {
       await signIn("github", { redirectTo: getDashboardRedirect() });
     } catch (err: unknown) {
@@ -83,7 +80,7 @@ export default function LoginPage() {
         err instanceof ConvexError
           ? (err.data as { message: string }).message || "Gagal masuk dengan GitHub"
           : "Gagal masuk dengan GitHub";
-      setError(errorMessage);
+      toast.error(errorMessage);
       setIsLoading(false);
     }
   };
@@ -107,33 +104,6 @@ export default function LoginPage() {
                 <img src="/logo.avif" alt="SAH-in Aja" className="mx-auto h-12 w-auto sm:h-16" />
               </Link>
             </div>
-
-            {/* Success Message */}
-            {showSuccess && (
-              <div className="border-primary-green/30 bg-primary-green/5 rounded-lg border p-4">
-                <div className="flex items-start gap-3">
-                  <div className="bg-primary-green flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
-                    <CheckCircle2 className="h-4 w-4 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Email terkirim!</p>
-                    <p className="mt-0.5 text-xs text-gray-500">Cek inbox email Anda dan klik link untuk masuk.</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Error Message */}
-            {error && (
-              <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-500">
-                    <XCircle className="h-4 w-4 text-white" />
-                  </div>
-                  <p className="text-sm font-medium text-red-600">{error}</p>
-                </div>
-              </div>
-            )}
 
             {/* OAuth Buttons */}
             <div className="space-y-3">
