@@ -127,12 +127,12 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 
       const userId = await ctx.db.insert("users", {
         email: normalizedEmail,
-        name: name || "User",
         emailVerificationTime: args.type === "oauth" ? Date.now() : undefined,
         linkedProviders: [provider],
         credits: 3, // Free tier gets 3 credits
         tier: "free",
         createdAt: Date.now(),
+        ...(name ? { name } : {}),
         ...(image ? { image } : {}),
       });
 

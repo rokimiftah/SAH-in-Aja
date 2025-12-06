@@ -232,6 +232,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const name = (user?.name ?? "").trim();
   const email = (user?.email ?? "").trim();
+  const displayName = name || email;
   const image = typeof user?.image === "string" ? user.image : undefined;
   const storageId = user?.storageId;
 
@@ -529,8 +530,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           >
             <img key={avatarKey} src={avatarUrl} alt="Avatar" className="h-10 w-10 rounded-full shadow-sm ring-2 ring-white" />
             <div className="min-w-0 flex-1 text-left">
-              <p className="truncate text-sm font-semibold text-gray-800">{name}</p>
-              <p className="truncate text-xs text-gray-500">{email}</p>
+              <p className="truncate text-sm font-semibold text-gray-800">{displayName}</p>
+              {name && <p className="truncate text-xs text-gray-500">{email}</p>}
             </div>
             <ChevronUp className={cn("h-4 w-4 text-gray-400 transition-transform", userMenuOpen ? "rotate-180" : "")} />
           </button>
