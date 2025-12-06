@@ -427,7 +427,7 @@ Pricing: $0.2/1M input, $0.6/1M output
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/SAH-in-Aja.git
+git clone https://github.com/rokimiftah/SAH-in-Aja.git
 cd SAH-in-Aja
 
 # Install dependencies
