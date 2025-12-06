@@ -11,7 +11,7 @@ export const PrivacyPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white font-poppins">
+    <div className="font-poppins min-h-screen bg-white">
       <Navbar />
 
       <main className="px-4 pt-24 pb-16 sm:pt-28">
