@@ -10,7 +10,7 @@ import { internalMutation, mutation, query } from "./_generated/server";
 const DAILY_LIMITS = {
   siapHalal: 3,
   dokumenHalal: 3,
-  asistenHalal: 1,
+  asistenHalal: 5,
 };
 
 // Get current date in UTC+7 (Asia/Jakarta)
