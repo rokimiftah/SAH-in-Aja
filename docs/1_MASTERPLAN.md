@@ -443,13 +443,13 @@ FAQ Matching (keyword/similarity)
 
 **Alternative Models Available on Kolosal:**
 
-| Model | Context | Price (input/output per 1M) | Use Case |
-|-------|---------|----------------------------|----------|
-| Claude Sonnet 4.5 | 200K | $3.0 / $15.0 | Vision AI |
-| Llama 4 Maverick | 131K | $0.2 / $0.6 | Text (cheapest) |
-| Qwen 3 VL 30B | 262K | $0.3 / $1.0 | Vision (budget) |
-| Kimi K2 | 262K | $0.6 / $2.5 | Text (large context) |
-| GLM 4.6 | 200K | $0.6 / $2.2 | Text (alternative) |
+| Model             | Context | Price (input/output per 1M) | Use Case             |
+| ----------------- | ------- | --------------------------- | -------------------- |
+| Claude Sonnet 4.5 | 200K    | $3.0 / $15.0                | Vision AI            |
+| Llama 4 Maverick  | 131K    | $0.2 / $0.6                 | Text (cheapest)      |
+| Qwen 3 VL 30B     | 262K    | $0.3 / $1.0                 | Vision (budget)      |
+| Kimi K2           | 262K    | $0.6 / $2.5                 | Text (large context) |
+| GLM 4.6           | 200K    | $0.6 / $2.2                 | Text (alternative)   |
 
 **Knowledge Base Strategy:**
 
@@ -679,14 +679,14 @@ Performance on 3G (Target Device):
 
 #### 🌐 External APIs & Services
 
-| Service                      | Purpose                           | Pricing   | Rate Limit                |
-| ---------------------------- | --------------------------------- | --------- | ------------------------- |
-| **Kolosal - Claude Sonnet 4.5** | Vision AI (Siap Halal)            | Pay-per-use | $3.0/$15.0 per 1M tokens |
-| **Kolosal - Llama 4 Maverick**  | Text AI (Dokumen Halal + Asisten) | Pay-per-use | $0.2/$0.6 per 1M tokens  |
-| **jsPDF (Server)**           | PDF generation for documents      | ✅ FREE   | Server-side only          |
-| **Convex Cloud**             | Backend + Database + Storage      | ✅ FREE   | 1GB, 1M actions/mo        |
-| **Cloudflare**               | CDN + DNS + R2 Storage            | ✅ FREE   | 100GB R2, unlimited CDN   |
-| **Total Development Cost**   | All APIs                          | **$0.00** | Non-issue for development |
+| Service                         | Purpose                           | Pricing     | Rate Limit                |
+| ------------------------------- | --------------------------------- | ----------- | ------------------------- |
+| **Kolosal - Claude Sonnet 4.5** | Vision AI (Siap Halal)            | Pay-per-use | $3.0/$15.0 per 1M tokens  |
+| **Kolosal - Llama 4 Maverick**  | Text AI (Dokumen Halal + Asisten) | Pay-per-use | $0.2/$0.6 per 1M tokens   |
+| **jsPDF (Server)**              | PDF generation for documents      | ✅ FREE     | Server-side only          |
+| **Convex Cloud**                | Backend + Database + Storage      | ✅ FREE     | 1GB, 1M actions/mo        |
+| **Cloudflare**                  | CDN + DNS + R2 Storage            | ✅ FREE     | 100GB R2, unlimited CDN   |
+| **Total Development Cost**      | All APIs                          | **$0.00**   | Non-issue for development |
 
 ---
 
