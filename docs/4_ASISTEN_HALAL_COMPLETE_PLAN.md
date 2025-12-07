@@ -3,12 +3,15 @@
 ## 📌 Document Information
 
 - **Feature**: Asisten Halal (Halal Certification Assistant AI)
-- **Version**: 3.0.0 (Full Halal Certification Focus)
+- **Version**: 4.0.0 (LLM-based Classification)
 - **Author**: SAH-in Aja! Development Team
-- **Status**: Planning Phase
+- **Status**: Implemented
+- **Last Updated**: 2024-12-07
 
 **NOTE**: This document focuses **exclusively** on halal certification guidance.
 All features are designed to help UMKMs achieve BPJPH/MUI halal certification.
+
+> ⚠️ **ARCHITECTURE UPDATE (2024-12-07)**: Sistem telah dimigrasi dari FAQ-based matching ke LLM-based classification. Lihat `docs/CHANGELOG_ASISTEN_HALAL.md` untuk detail perubahan.
 
 ---
 
@@ -72,12 +75,13 @@ All features are designed to help UMKMs achieve BPJPH/MUI halal certification.
 
 ## 📊 Key Capabilities
 
-### 1. Halal FAQ Assistant
+### 1. Halal AI Assistant (LLM-based)
 
-- **500+ curated halal FAQs** covering certification process
-- **Instant answers** to common halal questions
-- **Hybrid approach**: FAQ matching first, LLM fallback with disclaimer
+- **LLM-powered responses** untuk semua pertanyaan halal
+- **Smart topic classification** menggunakan LLM untuk filter pertanyaan
+- **Context-aware**: Pertanyaan ambigu diasumsikan terkait halal
 - **Assessment-aware responses** based on Siap Halal results
+- **Blocked content filter** untuk konten berbahaya (keyword-based)
 
 ### 2. Ingredient Checker
 
