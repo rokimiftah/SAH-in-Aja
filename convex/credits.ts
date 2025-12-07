@@ -285,23 +285,122 @@ export const applyPromoCode = mutation({
   },
 });
 
-// Internal mutation for cron job to clean up old records
-export const cleanupOldCredits = internalMutation({
+// One-time migration: Create daily credits for all existing users who don't have one
+// Run this from Convex dashboard: internal.credits.migrateExistingUsers
+export const migrateExistingUsers = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const today = getDateInUTC7();
+    const users = await ctx.db.query("users").collect();
+
+    let created = 0;
+    let skipped = 0;
+
+    for (const user of users) {
+      const existing = await ctx.db
+        .query("user_daily_credits")
+        .withIndex("by_user_date", (q) => q.eq("userId", user._id).eq("date", today))
+        .first();
+
+      if (existing) {
+        skipped++;
+        continue;
+      }
+
+      await ctx.db.insert("user_daily_credits", {
+        userId: user._id,
+        date: today,
+        siapHalalCredits: DAILY_LIMITS.siapHalal,
+        dokumenHalalCredits: DAILY_LIMITS.dokumenHalal,
+        asistenHalalChats: DAILY_LIMITS.asistenHalal,
+      });
+      created++;
+    }
+
+    return { created, skipped, total: users.length };
+  },
+});
+
+// Internal mutation to create daily credits for a new user (called from auth.ts)
+export const createDailyCreditsForUser = internalMutation({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const today = getDateInUTC7();
+
+    // Check if already exists
+    const existing = await ctx.db
+      .query("user_daily_credits")
+      .withIndex("by_user_date", (q) => q.eq("userId", args.userId).eq("date", today))
+      .first();
+
+    if (existing) {
+      return { id: existing._id, created: false };
+    }
+
+    const newId = await ctx.db.insert("user_daily_credits", {
+      userId: args.userId,
+      date: today,
+      siapHalalCredits: DAILY_LIMITS.siapHalal,
+      dokumenHalalCredits: DAILY_LIMITS.dokumenHalal,
+      asistenHalalChats: DAILY_LIMITS.asistenHalal,
+    });
+
+    return { id: newId, created: true };
+  },
+});
+
+// Internal mutation for cron job to reset all user credits at 00:00 UTC+7
+export const resetAllDailyCredits = internalMutation({
   args: {},
   handler: async (ctx) => {
     const today = getDateInUTC7();
 
-    // Get all records that are not from today
+    // Get all users
+    const users = await ctx.db.query("users").collect();
+
+    let created = 0;
+    let updated = 0;
+
+    for (const user of users) {
+      // Check if user has a record for today
+      const existing = await ctx.db
+        .query("user_daily_credits")
+        .withIndex("by_user_date", (q) => q.eq("userId", user._id).eq("date", today))
+        .first();
+
+      if (existing) {
+        // Reset credits to default values
+        await ctx.db.patch(existing._id, {
+          siapHalalCredits: DAILY_LIMITS.siapHalal,
+          dokumenHalalCredits: DAILY_LIMITS.dokumenHalal,
+          asistenHalalChats: DAILY_LIMITS.asistenHalal,
+        });
+        updated++;
+      } else {
+        // Create new record for today
+        await ctx.db.insert("user_daily_credits", {
+          userId: user._id,
+          date: today,
+          siapHalalCredits: DAILY_LIMITS.siapHalal,
+          dokumenHalalCredits: DAILY_LIMITS.dokumenHalal,
+          asistenHalalChats: DAILY_LIMITS.asistenHalal,
+        });
+        created++;
+      }
+    }
+
+    // Clean up old records (from previous days)
     const oldRecords = await ctx.db
       .query("user_daily_credits")
       .filter((q) => q.neq(q.field("date"), today))
       .collect();
 
-    // Delete old records
     for (const record of oldRecords) {
       await ctx.db.delete(record._id);
     }
 
-    return { deleted: oldRecords.length };
+    return { created, updated, deleted: oldRecords.length };
   },
 });

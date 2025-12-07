@@ -10,6 +10,7 @@ import { convexAuth } from "@convex-dev/auth/server";
 import { ConvexError } from "convex/values";
 import { z } from "zod";
 
+import { internal } from "./_generated/api";
 import { magicLink } from "./lib/magicLink";
 
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
@@ -135,6 +136,9 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         ...(name ? { name } : {}),
         ...(image ? { image } : {}),
       });
+
+      // Create daily credits for new user
+      await ctx.scheduler.runAfter(0, internal.credits.createDailyCreditsForUser, { userId });
 
       return userId;
     },
