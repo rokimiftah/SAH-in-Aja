@@ -25,7 +25,7 @@ export const KOLOSAL_MODELS = {
   // Vision AI - for Siap Halal photo analysis (Claude Sonnet 4.5 supports vision)
   VISION: "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
   // Text AI - for Dokumen Halal & Asisten Halal (cheapest option)
-  TEXT: "meta-llama/llama-4-maverick-17b-128e-instruct",
+  TEXT: "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
 } as const;
 
 // System prompts
