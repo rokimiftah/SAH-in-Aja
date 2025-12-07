@@ -352,6 +352,7 @@ export const createDailyCreditsForUser = internalMutation({
 });
 
 // Internal mutation for cron job to reset all user credits at 00:00 UTC+7
+// Preserves bonus credits from promo codes (credits above daily limit)
 export const resetAllDailyCredits = internalMutation({
   args: {},
   handler: async (ctx) => {
@@ -364,28 +365,45 @@ export const resetAllDailyCredits = internalMutation({
     let updated = 0;
 
     for (const user of users) {
+      // First, check for old records to get any bonus credits to carry over
+      const oldRecord = await ctx.db
+        .query("user_daily_credits")
+        .withIndex("by_user", (q) => q.eq("userId", user._id))
+        .first();
+
+      // Calculate bonus credits (credits above daily limit) to carry over
+      let bonusSiapHalal = 0;
+      let bonusDokumenHalal = 0;
+      let bonusAsistenHalal = 0;
+
+      if (oldRecord) {
+        bonusSiapHalal = Math.max(0, oldRecord.siapHalalCredits - DAILY_LIMITS.siapHalal);
+        bonusDokumenHalal = Math.max(0, oldRecord.dokumenHalalCredits - DAILY_LIMITS.dokumenHalal);
+        bonusAsistenHalal = Math.max(0, oldRecord.asistenHalalChats - DAILY_LIMITS.asistenHalal);
+      }
+
       // Check if user has a record for today
-      const existing = await ctx.db
+      const existingToday = await ctx.db
         .query("user_daily_credits")
         .withIndex("by_user_date", (q) => q.eq("userId", user._id).eq("date", today))
         .first();
 
-      if (existing) {
-        // Reset credits to default values
-        await ctx.db.patch(existing._id, {
-          siapHalalCredits: DAILY_LIMITS.siapHalal,
-          dokumenHalalCredits: DAILY_LIMITS.dokumenHalal,
-          asistenHalalChats: DAILY_LIMITS.asistenHalal,
+      if (existingToday) {
+        // Reset to daily limit + preserve bonus credits
+        await ctx.db.patch(existingToday._id, {
+          siapHalalCredits: DAILY_LIMITS.siapHalal + bonusSiapHalal,
+          dokumenHalalCredits: DAILY_LIMITS.dokumenHalal + bonusDokumenHalal,
+          asistenHalalChats: DAILY_LIMITS.asistenHalal + bonusAsistenHalal,
         });
         updated++;
       } else {
-        // Create new record for today
+        // Create new record for today with daily limit + bonus carry over
         await ctx.db.insert("user_daily_credits", {
           userId: user._id,
           date: today,
-          siapHalalCredits: DAILY_LIMITS.siapHalal,
-          dokumenHalalCredits: DAILY_LIMITS.dokumenHalal,
-          asistenHalalChats: DAILY_LIMITS.asistenHalal,
+          siapHalalCredits: DAILY_LIMITS.siapHalal + bonusSiapHalal,
+          dokumenHalalCredits: DAILY_LIMITS.dokumenHalal + bonusDokumenHalal,
+          asistenHalalChats: DAILY_LIMITS.asistenHalal + bonusAsistenHalal,
         });
         created++;
       }
