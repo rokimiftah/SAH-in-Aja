@@ -132,7 +132,7 @@ Pilih template, Isi data, Generate dokumen
 - Surat Komitmen Halal
 - Export ke DOCX
 
-**Model:** Llama 4 Maverick
+**Model:** Claude Sonnet 4.5
 
 </td>
 <td width="33%" valign="top">
@@ -150,7 +150,7 @@ Tanya, Jawab instan, Panduan lengkap
 - Guardrails anti-penyalahgunaan
 - Konteks percakapan
 
-**Model:** Llama 4 Maverick
+**Model:** Claude Sonnet 4.5
 
 </td>
 </tr>
@@ -312,7 +312,7 @@ Informasi profil akan otomatis digunakan saat membuat dokumen.
 | Provider                       | Model             | Purpose                     |
 | ------------------------------ | ----------------- | --------------------------- |
 | [Kolosal](https://kolosal.ai/) | Claude Sonnet 4.5 | Vision AI (Siap Halal)      |
-| [Kolosal](https://kolosal.ai/) | Llama 4 Maverick  | Text AI (Dokumen & Asisten) |
+| [Kolosal](https://kolosal.ai/) | Claude Sonnet 4.5 | Text AI (Dokumen & Asisten) |
 
 ### Infrastructure
 
@@ -346,9 +346,9 @@ Pricing: $3.0/1M input, $15.0/1M output
 ### Text AI - Dokumen & Asisten Halal
 
 ```
-Model: meta-llama/llama-4-maverick-17b-128e-instruct
-Context: 131K tokens
-Pricing: $0.2/1M input, $0.6/1M output
+Model: global.anthropic.claude-sonnet-4-5-20250929-v1:0
+Context: 200K tokens
+Pricing: $3.0/1M input, $15.0/1M output
 ```
 
 **Kemampuan:**

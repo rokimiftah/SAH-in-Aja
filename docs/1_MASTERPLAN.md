@@ -216,7 +216,7 @@ Form UI: User reviews & edits
   - Required fields validation
   - Real-time preview
     ↓
-Convex Action → Kolosal Llama 4 Maverick
+Convex Action → Kolosal Claude Sonnet 4.5
     ↓
 System Prompt: "Generate dokumen SJPH berdasarkan template dan data berikut..."
     ↓
@@ -276,7 +276,7 @@ System Prompt:
 
    User context: Skor halal 85%, usaha keripik pisang, perlu ganti supplier kecap"
     ↓
-Kolosal Llama 4 Maverick: Generate personalized answer
+Kolosal Claude Sonnet 4.5: Generate personalized answer
     ↓
 Response: Step-by-step guide + link ke BPJPH + checklist dokumen
 ```
@@ -429,17 +429,18 @@ FAQ Matching (keyword/similarity)
 
 **Text AI - Dokumen Halal + Asisten Halal:**
 
-- **Llama 4 Maverick 17B** (Kolosal - cheapest option)
-  - Model ID: `meta-llama/llama-4-maverick-17b-128e-instruct`
+- **Claude Sonnet 4.5** (Kolosal - cheapest option)
+  - Model ID: `global.anthropic.claude-sonnet-4-5-20250929-v1:0`
   - Context: 131K tokens
   - Capabilities: Strong legal drafting, structured output
   - Performance: Cost-effective for text generation
   - Pricing: $0.2/1M input, $0.6/1M output (very cheap!)
-  - **Why Llama 4 Maverick:**
-    - ✅ Most cost-effective option
-    - ✅ Large context window (131K)
+  - **Why Claude Sonnet 4.5:**
+    - ✅ Excellent multimodal capabilities
+    - ✅ Strong reasoning and analysis
     - ✅ Good instruction following
-    - ✅ Perfect for document generation
+    - ✅ Supports structured output
+    - ✅ Reliable vision API format
 
 **Alternative Models Available on Kolosal:**
 
@@ -682,7 +683,7 @@ Performance on 3G (Target Device):
 | Service                         | Purpose                           | Pricing     | Rate Limit                |
 | ------------------------------- | --------------------------------- | ----------- | ------------------------- |
 | **Kolosal - Claude Sonnet 4.5** | Vision AI (Siap Halal)            | Pay-per-use | $3.0/$15.0 per 1M tokens  |
-| **Kolosal - Llama 4 Maverick**  | Text AI (Dokumen Halal + Asisten) | Pay-per-use | $0.2/$0.6 per 1M tokens   |
+| **Kolosal - Claude Sonnet 4.5** | Text AI (Dokumen Halal + Asisten) | Pay-per-use | $3.0/$15.0 per 1M tokens  |
 | **jsPDF (Server)**              | PDF generation for documents      | ✅ FREE     | Server-side only          |
 | **Convex Cloud**                | Backend + Database + Storage      | ✅ FREE     | 1GB, 1M actions/mo        |
 | **Cloudflare**                  | CDN + DNS + R2 Storage            | ✅ FREE     | 100GB R2, unlimited CDN   |
@@ -1328,7 +1329,7 @@ Margin:
     },
     handler: async (ctx, args) => {
       const response = await kolosal.chat.completions.create({
-        model: "meta-llama/llama-4-maverick-17b-128e-instruct",
+        model: "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
         messages: [
           {
             role: "system",
@@ -1769,7 +1770,7 @@ Margin:
 
 3. **Technical Execution (100%):**
    - ✅ All 3 features fully functional (not mocks)
-   - ✅ Real AI processing (Kolosal: Claude Sonnet 4.5 + Llama 4 Maverick)
+   - ✅ Real AI processing (Kolosal: Claude Sonnet 4.5)
    - ✅ Production-ready: Error handling, edge cases, mobile-optimized
    - ✅ Smart architecture: Simplified RAG for realistic hackathon scope
    - ✅ Code quality: TypeScript, proper structure, maintainable
@@ -1925,7 +1926,7 @@ Margin:
 
 4. ✅ **Test APIs:**
    - [ ] Test Kolosal Claude Sonnet 4.5 with sample photos
-   - [ ] Test Kolosal Llama 4 Maverick with sample text
+   - [ ] Test Kolosal Claude Sonnet 4.5 with sample text
    - [ ] Verify rate limits work
 
 5. ✅ **Create Project Structure:**

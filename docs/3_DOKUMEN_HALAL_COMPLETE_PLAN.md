@@ -741,13 +741,13 @@ function validateClauseSelection(selectedClauses: string[]): ValidationResult {
 │  └──────────────────────────────────────────────────────────────┘ │
 └────────────────────────────┬──────────────────────────────────────┘
                              │
-                    ┌────────┴────────┐
-                    │                 │
-         ┌──────────▼─────────┐ ┌─────▼──────────┐
-         │  Kolosal API       │ │  Groq API      │
-         │  (Llama 4 Maverick)│ │  (Llama 3.3)   │
-         │  Vision + Text     │ │  Fast inference│
-         └────────────────────┘ └────────────────┘
+                    ┌────────┴─────────┐
+                    │                  │
+         ┌──────────▼──────────┐ ┌─────▼──────────┐
+         │  Kolosal API        │ │  Groq API      │
+         │  (Claude Sonnet 4.5)│ │  (Llama 3.3)   │
+         │  Vision + Text      │ │  Fast inference│
+         └─────────────────────┘ └────────────────┘
 ```
 
 ### 4.2 Database Schema
