@@ -43,10 +43,23 @@ export const getByUser = query({
   },
 });
 
-// Get latest scan by user
+// Get latest scan by user (authorized - only own data or admin)
 export const getLatest = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) {
+      throw new ConvexError("Silakan login terlebih dahulu");
+    }
+
+    // Check if requesting own data or is admin
+    if (currentUserId !== args.userId) {
+      const currentUser = await ctx.db.get(currentUserId);
+      if (!currentUser || currentUser.role !== "admin") {
+        throw new ConvexError("Tidak memiliki akses ke data ini");
+      }
+    }
+
     return await ctx.db
       .query("halal_scans")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
@@ -55,15 +68,31 @@ export const getLatest = query({
   },
 });
 
-// Get single scan
+// Get single scan (authorized - only owner or admin)
 export const get = query({
   args: { scanId: v.id("halal_scans") },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.scanId);
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) {
+      throw new ConvexError("Silakan login terlebih dahulu");
+    }
+
+    const scan = await ctx.db.get(args.scanId);
+    if (!scan) return null;
+
+    // Check if requesting own data or is admin
+    if (currentUserId !== scan.userId) {
+      const currentUser = await ctx.db.get(currentUserId);
+      if (!currentUser || currentUser.role !== "admin") {
+        throw new ConvexError("Tidak memiliki akses ke data ini");
+      }
+    }
+
+    return scan;
   },
 });
 
-// Create new scan result
+// Create new scan result (authorized - only for own userId)
 export const create = mutation({
   args: {
     userId: v.id("users"),
@@ -83,6 +112,16 @@ export const create = mutation({
     creditsUsed: v.number(),
   },
   handler: async (ctx, args) => {
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) {
+      throw new ConvexError("Silakan login terlebih dahulu");
+    }
+
+    // Only allow creating scan for own userId
+    if (currentUserId !== args.userId) {
+      throw new ConvexError("Tidak dapat membuat scan untuk user lain");
+    }
+
     const scanId = await ctx.db.insert("halal_scans", {
       userId: args.userId,
       photoUrls: args.photoUrls,

@@ -28,15 +28,31 @@ export const getByUser = query({
   },
 });
 
-// Get single consultation
+// Get single consultation (authorized - only owner or admin)
 export const get = query({
   args: { consultationId: v.id("halal_consultations") },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.consultationId);
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) {
+      throw new ConvexError("Silakan login terlebih dahulu");
+    }
+
+    const consultation = await ctx.db.get(args.consultationId);
+    if (!consultation) return null;
+
+    // Check if requesting own data or is admin
+    if (currentUserId !== consultation.userId) {
+      const currentUser = await ctx.db.get(currentUserId);
+      if (!currentUser || currentUser.role !== "admin") {
+        throw new ConvexError("Tidak memiliki akses ke data ini");
+      }
+    }
+
+    return consultation;
   },
 });
 
-// Create new consultation
+// Create new consultation (authorized - only for own userId)
 export const create = mutation({
   args: {
     userId: v.id("users"),
@@ -44,6 +60,16 @@ export const create = mutation({
     topic: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) {
+      throw new ConvexError("Silakan login terlebih dahulu");
+    }
+
+    // Only allow creating consultation for own userId
+    if (currentUserId !== args.userId) {
+      throw new ConvexError("Tidak dapat membuat konsultasi untuk user lain");
+    }
+
     const consultationId = await ctx.db.insert("halal_consultations", {
       userId: args.userId,
       messages: [
@@ -61,7 +87,7 @@ export const create = mutation({
   },
 });
 
-// Add message to consultation
+// Add message to consultation (authorized - only owner)
 export const addMessage = mutation({
   args: {
     consultationId: v.id("halal_consultations"),
@@ -69,8 +95,20 @@ export const addMessage = mutation({
     content: v.string(),
   },
   handler: async (ctx, args) => {
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) {
+      throw new ConvexError("Silakan login terlebih dahulu");
+    }
+
     const consultation = await ctx.db.get(args.consultationId);
-    if (!consultation) throw new Error("Consultation not found");
+    if (!consultation) {
+      throw new ConvexError("Konsultasi tidak ditemukan");
+    }
+
+    // Only owner can add messages to their consultation
+    if (currentUserId !== consultation.userId) {
+      throw new ConvexError("Tidak memiliki akses ke konsultasi ini");
+    }
 
     await ctx.db.patch(args.consultationId, {
       messages: [
@@ -85,10 +123,28 @@ export const addMessage = mutation({
   },
 });
 
-// Mark consultation as resolved
+// Mark consultation as resolved (authorized - only owner or admin)
 export const resolve = mutation({
   args: { consultationId: v.id("halal_consultations") },
   handler: async (ctx, args) => {
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) {
+      throw new ConvexError("Silakan login terlebih dahulu");
+    }
+
+    const consultation = await ctx.db.get(args.consultationId);
+    if (!consultation) {
+      throw new ConvexError("Konsultasi tidak ditemukan");
+    }
+
+    // Check if resolving own consultation or is admin
+    if (currentUserId !== consultation.userId) {
+      const currentUser = await ctx.db.get(currentUserId);
+      if (!currentUser || currentUser.role !== "admin") {
+        throw new ConvexError("Tidak memiliki akses ke konsultasi ini");
+      }
+    }
+
     await ctx.db.patch(args.consultationId, { resolved: true });
   },
 });

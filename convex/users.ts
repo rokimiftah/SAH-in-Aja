@@ -49,18 +49,52 @@ export const updateUserProfile = mutation({
   },
 });
 
-// Get user profile
+// Get user profile (authenticated users only - returns limited public data for others)
 export const getProfile = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.userId);
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) {
+      throw new ConvexError("Silakan login terlebih dahulu");
+    }
+
+    const user = await ctx.db.get(args.userId);
+    if (!user) return null;
+
+    // If requesting own profile or is admin, return full data
+    if (currentUserId === args.userId) {
+      return user;
+    }
+
+    const currentUser = await ctx.db.get(currentUserId);
+    if (currentUser?.role === "admin") {
+      return user;
+    }
+
+    // For other users, return limited public data only
+    return {
+      _id: user._id,
+      name: user.name,
+      image: user.image,
+      businessName: user.businessName,
+    };
   },
 });
 
-// Get user by email
+// Get user by email (admin only)
 export const getByEmail = query({
   args: { email: v.string() },
   handler: async (ctx, args) => {
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) {
+      throw new ConvexError("Silakan login terlebih dahulu");
+    }
+
+    const currentUser = await ctx.db.get(currentUserId);
+    if (!currentUser || currentUser.role !== "admin") {
+      throw new ConvexError("Hanya admin yang dapat mencari user berdasarkan email");
+    }
+
     return await ctx.db
       .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
@@ -68,16 +102,26 @@ export const getByEmail = query({
   },
 });
 
-// Deduct credits
+// Deduct credits (internal use only - caller must be the user themselves)
 export const deductCredits = mutation({
   args: {
     userId: v.id("users"),
     amount: v.number(),
   },
   handler: async (ctx, args) => {
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) {
+      throw new ConvexError("Silakan login terlebih dahulu");
+    }
+
+    // Only allow deducting own credits
+    if (currentUserId !== args.userId) {
+      throw new ConvexError("Tidak dapat mengurangi kredit user lain");
+    }
+
     const user = await ctx.db.get(args.userId);
-    if (!user) throw new Error("User not found");
-    if ((user.credits ?? 0) < args.amount) throw new Error("Insufficient credits");
+    if (!user) throw new ConvexError("User tidak ditemukan");
+    if ((user.credits ?? 0) < args.amount) throw new ConvexError("Kredit tidak mencukupi");
 
     await ctx.db.patch(args.userId, {
       credits: (user.credits ?? 0) - args.amount,

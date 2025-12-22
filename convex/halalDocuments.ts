@@ -43,15 +43,31 @@ export const getByUser = query({
   },
 });
 
-// Get single document
+// Get single document (authorized - only owner or admin)
 export const get = query({
   args: { documentId: v.id("halal_documents") },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.documentId);
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) {
+      throw new ConvexError("Silakan login terlebih dahulu");
+    }
+
+    const doc = await ctx.db.get(args.documentId);
+    if (!doc) return null;
+
+    // Check if requesting own data or is admin
+    if (currentUserId !== doc.userId) {
+      const currentUser = await ctx.db.get(currentUserId);
+      if (!currentUser || currentUser.role !== "admin") {
+        throw new ConvexError("Tidak memiliki akses ke data ini");
+      }
+    }
+
+    return doc;
   },
 });
 
-// Create new document
+// Create new document (authorized - only for own userId)
 export const create = mutation({
   args: {
     userId: v.id("users"),
@@ -79,6 +95,16 @@ export const create = mutation({
     creditsUsed: v.number(),
   },
   handler: async (ctx, args) => {
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) {
+      throw new ConvexError("Silakan login terlebih dahulu");
+    }
+
+    // Only allow creating document for own userId
+    if (currentUserId !== args.userId) {
+      throw new ConvexError("Tidak dapat membuat dokumen untuk user lain");
+    }
+
     const docId = await ctx.db.insert("halal_documents", {
       userId: args.userId,
       templateType: args.templateType,
@@ -92,13 +118,31 @@ export const create = mutation({
   },
 });
 
-// Update document with PDF URL
+// Update document with PDF URL (authorized - only owner or admin)
 export const updatePdfUrl = mutation({
   args: {
     documentId: v.id("halal_documents"),
     pdfUrl: v.string(),
   },
   handler: async (ctx, args) => {
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) {
+      throw new ConvexError("Silakan login terlebih dahulu");
+    }
+
+    const doc = await ctx.db.get(args.documentId);
+    if (!doc) {
+      throw new ConvexError("Dokumen tidak ditemukan");
+    }
+
+    // Check if updating own document or is admin
+    if (currentUserId !== doc.userId) {
+      const currentUser = await ctx.db.get(currentUserId);
+      if (!currentUser || currentUser.role !== "admin") {
+        throw new ConvexError("Tidak memiliki akses ke dokumen ini");
+      }
+    }
+
     await ctx.db.patch(args.documentId, {
       pdfUrl: args.pdfUrl,
     });
