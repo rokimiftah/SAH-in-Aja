@@ -15,8 +15,12 @@ export const getCurrentUser = query({
   },
 });
 
-// Generate upload URL for avatar
+// Generate upload URL for avatar (authenticated users only)
 export const generateUploadUrl = mutation(async (ctx) => {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) {
+    throw new ConvexError("Silakan login terlebih dahulu");
+  }
   return await ctx.storage.generateUploadUrl();
 });
 
