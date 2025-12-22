@@ -1,31 +1,29 @@
 import OpenAI from "openai";
 
 /**
- * Kolosal API Integration
+ * LLM API Integration (Claude Sonnet 4.5 via OpenAI-compatible API)
  *
- * CATATAN: Sebelumnya menggunakan NVIDIA API (build.nvidia.com) selama development
- * karena memiliki free credits yang cukup untuk testing. Kolosal API digunakan
- * untuk production/demo agar kredit Kolosal tidak habis selama development.
+ * Provider: LLM API endpoint (OpenAI-compatible)
+ * Model: global.anthropic.claude-sonnet-4-5-20250929-v1:0
  *
- * Jika ingin development dengan NVIDIA, gunakan branch terpisah atau
- * set KOLOSAL_API_KEY dengan NVIDIA API key dan ubah baseURL ke:
- * https://integrate.api.nvidia.com/v1
+ * CATATAN: Menggunakan API endpoint yang kompatibel dengan OpenAI
+ * untuk integrasi Claude Sonnet 4.5 sebagai model LLM utama.
  */
 
-// Kolosal API client (OpenAI-compatible)
-export const createKolosalClient = (apiKey: string) => {
+// LLM API client (OpenAI-compatible)
+export const createLLMClient = (apiKey: string) => {
   return new OpenAI({
     apiKey,
-    baseURL: "https://api.kolosal.ai/v1",
+    baseURL: process.env.LLM_API_URL,
   });
 };
 
 // Models
-export const KOLOSAL_MODELS = {
+export const LLM_MODELS = {
   // Vision AI - for Siap Halal photo analysis (Claude Sonnet 4.5 supports vision)
-  VISION: "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+  VISION: process.env.LLM_MODEL_VISION as string,
   // Text AI - for Dokumen Halal & Asisten Halal (cheapest option)
-  TEXT: "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+  TEXT: process.env.LLM_MODEL_TEXT as string,
 } as const;
 
 // System prompts
@@ -81,7 +79,7 @@ OUTPUT FORMAT (JSON):
 PANDUAN BAHASA:
 - Gunakan bahasa Indonesia SEDERHANA seperti berbicara dengan ibu-ibu warung
 - Hindari istilah teknis, gunakan kata sehari-hari
-- summaryPoints maksimal 4-5 poin, mulai dengan emoji ✅ untuk positif dan ⚠️ untuk perlu perbaikan
+- summaryPoints maksimal 4-5 poin, mulai dengan emoji ✅ untuk positif dan ⚠️ untuk perlu perbaiki
 - overallMessage harus memotivasi, bukan menakut-nakuti
 - Contoh baik: "Dapurnya sudah bersih, tinggal ganti kecap yang ada label halalnya ya Bu!"
 - Contoh buruk: "Fasilitas produksi tidak memenuhi standar SJPH HAS 23000 kriteria 6"

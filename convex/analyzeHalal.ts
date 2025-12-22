@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 
 import { action } from "./_generated/server";
-import { createKolosalClient, KOLOSAL_MODELS, SYSTEM_PROMPTS } from "./lib/kolosal";
+import { createLLMClient, LLM_MODELS, SYSTEM_PROMPTS } from "./lib/llmClient";
 
 // Helper function to convert ArrayBuffer to base64 (works in Convex runtime)
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
@@ -27,9 +27,9 @@ export const analyzeKitchen = action({
     photoStorageIds: v.array(v.id("_storage")),
   },
   handler: async (ctx, args) => {
-    const apiKey = process.env.KOLOSAL_API_KEY;
+    const apiKey = process.env.LLM_API_KEY;
     if (!apiKey) {
-      throw new Error("KOLOSAL_API_KEY not configured");
+      throw new Error("LLM_API_KEY not configured");
     }
 
     // Convert storage IDs to URLs and then to base64
@@ -48,7 +48,7 @@ export const analyzeKitchen = action({
       throw new Error("No valid photo URLs");
     }
 
-    const kolosal = createKolosalClient(apiKey);
+    const llmClient = createLLMClient(apiKey);
 
     // Build message content with base64 images
     const imageContents = imageBase64List.map((base64Url) => ({
@@ -56,10 +56,10 @@ export const analyzeKitchen = action({
       image_url: { url: base64Url },
     }));
 
-    let response: Awaited<ReturnType<typeof kolosal.chat.completions.create>>;
+    let response: Awaited<ReturnType<typeof llmClient.chat.completions.create>>;
     try {
-      response = await kolosal.chat.completions.create({
-        model: KOLOSAL_MODELS.VISION,
+      response = await llmClient.chat.completions.create({
+        model: LLM_MODELS.VISION,
         messages: [
           {
             role: "system",
@@ -80,7 +80,7 @@ export const analyzeKitchen = action({
         max_tokens: 2000,
       });
     } catch (apiError) {
-      console.error("Kolosal API Error:", apiError);
+      console.error("LLM API Error:", apiError);
       throw new Error(`AI API Error: ${apiError instanceof Error ? apiError.message : "Unknown error"}`);
     }
 

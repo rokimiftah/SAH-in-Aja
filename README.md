@@ -14,8 +14,6 @@
 [![Kolosal AI](https://img.shields.io/badge/Kolosal-AI-76B900?style=for-the-badge)](https://kolosal.ai/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-06B6D4?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
 
-[Demo](https://sahin.biz.id) | [Dokumentasi](./docs/) | [Hackathon IMPHNEN x Kolosal.ai](https://kolosal.ai/)
-
 </div>
 
 ---
@@ -34,8 +32,6 @@
 - [Sistem Kredit](#sistem-kredit)
 - [Environment Variables](#environment-variables)
 - [Screenshots](#screenshots)
-- [Dokumentasi](#dokumentasi)
-- [Tim](#tim)
 - [Disclaimer](#disclaimer)
 - [License](#license)
 
@@ -156,7 +152,7 @@ Tanya, Jawab instan, Panduan lengkap
 </tr>
 </table>
 
-### 4. Admin Dashboard (New)
+### 4. Admin Dashboard
 
 **Pusat Kontrol Pengelola Platform**
 
@@ -318,10 +314,10 @@ Informasi profil akan otomatis digunakan saat membuat dokumen.
 
 ### AI/ML
 
-| Provider                       | Model             | Purpose                     |
-| ------------------------------ | ----------------- | --------------------------- |
-| [Kolosal](https://kolosal.ai/) | Claude Sonnet 4.5 | Vision AI (Siap Halal)      |
-| [Kolosal](https://kolosal.ai/) | Claude Sonnet 4.5 | Text AI (Dokumen & Asisten) |
+| Provider                       | Model             | Purpose   |
+| ------------------------------ | ----------------- | --------- |
+| [LLM API](https://kolosal.ai/) | Claude Sonnet 4.5 | Vision AI |
+| [LLM API](https://kolosal.ai/) | Claude Sonnet 4.5 | Text AI   |
 
 ### Infrastructure
 
@@ -335,7 +331,7 @@ Informasi profil akan otomatis digunakan saat membuat dokumen.
 
 ## AI Models
 
-Platform ini menggunakan **Kolosal API** sebagai provider AI utama:
+Platform ini menggunakan **LLM API** (Claude Sonnet 4.5) sebagai provider AI utama:
 
 ### Vision AI - Siap Halal
 
@@ -366,17 +362,6 @@ Pricing: $3.0/1M input, $15.0/1M output
 - Large context window
 - Good instruction following
 - Structured document output
-
-### Alternative Models (Available on Kolosal)
-
-| Model         | Context | Price (in/out per 1M) | Use Case             |
-| ------------- | ------- | --------------------- | -------------------- |
-| Qwen 3 VL 30B | 262K    | $0.3 / $1.0           | Vision (budget)      |
-| Kimi K2       | 262K    | $0.6 / $2.5           | Text (large context) |
-| GLM 4.6       | 200K    | $0.6 / $2.2           | Text (alternative)   |
-| MiniMax M2    | 204K    | $0.3 / $1.2           | Text (alternative)   |
-
-> **Note:** Selama development menggunakan NVIDIA API (build.nvidia.com) karena memiliki free credits untuk testing. Kolosal API digunakan untuk production/demo.
 
 ---
 
@@ -415,8 +400,8 @@ Pricing: $3.0/1M input, $15.0/1M output
 ┌─────────────────────────────────────────────────────────────┐
 │                    EXTERNAL SERVICES                        │
 │  ┌──────────────┬──────────────┬──────────────────────┐     │
-│  │ Kolosal API  │ Resend       │ Convex Storage       │     │
-│  │ (AI Models)  │ (Email)      │ (File Upload)        │     │
+│  │ LLM API      │ Resend       │ Convex Storage       │     │
+│  │ (Claude)     │ (Email)      │ (File Upload)        │     │
 │  └──────────────┴──────────────┴──────────────────────┘     │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -430,7 +415,7 @@ Pricing: $3.0/1M input, $15.0/1M output
 - [Bun](https://bun.sh/) >= 1.0
 - [Node.js](https://nodejs.org/) >= 18 (for Convex CLI)
 - Akun [Convex](https://convex.dev/)
-- API Key [Kolosal](https://kolosal.ai/)
+- API Key LLM
 
 ### Installation
 
@@ -503,7 +488,7 @@ SAH-in-Aja/
 │   ├── consultHalal.ts         # Chat AI action
 │   ├── credits.ts              # Credit system
 │   ├── lib/
-│   │   └── kolosal.ts          # AI client & prompts
+│   │   └── llmClient.ts        # LLM client & prompts
 │   └── _generated/             # Auto-generated types
 ├── docs/                       # Documentation (20K+ lines)
 │   ├── 0_BRANDING_GUIDE.md
@@ -568,8 +553,9 @@ JWKS=your_jwks_json
 JWT_PRIVATE_KEY=your_jwt_private_key
 SITE_URL=https://sahin.biz.id
 
-# AI Provider
-KOLOSAL_API_KEY=kol__your_api_key
+# LLM Provider
+LLM_API_KEY=llm__your_api_key
+LLM_API_URL=
 
 # Email (Optional)
 RESEND_API_KEY=re_your_api_key
@@ -598,50 +584,6 @@ RESEND_API_KEY=re_your_api_key
 ### Asisten Halal - AI Chatbot
 
 ![Asisten Halal](https://cdn.sahin.biz.id/asisten-halal.png)
-
----
-
-## Dokumentasi
-
-Proyek ini dilengkapi dengan **20,000+ baris** dokumentasi teknis:
-
-| Dokumen                                                     | Konten                                   | Lines  |
-| ----------------------------------------------------------- | ---------------------------------------- | ------ |
-| [Branding Guide](docs/0_BRANDING_GUIDE.md)                  | Brand identity, messaging, tone of voice | 800+   |
-| [Masterplan](docs/1_MASTERPLAN.md)                          | Architecture, roadmap, business model    | 2,000+ |
-| [Siap Halal Plan](docs/2_SIAP_HALAL_COMPLETE_PLAN.md)       | Complete implementation guide            | 4,600+ |
-| [Dokumen Halal Plan](docs/3_DOKUMEN_HALAL_COMPLETE_PLAN.md) | Document generator specs                 | 6,700+ |
-| [Asisten Halal Plan](docs/4_ASISTEN_HALAL_COMPLETE_PLAN.md) | Chatbot implementation                   | 4,100+ |
-| [Design System](docs/5_DESIGN_SYSTEM.md)                    | UI/UX guidelines                         | 1,500+ |
-| [Deployment Guide](docker/README.md)                        | Docker self-host & Convex managed setup  | 300+   |
-
----
-
-## Optimasi Mobile
-
-Platform dioptimasi untuk device low-end yang umum digunakan UMKM Indonesia:
-
-### Target Device
-
-```
-Device: Samsung A03, Xiaomi Redmi 9A, Oppo A16
-├── RAM: 2-3GB
-├── CPU: MediaTek Helio P22 / Snapdragon 450
-├── Network: 3G/4G (0.5-2 Mbps)
-├── Browser: Chrome 110+
-└── Android: 11-12
-```
-
----
-
-## Tim
-
-**Hackathon IMPHNEN x Kolosal.ai 2025**
-
-| Name                      | Role                           |
-| ------------------------- | ------------------------------ |
-| **Roki Miftah Kamaludin** | Bagian Nyengir, Dimarahin Mulu |
-| **Indah Prabadewi**       | Market Analyst, QA, Supporter  |
 
 ---
 
@@ -696,7 +638,5 @@ copies or substantial portions of the Software.
 <br>
 
 Made with love for Indonesian MSMEs
-
-**Hackathon IMPHNEN x Kolosal.ai 2025**
 
 </div>

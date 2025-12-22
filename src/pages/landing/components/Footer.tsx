@@ -15,9 +15,6 @@ export const Footer = () => {
             </Link>
           </div>
         </div>
-        <div className="mt-4 border-t border-gray-100 pt-4 text-center text-xs text-gray-400 sm:mt-6 sm:pt-6">
-          Hackathon IMPHNEN x Kolosai.ai 2025
-        </div>
       </div>
     </footer>
   );

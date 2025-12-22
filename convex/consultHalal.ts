@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 
 import { action } from "./_generated/server";
-import { createKolosalClient, KOLOSAL_MODELS, SYSTEM_PROMPTS } from "./lib/kolosal";
+import { createLLMClient, LLM_MODELS, SYSTEM_PROMPTS } from "./lib/llmClient";
 
 // Guardrails - Keywords that indicate harmful/inappropriate content (tetap keyword-based untuk keamanan)
 const BLOCKED_KEYWORDS = [
@@ -83,7 +83,7 @@ function isGreeting(message: string): boolean {
 // LLM-based topic classification
 async function classifyTopicWithLLM(
   message: string,
-  kolosal: ReturnType<typeof createKolosalClient>,
+  llmClient: ReturnType<typeof createLLMClient>,
 ): Promise<{ isHalalRelated: boolean; reason: string }> {
   const classificationPrompt = `Kamu adalah classifier untuk aplikasi "Asisten Halal" - chatbot khusus sertifikasi halal BPJPH/MUI.
 
@@ -108,8 +108,8 @@ Jawab dengan format JSON (tanpa markdown):
 {"isHalalRelated": true/false, "reason": "alasan singkat"}`;
 
   try {
-    const response = await kolosal.chat.completions.create({
-      model: KOLOSAL_MODELS.TEXT,
+    const response = await llmClient.chat.completions.create({
+      model: LLM_MODELS.TEXT,
       messages: [{ role: "user", content: classificationPrompt }],
       temperature: 0,
       max_tokens: 100,
@@ -153,7 +153,7 @@ export const chat = action({
   },
   handler: async (_ctx, args) => {
     // === SETUP API CLIENT ===
-    const apiKey = process.env.KOLOSAL_API_KEY;
+    const apiKey = process.env.LLM_API_KEY;
     if (!apiKey) {
       return {
         response: "Maaf, sistem sedang tidak tersedia. Silakan coba lagi nanti atau hubungi BPJPH di 1500-363.",
@@ -161,7 +161,7 @@ export const chat = action({
         confidence: 0,
       };
     }
-    const kolosal = createKolosalClient(apiKey);
+    const llmClient = createLLMClient(apiKey);
 
     // === GUARDRAILS ===
     // Check for blocked content (harmful, adult, hate speech) - keyword-based untuk kecepatan
@@ -177,7 +177,7 @@ export const chat = action({
     // Skip classification for greetings
     if (!isGreeting(args.message)) {
       // LLM-based topic classification untuk pertanyaan non-greeting
-      const classification = await classifyTopicWithLLM(args.message, kolosal);
+      const classification = await classifyTopicWithLLM(args.message, llmClient);
 
       if (!classification.isHalalRelated) {
         return {
@@ -220,8 +220,8 @@ export const chat = action({
       content: args.message,
     });
 
-    const response = await kolosal.chat.completions.create({
-      model: KOLOSAL_MODELS.TEXT,
+    const response = await llmClient.chat.completions.create({
+      model: LLM_MODELS.TEXT,
       messages,
       temperature: 0.7,
       max_tokens: 4096,

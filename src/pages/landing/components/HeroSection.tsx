@@ -13,10 +13,6 @@ export const HeroSection = () => {
     <section className="pt-20 pb-12 sm:pt-24 sm:pb-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <motion.div {...fadeInUp} className="mx-auto max-w-3xl pt-6 text-center sm:pt-8">
-          <div className="border-primary-green/20 bg-primary-green/5 mb-4 inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs sm:mb-5 sm:px-4 sm:py-2 sm:text-sm">
-            <span className="text-primary-green">Powered by</span>
-            <span className="font-semibold text-gray-900">Kolosal.ai</span>
-          </div>
           <h1 className="mb-4 text-3xl font-semibold tracking-tight text-gray-900 sm:mb-5 sm:text-5xl lg:text-6xl">
             Persiapan Sertifikasi Halal Lebih Mudah
           </h1>

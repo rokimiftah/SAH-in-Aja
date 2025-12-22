@@ -2,7 +2,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 
 import { action } from "./_generated/server";
-import { createKolosalClient, KOLOSAL_MODELS, SYSTEM_PROMPTS } from "./lib/kolosal";
+import { createLLMClient, LLM_MODELS, SYSTEM_PROMPTS } from "./lib/llmClient";
 
 const MAX_PHOTOS = 3;
 const ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
@@ -60,9 +60,9 @@ export const analyzeMaterial = action({
       throw new ConvexError("Silakan login terlebih dahulu");
     }
 
-    const apiKey = process.env.KOLOSAL_API_KEY;
+    const apiKey = process.env.LLM_API_KEY;
     if (!apiKey) {
-      throw new Error("KOLOSAL_API_KEY not configured");
+      throw new Error("LLM_API_KEY not configured");
     }
 
     if (args.photoStorageIds.length === 0) {
@@ -87,7 +87,7 @@ export const analyzeMaterial = action({
       imageBase64List.push(base64);
     }
 
-    const kolosal = createKolosalClient(apiKey);
+    const llmClient = createLLMClient(apiKey);
 
     const imageContents = imageBase64List.map((base64, index) => ({
       type: "image_url" as const,
@@ -100,10 +100,10 @@ export const analyzeMaterial = action({
     const photoLabels =
       imageBase64List.length === 1 ? "foto kemasan ini" : `${imageBase64List.length} foto kemasan (depan dan belakang)`;
 
-    let response: Awaited<ReturnType<typeof kolosal.chat.completions.create>>;
+    let response: Awaited<ReturnType<typeof llmClient.chat.completions.create>>;
     try {
-      response = await kolosal.chat.completions.create({
-        model: KOLOSAL_MODELS.VISION,
+      response = await llmClient.chat.completions.create({
+        model: LLM_MODELS.VISION,
         messages: [
           {
             role: "system",
@@ -124,7 +124,7 @@ export const analyzeMaterial = action({
         max_tokens: 2000,
       });
     } catch (apiError) {
-      console.error("Kolosal API Error:", apiError);
+      console.error("LLM API Error:", apiError);
       throw new ConvexError(`Gagal menganalisis foto. Silakan coba lagi.`);
     }
 

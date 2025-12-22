@@ -20,7 +20,7 @@ import type * as halalConsultations from "../halalConsultations.js";
 import type * as halalDocuments from "../halalDocuments.js";
 import type * as halalScans from "../halalScans.js";
 import type * as http from "../http.js";
-import type * as lib_kolosal from "../lib/kolosal.js";
+import type * as lib_llmClient from "../lib/llmClient.js";
 import type * as lib_magicLink from "../lib/magicLink.js";
 import type * as maintenance from "../maintenance.js";
 import type * as materialScans from "../materialScans.js";
@@ -46,7 +46,7 @@ declare const fullApi: ApiFromModules<{
   halalDocuments: typeof halalDocuments;
   halalScans: typeof halalScans;
   http: typeof http;
-  "lib/kolosal": typeof lib_kolosal;
+  "lib/llmClient": typeof lib_llmClient;
   "lib/magicLink": typeof lib_magicLink;
   maintenance: typeof maintenance;
   materialScans: typeof materialScans;
