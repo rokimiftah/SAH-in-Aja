@@ -11,6 +11,7 @@ const DAILY_LIMITS = {
   siapHalal: 3,
   dokumenHalal: 3,
   asistenHalal: 5,
+  cekBahan: 10,
 };
 
 // Get current date in UTC+7 (Asia/Jakarta)
@@ -52,6 +53,7 @@ async function getOrCreateDailyCredits(ctx: MutationCtx, userId: Id<"users">) {
     siapHalalCredits: DAILY_LIMITS.siapHalal,
     dokumenHalalCredits: DAILY_LIMITS.dokumenHalal,
     asistenHalalChats: DAILY_LIMITS.asistenHalal,
+    cekBahanCredits: DAILY_LIMITS.cekBahan,
   });
 
   return {
@@ -61,6 +63,7 @@ async function getOrCreateDailyCredits(ctx: MutationCtx, userId: Id<"users">) {
     siapHalalCredits: DAILY_LIMITS.siapHalal,
     dokumenHalalCredits: DAILY_LIMITS.dokumenHalal,
     asistenHalalChats: DAILY_LIMITS.asistenHalal,
+    cekBahanCredits: DAILY_LIMITS.cekBahan,
   };
 }
 
@@ -78,6 +81,7 @@ export const getMyDailyCredits = query({
     const siapHalal = credits?.siapHalalCredits ?? DAILY_LIMITS.siapHalal;
     const dokumenHalal = credits?.dokumenHalalCredits ?? DAILY_LIMITS.dokumenHalal;
     const asistenHalal = credits?.asistenHalalChats ?? DAILY_LIMITS.asistenHalal;
+    const cekBahan = credits?.cekBahanCredits ?? DAILY_LIMITS.cekBahan;
 
     return {
       siapHalalCredits: siapHalal > DAILY_LIMITS.siapHalal ? siapHalal : Math.min(siapHalal, DAILY_LIMITS.siapHalal),
@@ -85,6 +89,7 @@ export const getMyDailyCredits = query({
         dokumenHalal > DAILY_LIMITS.dokumenHalal ? dokumenHalal : Math.min(dokumenHalal, DAILY_LIMITS.dokumenHalal),
       asistenHalalChats:
         asistenHalal > DAILY_LIMITS.asistenHalal ? asistenHalal : Math.min(asistenHalal, DAILY_LIMITS.asistenHalal),
+      cekBahanCredits: cekBahan > DAILY_LIMITS.cekBahan ? cekBahan : Math.min(cekBahan, DAILY_LIMITS.cekBahan),
       limits: DAILY_LIMITS,
     };
   },
@@ -93,7 +98,7 @@ export const getMyDailyCredits = query({
 // Check if user has credits for a specific feature
 export const checkCredits = query({
   args: {
-    feature: v.union(v.literal("siapHalal"), v.literal("dokumenHalal"), v.literal("asistenHalal")),
+    feature: v.union(v.literal("siapHalal"), v.literal("dokumenHalal"), v.literal("asistenHalal"), v.literal("cekBahan")),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -119,6 +124,11 @@ export const checkCredits = query({
       case "asistenHalal":
         limit = DAILY_LIMITS.asistenHalal;
         remaining = credits?.asistenHalalChats ?? limit;
+        if (remaining <= limit) remaining = Math.min(remaining, limit);
+        break;
+      case "cekBahan":
+        limit = DAILY_LIMITS.cekBahan;
+        remaining = credits?.cekBahanCredits ?? limit;
         if (remaining <= limit) remaining = Math.min(remaining, limit);
         break;
     }
@@ -206,6 +216,35 @@ export const useAsistenHalalCredit = mutation({
     return {
       remaining: newCredits,
       limit: DAILY_LIMITS.asistenHalal,
+    };
+  },
+});
+
+// Use credit for Cek Bahan (material scan)
+export const useCekBahanCredit = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Silakan login terlebih dahulu");
+
+    const credits = await getOrCreateDailyCredits(ctx, userId);
+
+    const currentCredits = credits.cekBahanCredits ?? DAILY_LIMITS.cekBahan;
+    const cappedCredits =
+      currentCredits > DAILY_LIMITS.cekBahan ? currentCredits : Math.min(currentCredits, DAILY_LIMITS.cekBahan);
+
+    if (cappedCredits <= 0) {
+      throw new ConvexError("Kredit Cek Bahan habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
+    }
+
+    const newCredits = cappedCredits - 1;
+    await ctx.db.patch(credits._id, {
+      cekBahanCredits: newCredits,
+    });
+
+    return {
+      remaining: newCredits,
+      limit: DAILY_LIMITS.cekBahan,
     };
   },
 });

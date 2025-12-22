@@ -6,3 +6,5 @@ export { DokumenHalalPage } from "./DokumenHalalPage";
 export { DokumenHalalHistoryPage } from "./DokumenHalalHistoryPage";
 export { AsistenHalalPage } from "./AsistenHalalPage";
 export { EditProfilePage } from "./EditProfilePage";
+export { CekBahanPage } from "./CekBahanPage";
+export { CekBahanHistoryPage } from "./CekBahanHistoryPage";

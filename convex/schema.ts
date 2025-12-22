@@ -31,7 +31,8 @@ export default defineSchema({
     date: v.string(), // Format: YYYY-MM-DD in UTC+7
     siapHalalCredits: v.number(), // Max 3 per day
     dokumenHalalCredits: v.number(), // Max 3 per day
-    asistenHalalChats: v.number(), // Max 20 new chats per day
+    asistenHalalChats: v.number(), // Max 5 new chats per day
+    cekBahanCredits: v.optional(v.number()), // Max 10 per day (optional for backward compatibility)
   })
     .index("by_user", ["userId"])
     .index("by_user_date", ["userId", "date"]),
@@ -55,6 +56,35 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_user_code", ["userId", "promoCodeId"]),
+
+  // Material scans table (Cek Bahan / Smart Material Scanner history)
+  material_scans: defineTable({
+    userId: v.id("users"),
+    photoUrls: v.array(v.string()), // Array of Convex storage URLs (depan + belakang kemasan)
+    extractedIngredients: v.array(v.string()), // OCR extracted ingredients
+    analysis: v.array(
+      v.object({
+        ingredient: v.string(),
+        status: v.union(v.literal("aman"), v.literal("meragukan"), v.literal("tidak_halal")),
+        reason: v.string(),
+        action: v.optional(v.string()),
+      }),
+    ),
+    overallStatus: v.union(v.literal("aman"), v.literal("meragukan"), v.literal("tidak_halal")),
+    summary: v.string(),
+    // Optional: detected halal certificate info
+    halalCertificate: v.optional(
+      v.object({
+        detected: v.boolean(),
+        number: v.optional(v.string()),
+        issuer: v.optional(v.string()), // MUI, BPJPH, etc.
+      }),
+    ),
+    // Optional: positive list detection
+    positiveListDetected: v.optional(v.boolean()),
+    creditsUsed: v.number(),
+    createdAt: v.number(),
+  }).index("by_user", ["userId"]),
 
   // Halal scans table (Siap Halal history)
   halal_scans: defineTable({

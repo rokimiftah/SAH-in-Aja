@@ -15,6 +15,7 @@ import {
   LayoutDashboard,
   LogOut,
   MessageCircle,
+  Package,
   UserPen,
   X,
 } from "lucide-react";
@@ -175,6 +176,23 @@ const NAV_ITEMS = [
         label: "Riwayat",
         icon: History,
         href: "/dashboard/asisten-halal/history",
+      },
+    ],
+  },
+  {
+    id: "cek-bahan",
+    label: FEATURES.cekBahan.name,
+    icon: Package,
+    href: "/dashboard/cek-bahan",
+    available: true,
+    activeClass: "bg-gradient-to-r from-cyan-500 to-teal-600 text-white shadow-md",
+    activeLightClass: "bg-cyan-50 text-cyan-700",
+    subItems: [
+      {
+        id: "cek-bahan-history",
+        label: "Riwayat",
+        icon: History,
+        href: "/dashboard/cek-bahan/history",
       },
     ],
   },
@@ -379,7 +397,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                               ? "Analisis Baru"
                               : item.id === "asisten-halal"
                                 ? "Konsultasi Baru"
-                                : "Buat Dokumen"}
+                                : item.id === "cek-bahan"
+                                  ? "Scan Baru"
+                                  : "Buat Dokumen"}
                             {dailyCredits && item.id === "siap-halal" && (
                               <CreditBadge remaining={dailyCredits.siapHalalCredits} limit={dailyCredits.limits.siapHalal} />
                             )}
@@ -391,6 +411,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                             )}
                             {dailyCredits && item.id === "asisten-halal" && (
                               <CreditBadge remaining={dailyCredits.asistenHalalChats} limit={dailyCredits.limits.asistenHalal} />
+                            )}
+                            {dailyCredits && item.id === "cek-bahan" && (
+                              <CreditBadge
+                                remaining={dailyCredits.cekBahanCredits ?? dailyCredits.limits.cekBahan}
+                                limit={dailyCredits.limits.cekBahan}
+                              />
                             )}
                           </button>
                           {item.subItems.map((subItem) => {

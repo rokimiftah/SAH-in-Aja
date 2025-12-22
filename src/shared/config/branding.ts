@@ -243,6 +243,56 @@ export const FEATURES = {
       },
     ],
   },
+
+  cekBahan: {
+    name: "Cek Bahan",
+    icon: "📦",
+    tagline: "Smart Material Scanner",
+    positioning: "Cek Status Halal Bahan dari Kemasan",
+    description:
+      "Foto kemasan produk, AI deteksi logo halal, cek Positive List, dan analisis komposisi bahan untuk memastikan status halal sebelum digunakan.",
+
+    benefits: ["Deteksi logo halal otomatis", "Cek bahan kritis E-Number", "Hasil instan 10 detik"],
+
+    cta: {
+      primary: "Foto Kemasan Bahan",
+      secondary: "Cek Status Bahan",
+      tertiary: "Scan Label",
+    },
+
+    disclaimer: `
+      ⚠️ ANALISIS BAHAN - PERLU VERIFIKASI
+
+      Ini adalah analisis PERSIAPAN berdasarkan foto label kemasan.
+
+      Hasil analisis AI:
+      • Deteksi logo halal berdasarkan visual
+      • Pengecekan Positive List (KMA No. 335/2022)
+      • Analisis komposisi dan bahan kritis
+
+      BUKAN pengganti sertifikat halal resmi.
+
+      Untuk kepastian status halal bahan:
+      • Minta sertifikat halal dari supplier
+      • Verifikasi nomor sertifikat di halal.go.id
+      • Konsultasikan dengan LPH terakreditasi
+
+      AI dapat memiliki error dalam membaca label.
+      Selalu verifikasi dengan dokumen resmi.`,
+
+    officialResources: [
+      {
+        name: "BPJPH",
+        url: "https://halal.go.id",
+        description: "Verifikasi nomor sertifikat halal",
+      },
+      {
+        name: "LPPOM MUI",
+        url: "https://www.halalmui.org",
+        description: "Database produk halal tersertifikasi",
+      },
+    ],
+  },
 } as const;
 
 /**
