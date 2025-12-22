@@ -110,11 +110,7 @@ export function useAsistenHalal(): UseAsistenHalalReturn {
             throw new Error("Silakan tunggu sebentar, sedang memuat data pengguna...");
           }
 
-          // Check and use credit for new chat
-          if (!creditStatus?.hasCredits) {
-            throw new Error("Kredit chat Asisten Halal habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
-          }
-
+          // Deduct credit first (atomic check on backend) - this will throw if no credits
           await deductCredit();
 
           currentConsultationId = await createConsultation({
@@ -122,6 +118,13 @@ export function useAsistenHalal(): UseAsistenHalalReturn {
             initialMessage: message.trim(),
           });
           setConsultationId(currentConsultationId);
+        } else {
+          // Save user message to DB for existing consultation (non-blocking)
+          addMessage({
+            consultationId: currentConsultationId,
+            role: "user",
+            content: message.trim(),
+          }).catch((err) => console.error("Failed to save user message to DB:", err));
         }
 
         // Build conversation history for context
@@ -152,7 +155,7 @@ export function useAsistenHalal(): UseAsistenHalalReturn {
             consultationId: currentConsultationId,
             role: "assistant",
             content: response.response,
-          }).catch((err) => console.error("Failed to save message to DB:", err));
+          }).catch((err) => console.error("Failed to save assistant message to DB:", err));
         }
       } catch (err) {
         console.error("Chat error:", err);
@@ -172,31 +175,15 @@ export function useAsistenHalal(): UseAsistenHalalReturn {
         setError(err instanceof Error ? err.message : "Terjadi kesalahan");
       }
     },
-    [
-      isLoading,
-      isOffline,
-      consultationId,
-      user,
-      messages,
-      chatAction,
-      createConsultation,
-      addMessage,
-      creditStatus,
-      deductCredit,
-    ],
+    [isLoading, isOffline, consultationId, user, messages, chatAction, createConsultation, addMessage, deductCredit],
   );
 
   const startNewChat = useCallback(async () => {
-    // Check if user has credits for new chat
-    if (!creditStatus?.hasCredits) {
-      setError("Kredit chat Asisten Halal habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
-      return;
-    }
-
+    // Reset state - credit check will be done on first message send (atomic on backend)
     setMessages([{ ...WELCOME_MESSAGE, timestamp: Date.now() }]);
     setConsultationId(null);
     setError(null);
-  }, [creditStatus]);
+  }, []);
 
   return {
     messages,

@@ -38,11 +38,7 @@ export function useDokumenHalal(): UseDokumenHalalReturn {
     setResult(null);
 
     try {
-      // Check and use credit first
-      if (!creditStatus?.hasCredits) {
-        throw new Error("Kredit Dokumen Halal habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
-      }
-
+      // Deduct credit first (atomic check on backend) - this will throw if no credits
       await deductCredit();
 
       const generationResult = await generateHalalDocument({

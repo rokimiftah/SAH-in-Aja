@@ -1,9 +1,10 @@
 import type { LucideIcon } from "lucide-react";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import imageCompression from "browser-image-compression";
 import {
+  AlertCircle,
   Camera,
   Check,
   ChevronLeft,
@@ -90,17 +91,28 @@ export function PhotoCapture({ onPhotosComplete }: PhotoCaptureProps) {
   const [capturedPhotos, setCapturedPhotos] = useState<CapturedPhoto[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [isCompressing, setIsCompressing] = useState(false);
+  const [compressionError, setCompressionError] = useState<string | null>(null);
   const [sliderIndex, setSliderIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const currentGuide = PHOTO_GUIDES[currentStep];
   const isComplete = capturedPhotos.length === PHOTO_GUIDES.length;
 
+  // Cleanup object URLs on unmount
+  useEffect(() => {
+    return () => {
+      for (const photo of capturedPhotos) {
+        URL.revokeObjectURL(photo.preview);
+      }
+    };
+  }, [capturedPhotos]);
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setIsCompressing(true);
+    setCompressionError(null);
 
     try {
       const compressed = await imageCompression(file, {
@@ -123,6 +135,7 @@ export function PhotoCapture({ onPhotosComplete }: PhotoCaptureProps) {
       }
     } catch (error) {
       console.error("Compression error:", error);
+      setCompressionError("Gagal memproses foto. Silakan coba lagi dengan foto lain.");
     } finally {
       setIsCompressing(false);
       if (inputRef.current) {
@@ -378,6 +391,14 @@ export function PhotoCapture({ onPhotosComplete }: PhotoCaptureProps) {
                   </>
                 )}
               </label>
+
+              {/* Error message */}
+              {compressionError && (
+                <div className="mt-4 flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+                  <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
+                  <span className="text-sm text-red-600">{compressionError}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

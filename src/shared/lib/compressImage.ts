@@ -10,13 +10,18 @@ export async function compressImage(file: File, maxSize = 256, quality = 0.8): P
     const img = new Image();
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
+    const objectUrl = URL.createObjectURL(file);
 
     if (!ctx) {
+      URL.revokeObjectURL(objectUrl);
       reject(new Error("Canvas context not available"));
       return;
     }
 
     img.onload = () => {
+      // Cleanup object URL after image is loaded
+      URL.revokeObjectURL(objectUrl);
+
       // Calculate new dimensions maintaining aspect ratio
       let { width, height } = img;
 
@@ -51,7 +56,11 @@ export async function compressImage(file: File, maxSize = 256, quality = 0.8): P
       );
     };
 
-    img.onerror = () => reject(new Error("Failed to load image"));
-    img.src = URL.createObjectURL(file);
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("Failed to load image"));
+    };
+
+    img.src = objectUrl;
   });
 }

@@ -64,6 +64,7 @@ export function DokumenHalalPage() {
 
   const { stage, result, error, generateDocument, reset } = useDokumenHalal();
   const creditStatus = useQuery(api.credits.checkCredits, { feature: "dokumenHalal" });
+  const isLoadingCredits = creditStatus === undefined;
   const hasCredits = creditStatus?.hasCredits ?? false;
   const { setProcessing } = useProcessing();
 
@@ -187,7 +188,7 @@ export function DokumenHalalPage() {
           </div>
 
           <div className="flex flex-col items-center gap-5">
-            {creditStatus && !hasCredits && (
+            {!isLoadingCredits && !hasCredits && (
               <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 <span>Kredit habis untuk hari ini. Reset besok pukul 00:00 WIB.</span>
@@ -196,11 +197,20 @@ export function DokumenHalalPage() {
             <button
               type="button"
               onClick={handleStartCreate}
-              disabled={!hasCredits}
+              disabled={isLoadingCredits || !hasCredits}
               className="bg-primary-blue inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold text-white shadow-md transition-shadow hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none sm:w-auto sm:gap-3 sm:px-6 sm:text-base lg:px-8 lg:py-4 lg:text-lg"
             >
-              <FileText className="h-5 w-5 shrink-0" />
-              <span className="whitespace-nowrap">{FEATURES.dokumenHalal.cta.primary}</span>
+              {isLoadingCredits ? (
+                <>
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <span className="whitespace-nowrap">Memuat...</span>
+                </>
+              ) : (
+                <>
+                  <FileText className="h-5 w-5 shrink-0" />
+                  <span className="whitespace-nowrap">{FEATURES.dokumenHalal.cta.primary}</span>
+                </>
+              )}
             </button>
             <button
               type="button"

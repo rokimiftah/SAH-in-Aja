@@ -1,5 +1,5 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
 
@@ -18,10 +18,23 @@ export const getMyDocuments = query({
   },
 });
 
-// Get documents by user
+// Get documents by user (authorized - only own data or admin)
 export const getByUser = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
+    const currentUserId = await getAuthUserId(ctx);
+    if (!currentUserId) {
+      throw new ConvexError("Silakan login terlebih dahulu");
+    }
+
+    // Check if requesting own data or is admin
+    if (currentUserId !== args.userId) {
+      const currentUser = await ctx.db.get(currentUserId);
+      if (!currentUser || currentUser.role !== "admin") {
+        throw new ConvexError("Tidak memiliki akses ke data ini");
+      }
+    }
+
     return await ctx.db
       .query("halal_documents")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))

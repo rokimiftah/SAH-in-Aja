@@ -1,7 +1,3 @@
-// convex/auth.ts
-
-/** biome-ignore-all lint/suspicious/noExplicitAny: <> */
-
 import type { MutationCtx } from "./_generated/server";
 
 import GitHub from "@auth/core/providers/github";
@@ -12,6 +8,36 @@ import { z } from "zod";
 
 import { internal } from "./_generated/api";
 import { magicLink } from "./lib/magicLink";
+
+interface GitHubProfile {
+  id: number | string;
+  email: string;
+  avatar_url?: string;
+  picture?: string;
+  name?: string;
+  login?: string;
+}
+
+interface GoogleProfile {
+  id?: string | number;
+  sub?: string;
+  email: string;
+  picture?: string;
+  image?: string;
+  name?: string;
+}
+
+interface AuthArgs {
+  profile: {
+    email: string;
+    image?: string;
+    name?: string;
+  };
+  provider?: {
+    id: string;
+  };
+  type?: string;
+}
 
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   providers: [
@@ -33,7 +59,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
           .safeParse({ email: normalizedEmail });
         if (error) throw new ConvexError(error.issues[0].message);
 
-        const raw: any = params;
+        const raw = params as unknown as GitHubProfile;
         const image: string | undefined =
           typeof raw.avatar_url === "string" ? raw.avatar_url : typeof raw.picture === "string" ? raw.picture : undefined;
 
@@ -51,7 +77,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
     Google({
       allowDangerousEmailAccountLinking: true,
       profile: (params) => {
-        const raw: any = params;
+        const raw = params as unknown as GoogleProfile;
         const id: string | undefined =
           typeof raw.id === "string"
             ? raw.id
@@ -88,27 +114,29 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
     }),
   ],
   callbacks: {
-    async createOrUpdateUser(ctx: MutationCtx, args: any) {
-      const normalizedEmail = args.profile.email.toLowerCase().trim();
-      const provider = typeof args.provider?.id === "string" ? args.provider.id : args.type === "oauth" ? "oauth" : "magic-link";
+    async createOrUpdateUser(ctx: MutationCtx, args: unknown) {
+      const typedArgs = args as AuthArgs;
+      const normalizedEmail = typedArgs.profile.email.toLowerCase().trim();
+      const provider =
+        typeof typedArgs.provider?.id === "string" ? typedArgs.provider.id : typedArgs.type === "oauth" ? "oauth" : "magic-link";
 
       const existingUser = await ctx.db
         .query("users")
         .withIndex("by_email", (q) => q.eq("email", normalizedEmail))
         .first();
 
-      const image: string | undefined = typeof args.profile.image === "string" ? args.profile.image : undefined;
+      const image: string | undefined = typeof typedArgs.profile.image === "string" ? typedArgs.profile.image : undefined;
       const name: string | undefined =
-        typeof args.profile.name === "string" && args.profile.name.trim() ? args.profile.name.trim() : undefined;
+        typeof typedArgs.profile.name === "string" && typedArgs.profile.name.trim() ? typedArgs.profile.name.trim() : undefined;
 
       if (existingUser) {
         const currentProviders = existingUser.linkedProviders || [];
-        const updates: any = {};
+        const updates: Record<string, unknown> = {};
 
         if (!currentProviders.includes(provider)) {
           updates.linkedProviders = [...currentProviders, provider];
         }
-        if (args.type === "oauth" && !existingUser.emailVerificationTime) {
+        if (typedArgs.type === "oauth" && !existingUser.emailVerificationTime) {
           updates.emailVerificationTime = Date.now();
         }
         // Only update image if user hasn't set a custom one (no storageId means using OAuth image)
@@ -128,7 +156,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 
       const userId = await ctx.db.insert("users", {
         email: normalizedEmail,
-        emailVerificationTime: args.type === "oauth" ? Date.now() : undefined,
+        emailVerificationTime: typedArgs.type === "oauth" ? Date.now() : undefined,
         linkedProviders: [provider],
         credits: 3, // Free tier gets 3 credits
         tier: "free",

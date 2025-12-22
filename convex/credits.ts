@@ -366,20 +366,23 @@ export const resetAllDailyCredits = internalMutation({
 
     for (const user of users) {
       // First, check for old records to get any bonus credits to carry over
-      const oldRecord = await ctx.db
+      const oldRecords = await ctx.db
         .query("user_daily_credits")
         .withIndex("by_user", (q) => q.eq("userId", user._id))
-        .first();
+        .collect();
+
+      // Filter out today's record and sort by date descending to get the latest previous record
+      const latestPreviousRecord = oldRecords.filter((r) => r.date !== today).sort((a, b) => b.date.localeCompare(a.date))[0];
 
       // Calculate bonus credits (credits above daily limit) to carry over
       let bonusSiapHalal = 0;
       let bonusDokumenHalal = 0;
       let bonusAsistenHalal = 0;
 
-      if (oldRecord) {
-        bonusSiapHalal = Math.max(0, oldRecord.siapHalalCredits - DAILY_LIMITS.siapHalal);
-        bonusDokumenHalal = Math.max(0, oldRecord.dokumenHalalCredits - DAILY_LIMITS.dokumenHalal);
-        bonusAsistenHalal = Math.max(0, oldRecord.asistenHalalChats - DAILY_LIMITS.asistenHalal);
+      if (latestPreviousRecord) {
+        bonusSiapHalal = Math.max(0, latestPreviousRecord.siapHalalCredits - DAILY_LIMITS.siapHalal);
+        bonusDokumenHalal = Math.max(0, latestPreviousRecord.dokumenHalalCredits - DAILY_LIMITS.dokumenHalal);
+        bonusAsistenHalal = Math.max(0, latestPreviousRecord.asistenHalalChats - DAILY_LIMITS.asistenHalal);
       }
 
       // Check if user has a record for today

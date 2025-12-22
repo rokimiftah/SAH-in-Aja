@@ -22,16 +22,28 @@ export function PromoCodesPage() {
     expiresAt: "",
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await createPromo({
-      code: formData.code,
-      credits: Number(formData.credits),
-      maxUsage: formData.maxUsage ? Number(formData.maxUsage) : undefined,
-      expiresAt: formData.expiresAt ? new Date(formData.expiresAt).getTime() : undefined,
-    });
-    setIsModalOpen(false);
-    setFormData({ code: "", credits: 10, maxUsage: "", expiresAt: "" });
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      await createPromo({
+        code: formData.code,
+        credits: Number(formData.credits),
+        maxUsage: formData.maxUsage ? Number(formData.maxUsage) : undefined,
+        expiresAt: formData.expiresAt ? new Date(formData.expiresAt).getTime() : undefined,
+      });
+      setIsModalOpen(false);
+      setFormData({ code: "", credits: 10, maxUsage: "", expiresAt: "" });
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Gagal membuat promo code");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCopy = (code: string) => {
@@ -192,7 +204,9 @@ export function PromoCodesPage() {
               <h2 className="mb-6 text-xl font-bold text-gray-900">Create Promo Code</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="promo-code" className="mb-1.5 block text-sm font-medium text-gray-700">Code</label>
+                  <label htmlFor="promo-code" className="mb-1.5 block text-sm font-medium text-gray-700">
+                    Code
+                  </label>
                   <div className="relative">
                     <Tag className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     <input
@@ -207,7 +221,9 @@ export function PromoCodesPage() {
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="promo-credits" className="mb-1.5 block text-sm font-medium text-gray-700">Credits Amount</label>
+                  <label htmlFor="promo-credits" className="mb-1.5 block text-sm font-medium text-gray-700">
+                    Credits Amount
+                  </label>
                   <div className="relative">
                     <Coins className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     <input
@@ -223,7 +239,9 @@ export function PromoCodesPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="promo-usage" className="mb-1.5 block text-sm font-medium text-gray-700">Max Usage</label>
+                    <label htmlFor="promo-usage" className="mb-1.5 block text-sm font-medium text-gray-700">
+                      Max Usage
+                    </label>
                     <input
                       id="promo-usage"
                       type="number"
@@ -235,7 +253,9 @@ export function PromoCodesPage() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="promo-expiration" className="mb-1.5 block text-sm font-medium text-gray-700">Expiration</label>
+                    <label htmlFor="promo-expiration" className="mb-1.5 block text-sm font-medium text-gray-700">
+                      Expiration
+                    </label>
                     <input
                       id="promo-expiration"
                       type="date"
@@ -245,17 +265,25 @@ export function PromoCodesPage() {
                     />
                   </div>
                 </div>
+                {submitError && (
+                  <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">{submitError}</div>
+                )}
                 <div className="mt-8 flex justify-end gap-3 pt-2">
                   <button
                     type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="cursor-pointer rounded-xl px-4 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900"
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      setSubmitError(null);
+                    }}
+                    disabled={isSubmitting}
+                    className="cursor-pointer rounded-xl px-4 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="cursor-pointer rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-orange-700 hover:shadow-md"
+                    disabled={isSubmitting}
+                    className="cursor-pointer rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-orange-700 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Create Code
                   </button>

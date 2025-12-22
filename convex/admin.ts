@@ -1,10 +1,12 @@
+import type { MutationCtx, QueryCtx } from "./_generated/server";
+
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
 
 // Helper to check if user is admin
-async function checkAdmin(ctx: any) {
+async function checkAdmin(ctx: QueryCtx | MutationCtx) {
   const userId = await getAuthUserId(ctx);
   if (!userId) {
     throw new Error("Unauthorized");
@@ -100,7 +102,7 @@ export const getDashboardStats = query({
     const sixtyDaysAgo = now - 60 * 24 * 60 * 60 * 1000;
 
     // Helper to calculate growth
-    const calculateGrowth = (items: any[]) => {
+    const calculateGrowth = (items: { createdAt?: number }[]) => {
       const currentPeriod = items.filter((i) => (i.createdAt ?? 0) >= thirtyDaysAgo).length;
       const lastPeriod = items.filter((i) => (i.createdAt ?? 0) >= sixtyDaysAgo && (i.createdAt ?? 0) < thirtyDaysAgo).length;
 
@@ -110,7 +112,7 @@ export const getDashboardStats = query({
     };
 
     // Helper to determine trend direction
-    const getTrend = (items: any[]) => {
+    const getTrend = (items: { createdAt?: number }[]) => {
       const currentPeriod = items.filter((i) => (i.createdAt ?? 0) >= thirtyDaysAgo).length;
       const lastPeriod = items.filter((i) => (i.createdAt ?? 0) >= sixtyDaysAgo && (i.createdAt ?? 0) < thirtyDaysAgo).length;
       return currentPeriod >= lastPeriod ? "up" : "down";
