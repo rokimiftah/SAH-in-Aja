@@ -163,6 +163,19 @@ export default function LoginPage() {
                 )}
               </button>
             </form>
+
+            {/* Terms and Privacy Agreement */}
+            <p className="text-center text-xs text-gray-500">
+              Dengan masuk, Anda menyetujui{" "}
+              <Link href="/terms" className="text-primary-green hover:underline">
+                Syarat & Ketentuan
+              </Link>{" "}
+              dan{" "}
+              <Link href="/privacy" className="text-primary-green hover:underline">
+                Kebijakan Privasi
+              </Link>{" "}
+              kami.
+            </p>
           </div>
         </div>
 
