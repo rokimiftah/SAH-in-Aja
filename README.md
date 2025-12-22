@@ -156,6 +156,15 @@ Tanya, Jawab instan, Panduan lengkap
 </tr>
 </table>
 
+### 4. Admin Dashboard (New)
+
+**Pusat Kontrol Pengelola Platform**
+
+- **User Management**: Pantau pertumbuhan pengguna dan kelola akses.
+- **Promo Codes**: Distribusi kredit tambahan melalui kode promo.
+- **Real-time Analytics**: Statistik penggunaan fitur Siap Halal dan Dokumen Generator.
+- **Role-Based Security**: Proteksi rute khusus admin.
+
 ---
 
 ## Cara Penggunaan

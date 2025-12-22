@@ -18,6 +18,7 @@ export default defineSchema({
     address: v.optional(v.string()),
     credits: v.optional(v.number()), // Koin SAH
     tier: v.optional(v.union(v.literal("free"), v.literal("eceran"), v.literal("juragan"))),
+    role: v.optional(v.union(v.literal("user"), v.literal("admin"))),
     createdAt: v.optional(v.number()),
     storageId: v.optional(v.string()),
   })

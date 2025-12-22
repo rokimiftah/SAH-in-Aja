@@ -497,6 +497,23 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <Gift className="h-4 w-4" />
               </button>
             </form>
+            {user?.role === "admin" && (
+              <>
+                <div className="border-t border-gray-100" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigate("/admin");
+                    setUserMenuOpen(false);
+                    onClose();
+                  }}
+                  className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-50"
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  Admin Dashboard
+                </button>
+              </>
+            )}
             <div className="border-t border-gray-100" />
             <button
               type="button"

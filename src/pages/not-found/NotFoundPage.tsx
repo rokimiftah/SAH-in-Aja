@@ -5,7 +5,7 @@ import { Footer, Navbar } from "@pages/landing/components";
 
 export const NotFoundPage = () => {
   return (
-    <div className="flex min-h-screen flex-col bg-white font-poppins">
+    <div className="font-poppins flex min-h-screen flex-col bg-white">
       <Navbar />
 
       <main className="flex grow flex-col items-center justify-center px-4 py-16 text-center">
@@ -17,7 +17,7 @@ export const NotFoundPage = () => {
 
         <Link
           href="/"
-          className="inline-flex items-center gap-2 rounded-lg bg-primary-green px-6 py-3 text-sm font-medium text-white transition hover:bg-primary-green/90"
+          className="bg-primary-green hover:bg-primary-green/90 inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium text-white transition"
         >
           <ArrowLeft className="h-4 w-4" />
           Kembali ke Beranda
