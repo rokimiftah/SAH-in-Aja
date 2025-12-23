@@ -555,7 +555,9 @@ SITE_URL=https://sahin.biz.id
 
 # LLM Provider
 LLM_API_KEY=llm__your_api_key
-LLM_API_URL=
+LLM_API_URL=https://api.kolosal.ai/v1
+LLM_MODEL_TEXT=global.anthropic.claude-sonnet-4-5-20250929-v1:0
+LLM_MODEL_VISION=global.anthropic.claude-sonnet-4-5-20250929-v1:0
 
 # Email (Optional)
 RESEND_API_KEY=re_your_api_key
@@ -637,6 +639,6 @@ copies or substantial portions of the Software.
 
 <br>
 
-Made with love for Indonesian MSMEs
+Made for Indonesian MSMEs
 
 </div>

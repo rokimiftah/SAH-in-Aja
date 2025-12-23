@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 
 import { action } from "./_generated/server";
-import { createLLMClient, LLM_MODELS, SYSTEM_PROMPTS } from "./lib/llmClient";
+import { createLLMClient, getLLMModel, SYSTEM_PROMPTS } from "./lib/llmClient";
 
 // Guardrails - Keywords that indicate harmful/inappropriate content (tetap keyword-based untuk keamanan)
 const BLOCKED_KEYWORDS = [
@@ -109,7 +109,7 @@ Jawab dengan format JSON (tanpa markdown):
 
   try {
     const response = await llmClient.chat.completions.create({
-      model: LLM_MODELS.TEXT,
+      model: getLLMModel("text"),
       messages: [{ role: "user", content: classificationPrompt }],
       temperature: 0,
       max_tokens: 100,
@@ -153,15 +153,7 @@ export const chat = action({
   },
   handler: async (_ctx, args) => {
     // === SETUP API CLIENT ===
-    const apiKey = process.env.LLM_API_KEY;
-    if (!apiKey) {
-      return {
-        response: "Maaf, sistem sedang tidak tersedia. Silakan coba lagi nanti atau hubungi BPJPH di 1500-363.",
-        source: "error",
-        confidence: 0,
-      };
-    }
-    const llmClient = createLLMClient(apiKey);
+    const llmClient = createLLMClient();
 
     // === GUARDRAILS ===
     // Check for blocked content (harmful, adult, hate speech) - keyword-based untuk kecepatan
@@ -221,7 +213,7 @@ export const chat = action({
     });
 
     const response = await llmClient.chat.completions.create({
-      model: LLM_MODELS.TEXT,
+      model: getLLMModel("text"),
       messages,
       temperature: 0.7,
       max_tokens: 4096,

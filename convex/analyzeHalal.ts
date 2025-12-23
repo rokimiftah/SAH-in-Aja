@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 
 import { action } from "./_generated/server";
-import { createLLMClient, LLM_MODELS, SYSTEM_PROMPTS } from "./lib/llmClient";
+import { createLLMClient, getLLMModel, SYSTEM_PROMPTS } from "./lib/llmClient";
 
 // Helper function to convert ArrayBuffer to base64 (works in Convex runtime)
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
@@ -27,11 +27,6 @@ export const analyzeKitchen = action({
     photoStorageIds: v.array(v.id("_storage")),
   },
   handler: async (ctx, args) => {
-    const apiKey = process.env.LLM_API_KEY;
-    if (!apiKey) {
-      throw new Error("LLM_API_KEY not configured");
-    }
-
     // Convert storage IDs to URLs and then to base64
     const photoUrls: string[] = [];
     const imageBase64List: string[] = [];
@@ -48,7 +43,7 @@ export const analyzeKitchen = action({
       throw new Error("No valid photo URLs");
     }
 
-    const llmClient = createLLMClient(apiKey);
+    const llmClient = createLLMClient();
 
     // Build message content with base64 images
     const imageContents = imageBase64List.map((base64Url) => ({
@@ -59,7 +54,7 @@ export const analyzeKitchen = action({
     let response: Awaited<ReturnType<typeof llmClient.chat.completions.create>>;
     try {
       response = await llmClient.chat.completions.create({
-        model: LLM_MODELS.VISION,
+        model: getLLMModel("vision"),
         messages: [
           {
             role: "system",
@@ -77,7 +72,7 @@ export const analyzeKitchen = action({
           },
         ],
         temperature: 0.3,
-        max_tokens: 2000,
+        max_tokens: 8192,
       });
     } catch (apiError) {
       console.error("LLM API Error:", apiError);

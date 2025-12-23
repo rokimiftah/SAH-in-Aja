@@ -10,21 +10,83 @@ import OpenAI from "openai";
  * untuk integrasi Claude Sonnet 4.5 sebagai model LLM utama.
  */
 
-// LLM API client (OpenAI-compatible)
-export const createLLMClient = (apiKey: string) => {
-  return new OpenAI({
-    apiKey,
-    baseURL: process.env.LLM_API_URL,
-  });
-};
+/**
+ * LLM Configuration
+ * Semua konfigurasi LLM dikelola di satu tempat
+ */
+interface LLMConfig {
+  apiKey: string;
+  apiUrl: string;
+  models: {
+    vision: string;
+    text: string;
+  };
+}
 
-// Models
-export const LLM_MODELS = {
-  // Vision AI - for Siap Halal photo analysis (Claude Sonnet 4.5 supports vision)
-  VISION: process.env.LLM_MODEL_VISION as string,
-  // Text AI - for Dokumen Halal & Asisten Halal (cheapest option)
-  TEXT: process.env.LLM_MODEL_TEXT as string,
-} as const;
+/**
+ * Mendapatkan konfigurasi LLM dari environment variables
+ * @throws Error jika konfigurasi tidak lengkap
+ * @returns LLMConfig
+ */
+function getLLMConfig(): LLMConfig {
+  const apiKey = process.env.LLM_API_KEY;
+  const apiUrl = process.env.LLM_API_URL;
+  const modelText = process.env.LLM_MODEL_TEXT;
+  const modelVision = process.env.LLM_MODEL_VISION;
+
+  if (!apiKey) {
+    throw new Error("LLM_API_KEY not configured");
+  }
+  if (!apiUrl) {
+    throw new Error("LLM_API_URL not configured");
+  }
+  if (!modelVision) {
+    throw new Error("LLM_MODEL_VISION not configured");
+  }
+  if (!modelText) {
+    throw new Error("LLM_MODEL_TEXT not configured");
+  }
+
+  return {
+    apiKey,
+    apiUrl,
+    models: {
+      vision: modelVision,
+      text: modelText,
+    },
+  };
+}
+
+/**
+ * Create LLM Client with centralized configuration
+ * @returns OpenAI-compatible client
+ */
+export function createLLMClient(): OpenAI {
+  const config = getLLMConfig();
+  return new OpenAI({
+    apiKey: config.apiKey,
+    baseURL: config.apiUrl,
+  });
+}
+
+/**
+ * Get LLM models configuration
+ * @returns Object with vision and text model names
+ */
+export function getLLMModels(): { vision: string; text: string } {
+  const config = getLLMConfig();
+  return config.models;
+}
+
+/**
+ * Get single model by type
+ * @param type - 'vision' or 'text'
+ * @returns Model name
+ */
+export function getLLMModel(type: "vision" | "text"): string {
+  const config = getLLMConfig();
+  return config.models[type];
+}
 
 // System prompts
 export const SYSTEM_PROMPTS = {

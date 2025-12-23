@@ -32,7 +32,7 @@ export default defineSchema({
     siapHalalCredits: v.number(), // Max 3 per day
     dokumenHalalCredits: v.number(), // Max 3 per day
     asistenHalalChats: v.number(), // Max 5 new chats per day
-    cekBahanCredits: v.optional(v.number()), // Max 10 per day (optional for backward compatibility)
+    cekBahanCredits: v.number(), // Max 10 per day
   })
     .index("by_user", ["userId"])
     .index("by_user_date", ["userId", "date"]),

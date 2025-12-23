@@ -2,7 +2,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 
 import { action } from "./_generated/server";
-import { createLLMClient, LLM_MODELS, SYSTEM_PROMPTS } from "./lib/llmClient";
+import { createLLMClient, getLLMModel, SYSTEM_PROMPTS } from "./lib/llmClient";
 
 const MAX_PHOTOS = 3;
 const ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
@@ -60,11 +60,6 @@ export const analyzeMaterial = action({
       throw new ConvexError("Silakan login terlebih dahulu");
     }
 
-    const apiKey = process.env.LLM_API_KEY;
-    if (!apiKey) {
-      throw new Error("LLM_API_KEY not configured");
-    }
-
     if (args.photoStorageIds.length === 0) {
       throw new ConvexError("Minimal 1 foto diperlukan");
     }
@@ -87,7 +82,7 @@ export const analyzeMaterial = action({
       imageBase64List.push(base64);
     }
 
-    const llmClient = createLLMClient(apiKey);
+    const llmClient = createLLMClient();
 
     const imageContents = imageBase64List.map((base64, index) => ({
       type: "image_url" as const,
@@ -103,7 +98,7 @@ export const analyzeMaterial = action({
     let response: Awaited<ReturnType<typeof llmClient.chat.completions.create>>;
     try {
       response = await llmClient.chat.completions.create({
-        model: LLM_MODELS.VISION,
+        model: getLLMModel("vision"),
         messages: [
           {
             role: "system",
@@ -121,7 +116,7 @@ export const analyzeMaterial = action({
           },
         ],
         temperature: 0.2,
-        max_tokens: 2000,
+        max_tokens: 8192,
       });
     } catch (apiError) {
       console.error("LLM API Error:", apiError);

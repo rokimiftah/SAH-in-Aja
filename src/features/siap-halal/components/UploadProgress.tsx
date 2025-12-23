@@ -106,9 +106,7 @@ export function UploadProgress({ stage, progress, currentPhoto = 0, totalPhotos 
                 ))}
               </div>
 
-              <p className="mt-6 text-center text-xs text-gray-500">
-                Mohon tunggu, proses ini membutuhkan waktu beberapa menit...
-              </p>
+              <p className="mt-6 text-center text-xs text-gray-500">Mohon tunggu...</p>
             </div>
           </>
         )}

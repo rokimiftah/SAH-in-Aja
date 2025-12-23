@@ -84,7 +84,7 @@ export function ScanProgress({ stage, progress }: ScanProgressProps) {
 
               <div className="mt-6 flex items-center justify-center gap-2 text-xs text-gray-500">
                 <Package className="h-4 w-4" />
-                <span>Mohon tunggu, proses ini membutuhkan waktu beberapa detik...</span>
+                <span>Mohon tunggu...</span>
               </div>
             </div>
           </>
