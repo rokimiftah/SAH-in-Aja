@@ -303,6 +303,7 @@ export const applyPromoCode = mutation({
       siapHalalCredits: credits.siapHalalCredits + promoCode.credits,
       dokumenHalalCredits: credits.dokumenHalalCredits + promoCode.credits,
       asistenHalalChats: credits.asistenHalalChats + promoCode.credits,
+      cekBahanCredits: credits.cekBahanCredits + promoCode.credits,
     });
 
     // Record usage
@@ -352,6 +353,7 @@ export const migrateExistingUsers = internalMutation({
         siapHalalCredits: DAILY_LIMITS.siapHalal,
         dokumenHalalCredits: DAILY_LIMITS.dokumenHalal,
         asistenHalalChats: DAILY_LIMITS.asistenHalal,
+        cekBahanCredits: DAILY_LIMITS.cekBahan,
       });
       created++;
     }
@@ -384,6 +386,7 @@ export const createDailyCreditsForUser = internalMutation({
       siapHalalCredits: DAILY_LIMITS.siapHalal,
       dokumenHalalCredits: DAILY_LIMITS.dokumenHalal,
       asistenHalalChats: DAILY_LIMITS.asistenHalal,
+      cekBahanCredits: DAILY_LIMITS.cekBahan,
     });
 
     return { id: newId, created: true };
@@ -417,11 +420,13 @@ export const resetAllDailyCredits = internalMutation({
       let bonusSiapHalal = 0;
       let bonusDokumenHalal = 0;
       let bonusAsistenHalal = 0;
+      let bonusCekBahan = 0;
 
       if (latestPreviousRecord) {
         bonusSiapHalal = Math.max(0, latestPreviousRecord.siapHalalCredits - DAILY_LIMITS.siapHalal);
         bonusDokumenHalal = Math.max(0, latestPreviousRecord.dokumenHalalCredits - DAILY_LIMITS.dokumenHalal);
         bonusAsistenHalal = Math.max(0, latestPreviousRecord.asistenHalalChats - DAILY_LIMITS.asistenHalal);
+        bonusCekBahan = Math.max(0, latestPreviousRecord.cekBahanCredits - DAILY_LIMITS.cekBahan);
       }
 
       // Check if user has a record for today
@@ -436,6 +441,7 @@ export const resetAllDailyCredits = internalMutation({
           siapHalalCredits: DAILY_LIMITS.siapHalal + bonusSiapHalal,
           dokumenHalalCredits: DAILY_LIMITS.dokumenHalal + bonusDokumenHalal,
           asistenHalalChats: DAILY_LIMITS.asistenHalal + bonusAsistenHalal,
+          cekBahanCredits: DAILY_LIMITS.cekBahan + bonusCekBahan,
         });
         updated++;
       } else {
@@ -446,6 +452,7 @@ export const resetAllDailyCredits = internalMutation({
           siapHalalCredits: DAILY_LIMITS.siapHalal + bonusSiapHalal,
           dokumenHalalCredits: DAILY_LIMITS.dokumenHalal + bonusDokumenHalal,
           asistenHalalChats: DAILY_LIMITS.asistenHalal + bonusAsistenHalal,
+          cekBahanCredits: DAILY_LIMITS.cekBahan + bonusCekBahan,
         });
         created++;
       }
