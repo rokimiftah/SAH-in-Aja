@@ -2,7 +2,6 @@ import type { LucideIcon } from "lucide-react";
 
 import { useEffect, useRef, useState } from "react";
 
-import imageCompression from "browser-image-compression";
 import {
   AlertCircle,
   Camera,
@@ -18,7 +17,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import { cn } from "@shared/lib";
+import { cn, compressImage } from "@shared/lib";
 
 const PHOTO_GUIDES: {
   id: number;
@@ -115,16 +114,16 @@ export function PhotoCapture({ onPhotosComplete }: PhotoCaptureProps) {
     setCompressionError(null);
 
     try {
-      const compressed = await imageCompression(file, {
-        maxSizeMB: 0.3,
-        maxWidthOrHeight: 1024,
-        useWebWorker: true,
+      const compressed = await compressImage(file, {
+        maxSize: 1024,
+        maxSizeKB: 100,
       });
 
+      const compressedFile = new File([compressed], file.name, { type: compressed.type });
       const preview = URL.createObjectURL(compressed);
       const newPhoto: CapturedPhoto = {
         id: currentGuide.id,
-        file: compressed,
+        file: compressedFile,
         preview,
       };
 

@@ -102,8 +102,8 @@ export function EditProfilePage() {
     }
 
     try {
-      // Compress to WebP, max 256x256, quality 0.8
-      const compressed = await compressImage(file, 256, 0.8);
+      // Compress to AVIF/WebP, max 256x256, target 50KB
+      const compressed = await compressImage(file, { maxSize: 256, maxSizeKB: 50 });
       setCompressedBlob(compressed);
       setPreviewUrl(URL.createObjectURL(compressed));
     } catch (err) {

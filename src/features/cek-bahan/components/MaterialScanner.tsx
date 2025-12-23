@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
-import imageCompression from "browser-image-compression";
 import { AlertCircle, Camera, Check, Package, RotateCcw, Sparkles, X } from "lucide-react";
 
-import { cn } from "@shared/lib";
+import { cn, compressImage } from "@shared/lib";
 
 interface CapturedPhoto {
   file: File;
@@ -48,12 +47,12 @@ export function MaterialScanner({ onPhotoComplete }: MaterialScannerProps) {
     setCompressionError(null);
 
     try {
-      const compressed = await imageCompression(file, {
-        maxSizeMB: 0.5,
-        maxWidthOrHeight: 1280,
-        useWebWorker: true,
+      const compressed = await compressImage(file, {
+        maxSize: 1280,
+        maxSizeKB: 100,
       });
 
+      const compressedFile = new File([compressed], file.name, { type: compressed.type });
       const preview = URL.createObjectURL(compressed);
 
       if (photos[activeSlot]) {
@@ -62,7 +61,7 @@ export function MaterialScanner({ onPhotoComplete }: MaterialScannerProps) {
 
       setPhotos((prev) => ({
         ...prev,
-        [activeSlot]: { file: compressed, preview },
+        [activeSlot]: { file: compressedFile, preview },
       }));
     } catch (error) {
       console.error("Compression error:", error);
