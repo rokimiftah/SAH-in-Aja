@@ -26,6 +26,7 @@ import type * as maintenance from "../maintenance.js";
 import type * as materialScans from "../materialScans.js";
 import type * as storage from "../storage.js";
 import type * as users from "../users.js";
+import type * as voiceAudit from "../voiceAudit.js";
 
 import type {
   ApiFromModules,
@@ -52,6 +53,7 @@ declare const fullApi: ApiFromModules<{
   materialScans: typeof materialScans;
   storage: typeof storage;
   users: typeof users;
+  voiceAudit: typeof voiceAudit;
 }>;
 
 /**

@@ -12,6 +12,7 @@ const DAILY_LIMITS = {
   dokumenHalal: 3,
   asistenHalal: 5,
   cekBahan: 10,
+  voiceAudit: 2,
 };
 
 // Get current date in UTC+7 (Asia/Jakarta)
@@ -54,6 +55,7 @@ async function getOrCreateDailyCredits(ctx: MutationCtx, userId: Id<"users">) {
     dokumenHalalCredits: DAILY_LIMITS.dokumenHalal,
     asistenHalalChats: DAILY_LIMITS.asistenHalal,
     cekBahanCredits: DAILY_LIMITS.cekBahan,
+    voiceAuditCredits: DAILY_LIMITS.voiceAudit,
   });
 
   return {
@@ -64,6 +66,7 @@ async function getOrCreateDailyCredits(ctx: MutationCtx, userId: Id<"users">) {
     dokumenHalalCredits: DAILY_LIMITS.dokumenHalal,
     asistenHalalChats: DAILY_LIMITS.asistenHalal,
     cekBahanCredits: DAILY_LIMITS.cekBahan,
+    voiceAuditCredits: DAILY_LIMITS.voiceAudit,
   };
 }
 
@@ -82,6 +85,7 @@ export const getMyDailyCredits = query({
     const dokumenHalal = credits?.dokumenHalalCredits ?? DAILY_LIMITS.dokumenHalal;
     const asistenHalal = credits?.asistenHalalChats ?? DAILY_LIMITS.asistenHalal;
     const cekBahan = credits?.cekBahanCredits ?? DAILY_LIMITS.cekBahan;
+    const voiceAudit = credits?.voiceAuditCredits ?? DAILY_LIMITS.voiceAudit;
 
     return {
       siapHalalCredits: siapHalal > DAILY_LIMITS.siapHalal ? siapHalal : Math.min(siapHalal, DAILY_LIMITS.siapHalal),
@@ -90,6 +94,7 @@ export const getMyDailyCredits = query({
       asistenHalalChats:
         asistenHalal > DAILY_LIMITS.asistenHalal ? asistenHalal : Math.min(asistenHalal, DAILY_LIMITS.asistenHalal),
       cekBahanCredits: cekBahan > DAILY_LIMITS.cekBahan ? cekBahan : Math.min(cekBahan, DAILY_LIMITS.cekBahan),
+      voiceAuditCredits: voiceAudit > DAILY_LIMITS.voiceAudit ? voiceAudit : Math.min(voiceAudit, DAILY_LIMITS.voiceAudit),
       limits: DAILY_LIMITS,
     };
   },
@@ -98,7 +103,13 @@ export const getMyDailyCredits = query({
 // Check if user has credits for a specific feature
 export const checkCredits = query({
   args: {
-    feature: v.union(v.literal("siapHalal"), v.literal("dokumenHalal"), v.literal("asistenHalal"), v.literal("cekBahan")),
+    feature: v.union(
+      v.literal("siapHalal"),
+      v.literal("dokumenHalal"),
+      v.literal("asistenHalal"),
+      v.literal("cekBahan"),
+      v.literal("voiceAudit"),
+    ),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -113,7 +124,6 @@ export const checkCredits = query({
       case "siapHalal":
         limit = DAILY_LIMITS.siapHalal;
         remaining = credits?.siapHalalCredits ?? limit;
-        // Only cap if value <= daily limit (not boosted by promo code)
         if (remaining <= limit) remaining = Math.min(remaining, limit);
         break;
       case "dokumenHalal":
@@ -129,6 +139,11 @@ export const checkCredits = query({
       case "cekBahan":
         limit = DAILY_LIMITS.cekBahan;
         remaining = credits?.cekBahanCredits ?? limit;
+        if (remaining <= limit) remaining = Math.min(remaining, limit);
+        break;
+      case "voiceAudit":
+        limit = DAILY_LIMITS.voiceAudit;
+        remaining = credits?.voiceAuditCredits ?? limit;
         if (remaining <= limit) remaining = Math.min(remaining, limit);
         break;
     }
@@ -249,6 +264,35 @@ export const useCekBahanCredit = mutation({
   },
 });
 
+// Use credit for Voice Audit (simulasi audit suara)
+export const useVoiceAuditCredit = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Silakan login terlebih dahulu");
+
+    const credits = await getOrCreateDailyCredits(ctx, userId);
+
+    const currentCredits = credits.voiceAuditCredits ?? DAILY_LIMITS.voiceAudit;
+    const cappedCredits =
+      currentCredits > DAILY_LIMITS.voiceAudit ? currentCredits : Math.min(currentCredits, DAILY_LIMITS.voiceAudit);
+
+    if (cappedCredits <= 0) {
+      throw new ConvexError("Kredit Simulasi Audit habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
+    }
+
+    const newCredits = cappedCredits - 1;
+    await ctx.db.patch(credits._id, {
+      voiceAuditCredits: newCredits,
+    });
+
+    return {
+      remaining: newCredits,
+      limit: DAILY_LIMITS.voiceAudit,
+    };
+  },
+});
+
 // Apply promo code
 export const applyPromoCode = mutation({
   args: {
@@ -304,6 +348,7 @@ export const applyPromoCode = mutation({
       dokumenHalalCredits: credits.dokumenHalalCredits + promoCode.credits,
       asistenHalalChats: credits.asistenHalalChats + promoCode.credits,
       cekBahanCredits: credits.cekBahanCredits + promoCode.credits,
+      voiceAuditCredits: (credits.voiceAuditCredits ?? DAILY_LIMITS.voiceAudit) + promoCode.credits,
     });
 
     // Record usage
@@ -354,6 +399,7 @@ export const migrateExistingUsers = internalMutation({
         dokumenHalalCredits: DAILY_LIMITS.dokumenHalal,
         asistenHalalChats: DAILY_LIMITS.asistenHalal,
         cekBahanCredits: DAILY_LIMITS.cekBahan,
+        voiceAuditCredits: DAILY_LIMITS.voiceAudit,
       });
       created++;
     }
@@ -387,6 +433,7 @@ export const createDailyCreditsForUser = internalMutation({
       dokumenHalalCredits: DAILY_LIMITS.dokumenHalal,
       asistenHalalChats: DAILY_LIMITS.asistenHalal,
       cekBahanCredits: DAILY_LIMITS.cekBahan,
+      voiceAuditCredits: DAILY_LIMITS.voiceAudit,
     });
 
     return { id: newId, created: true };
@@ -421,12 +468,17 @@ export const resetAllDailyCredits = internalMutation({
       let bonusDokumenHalal = 0;
       let bonusAsistenHalal = 0;
       let bonusCekBahan = 0;
+      let bonusVoiceAudit = 0;
 
       if (latestPreviousRecord) {
         bonusSiapHalal = Math.max(0, latestPreviousRecord.siapHalalCredits - DAILY_LIMITS.siapHalal);
         bonusDokumenHalal = Math.max(0, latestPreviousRecord.dokumenHalalCredits - DAILY_LIMITS.dokumenHalal);
         bonusAsistenHalal = Math.max(0, latestPreviousRecord.asistenHalalChats - DAILY_LIMITS.asistenHalal);
         bonusCekBahan = Math.max(0, latestPreviousRecord.cekBahanCredits - DAILY_LIMITS.cekBahan);
+        bonusVoiceAudit = Math.max(
+          0,
+          (latestPreviousRecord.voiceAuditCredits ?? DAILY_LIMITS.voiceAudit) - DAILY_LIMITS.voiceAudit,
+        );
       }
 
       // Check if user has a record for today
@@ -442,6 +494,7 @@ export const resetAllDailyCredits = internalMutation({
           dokumenHalalCredits: DAILY_LIMITS.dokumenHalal + bonusDokumenHalal,
           asistenHalalChats: DAILY_LIMITS.asistenHalal + bonusAsistenHalal,
           cekBahanCredits: DAILY_LIMITS.cekBahan + bonusCekBahan,
+          voiceAuditCredits: DAILY_LIMITS.voiceAudit + bonusVoiceAudit,
         });
         updated++;
       } else {
@@ -453,6 +506,7 @@ export const resetAllDailyCredits = internalMutation({
           dokumenHalalCredits: DAILY_LIMITS.dokumenHalal + bonusDokumenHalal,
           asistenHalalChats: DAILY_LIMITS.asistenHalal + bonusAsistenHalal,
           cekBahanCredits: DAILY_LIMITS.cekBahan + bonusCekBahan,
+          voiceAuditCredits: DAILY_LIMITS.voiceAudit + bonusVoiceAudit,
         });
         created++;
       }

@@ -17,6 +17,8 @@ import { DokumenHalalPage } from "./DokumenHalalPage";
 import { EditProfilePage } from "./EditProfilePage";
 import { SiapHalalHistoryPage } from "./SiapHalalHistoryPage";
 import { SiapHalalPage } from "./SiapHalalPage";
+import { VoiceAuditHistoryPage } from "./VoiceAuditHistoryPage";
+import { VoiceAuditPage } from "./VoiceAuditPage";
 
 export function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -55,6 +57,8 @@ export function DashboardLayout() {
               <Route path="/dashboard/asisten-halal" component={AsistenHalalPage} />
               <Route path="/dashboard/cek-bahan/history" component={CekBahanHistoryPage} />
               <Route path="/dashboard/cek-bahan" component={CekBahanPage} />
+              <Route path="/dashboard/voice-audit/history" component={VoiceAuditHistoryPage} />
+              <Route path="/dashboard/voice-audit" component={VoiceAuditPage} />
               <Route path="/dashboard/profile" component={EditProfilePage} />
               <Route>
                 <div className="flex h-full flex-col items-center justify-center gap-4 rounded-2xl border border-gray-200 bg-white">

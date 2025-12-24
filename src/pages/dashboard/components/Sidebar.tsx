@@ -15,6 +15,7 @@ import {
   LayoutDashboard,
   LogOut,
   MessageCircle,
+  Mic,
   Package,
   UserPen,
   X,
@@ -193,6 +194,23 @@ const NAV_ITEMS = [
         label: "Riwayat",
         icon: History,
         href: "/dashboard/cek-bahan/history",
+      },
+    ],
+  },
+  {
+    id: "voice-audit",
+    label: FEATURES.voiceAudit.name,
+    icon: Mic,
+    href: "/dashboard/voice-audit",
+    available: true,
+    activeClass: "bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-md",
+    activeLightClass: "bg-rose-50 text-rose-700",
+    subItems: [
+      {
+        id: "voice-audit-history",
+        label: "Riwayat",
+        icon: History,
+        href: "/dashboard/voice-audit/history",
       },
     ],
   },
@@ -399,7 +417,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                                 ? "Konsultasi Baru"
                                 : item.id === "cek-bahan"
                                   ? "Scan Baru"
-                                  : "Buat Dokumen"}
+                                  : item.id === "voice-audit"
+                                    ? "Simulasi Baru"
+                                    : "Buat Dokumen"}
                             {dailyCredits && item.id === "siap-halal" && (
                               <CreditBadge remaining={dailyCredits.siapHalalCredits} limit={dailyCredits.limits.siapHalal} />
                             )}
@@ -416,6 +436,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                               <CreditBadge
                                 remaining={dailyCredits.cekBahanCredits ?? dailyCredits.limits.cekBahan}
                                 limit={dailyCredits.limits.cekBahan}
+                              />
+                            )}
+                            {dailyCredits && item.id === "voice-audit" && (
+                              <CreditBadge
+                                remaining={dailyCredits.voiceAuditCredits ?? dailyCredits.limits.voiceAudit}
+                                limit={dailyCredits.limits.voiceAudit}
                               />
                             )}
                           </button>

@@ -21,6 +21,7 @@ export default defineSchema({
     role: v.optional(v.union(v.literal("user"), v.literal("admin"))),
     createdAt: v.optional(v.number()),
     storageId: v.optional(v.string()),
+    preferredTitle: v.optional(v.union(v.literal("bapak"), v.literal("ibu"), v.literal("mas"), v.literal("mbak"))),
   })
     .index("by_phone", ["phone"])
     .index("by_email", ["email"]),
@@ -33,6 +34,7 @@ export default defineSchema({
     dokumenHalalCredits: v.number(), // Max 3 per day
     asistenHalalChats: v.number(), // Max 5 new chats per day
     cekBahanCredits: v.number(), // Max 10 per day
+    voiceAuditCredits: v.number(), // Max 2 per day
   })
     .index("by_user", ["userId"])
     .index("by_user_date", ["userId", "date"]),
@@ -159,4 +161,28 @@ export default defineSchema({
     source: v.optional(v.string()),
     createdAt: v.number(),
   }).index("by_category", ["category"]),
+
+  // Voice Audit Sessions (Simulasi Audit Suara)
+  voice_audit_sessions: defineTable({
+    userId: v.id("users"),
+    vapiCallId: v.optional(v.string()),
+    auditorType: v.union(v.literal("galak"), v.literal("ramah")),
+    focusTopic: v.union(v.literal("bahan"), v.literal("produksi"), v.literal("sop"), v.literal("umum")),
+    preferredTitle: v.union(v.literal("bapak"), v.literal("ibu"), v.literal("mas"), v.literal("mbak")),
+    transcript: v.array(
+      v.object({
+        role: v.union(v.literal("assistant"), v.literal("user")),
+        text: v.string(),
+        timestamp: v.number(),
+      }),
+    ),
+    summary: v.optional(v.string()),
+    durationSeconds: v.optional(v.number()),
+    score: v.optional(v.number()),
+    feedback: v.optional(v.string()),
+    status: v.union(v.literal("active"), v.literal("completed"), v.literal("abandoned")),
+    creditsUsed: v.number(),
+    createdAt: v.number(),
+    completedAt: v.optional(v.number()),
+  }).index("by_user", ["userId"]),
 });

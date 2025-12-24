@@ -293,6 +293,57 @@ export const FEATURES = {
       },
     ],
   },
+
+  voiceAudit: {
+    name: "Simulasi Audit",
+    title: "Simulasi Audit Suara",
+    emoji: "🎙️",
+    icon: "🎙️",
+    tagline: "Latih Mental Menghadapi Auditor",
+    positioning: "Persiapan Wawancara Audit Halal - Latihan dengan AI",
+    description:
+      "Simulasi wawancara suara dengan AI sebagai auditor BPJPH. Latih mental dan pelajari jawaban yang benar sebelum menghadapi audit resmi.",
+
+    benefits: ["Wawancara suara real-time", "Auditor supportif", "Feedback langsung dengan referensi SJPH"],
+
+    cta: {
+      primary: "Mulai Simulasi Audit",
+      secondary: "Latihan Wawancara",
+      tertiary: "Siap Audit",
+    },
+
+    disclaimer: `
+      ⚠️ SIMULASI LATIHAN - BUKAN AUDIT RESMI
+
+      Ini adalah SIMULASI untuk latihan persiapan mental.
+      BUKAN audit halal resmi dari BPJPH/LPH.
+
+      Tujuan simulasi:
+      • Melatih mental menjawab pertanyaan auditor
+      • Mempelajari jawaban yang benar berdasarkan SJPH
+      • Meningkatkan kepercayaan diri saat audit resmi
+
+      Untuk audit resmi:
+      • Daftar di halal.go.id
+      • Hubungi LPH terakreditasi
+      • Jadwalkan audit on-site resmi
+
+      Pertanyaan dan evaluasi AI berdasarkan standar SJPH HAS 23000.
+      Kondisi audit resmi mungkin berbeda.`,
+
+    officialResources: [
+      {
+        name: "BPJPH",
+        url: "https://halal.go.id",
+        description: "Portal resmi pendaftaran sertifikasi halal",
+      },
+      {
+        name: "LPPOM MUI",
+        url: "https://www.halalmui.org",
+        description: "Informasi standar audit halal",
+      },
+    ],
+  },
 } as const;
 
 /**
