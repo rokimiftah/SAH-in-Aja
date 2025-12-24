@@ -1,4 +1,5 @@
 import { Camera, CheckCircle2, FileText, MessageCircle, Mic, Package } from "lucide-react";
+import { motion } from "motion/react";
 
 const features = [
   {
@@ -72,14 +73,27 @@ export const FeaturesSection = () => {
   return (
     <section id="features" className="bg-gray-50 py-12 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mx-auto mb-10 max-w-2xl text-center sm:mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto mb-10 max-w-2xl text-center sm:mb-16"
+        >
           <h2 className="mb-2 text-xl font-semibold text-gray-900 sm:mb-3 sm:text-3xl">5 Fitur Utama</h2>
           <p className="text-sm text-gray-500 sm:text-base">Semua yang kamu butuhkan untuk persiapan sertifikasi halal</p>
-        </div>
+        </motion.div>
 
         <div className="space-y-12 sm:space-y-20">
           {features.map((feature) => (
-            <div key={feature.id} className="grid items-center gap-6 sm:gap-10 lg:grid-cols-2">
+            <motion.div
+              key={feature.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="grid items-center gap-6 sm:gap-10 lg:grid-cols-2"
+            >
               <div className={feature.imagePosition === "right" ? "order-2 lg:order-1" : "order-2"}>
                 <div className={`mb-2 inline-flex items-center gap-1.5 text-xs font-medium sm:mb-3 sm:text-sm ${feature.color}`}>
                   <feature.icon className="h-4 w-4" />
@@ -103,7 +117,7 @@ export const FeaturesSection = () => {
                   className={`w-full rounded-lg border border-gray-200 sm:rounded-xl ${feature.shadow}`}
                 />
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

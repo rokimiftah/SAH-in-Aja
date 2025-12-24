@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { motion } from "motion/react";
 import { Link } from "wouter";
 
 export const HeroSection = () => {
@@ -9,7 +10,12 @@ export const HeroSection = () => {
   return (
     <section className="bg-white pt-20 pb-12 sm:pt-24 sm:pb-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mx-auto max-w-3xl pt-6 text-center sm:pt-16">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto max-w-3xl pt-6 text-center sm:pt-16"
+        >
           <h1 className="mb-4 text-3xl font-semibold tracking-tight text-gray-900 sm:mb-5 sm:text-5xl lg:text-6xl">
             Persiapan Sertifikasi Halal Lebih Mudah
           </h1>
@@ -32,21 +38,19 @@ export const HeroSection = () => {
               Lihat Fitur
             </a>
           </div>
-        </div>
+        </motion.div>
       </div>
 
-      <div className="relative mx-auto mt-8 max-w-7xl px-4 sm:mt-12 sm:px-6">
-        {!imageLoaded && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Loader2 className="text-primary-green h-8 w-8 animate-spin" />
-          </div>
-        )}
-        <img
+      <div className="mx-auto mt-8 max-w-7xl px-4 sm:mt-12 sm:px-6">
+        <motion.img
           src="/landing/dashboard.avif"
           alt="Dashboard SAH-in Aja"
           width={1920}
           height={959}
           onLoad={() => setImageLoaded(true)}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: imageLoaded ? 1 : 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
           className="h-auto w-full rounded-lg border border-gray-200 shadow-[0_20px_40px_-15px_rgba(0,168,132,0.4)] sm:rounded-xl sm:shadow-[0_35px_60px_-20px_rgba(0,168,132,0.5)]"
         />
       </div>
