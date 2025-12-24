@@ -11,15 +11,6 @@ export default defineConfig({
         "SAH-in Aja! Platform persiapan sertifikasi halal berbasis AI untuk UMKM Indonesia. Foto area produksi, dapat laporan kesiapan halal, lengkap dengan dokumen wajib dan panduan step-by-step ke BPJPH/MUI.",
       viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
     },
-    tags: [
-      {
-        tag: "link",
-        attrs: {
-          href: "https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap",
-          rel: "stylesheet",
-        },
-      },
-    ],
     favicon: "public/favicon.avif",
     title: "SAH-in Aja! - Siap Audit Halal",
   },
