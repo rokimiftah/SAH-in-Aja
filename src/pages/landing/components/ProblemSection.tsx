@@ -1,17 +1,17 @@
 import { AlertTriangle, CircleDollarSign } from "lucide-react";
 import { motion } from "motion/react";
 
-const fadeIn = {
-  initial: { opacity: 0 },
-  animate: { opacity: 1 },
-  transition: { duration: 0.5 },
-};
-
 export const ProblemSection = () => {
   return (
     <section className="py-12 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <motion.div {...fadeIn} className="mx-auto mb-8 max-w-2xl text-center sm:mb-12">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto mb-8 max-w-2xl text-center sm:mb-12"
+        >
           <h2 className="mb-2 text-xl font-semibold text-gray-900 sm:mb-3 sm:text-3xl">
             Kenapa Persiapan Sertifikasi Halal Sulit?
           </h2>
