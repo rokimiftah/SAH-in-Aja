@@ -144,6 +144,7 @@ export function DokumenHalalPage() {
       backButton={showBackButton ? { onClick: handleBack, mobileOnly: isMobileOnlyBack } : undefined}
       centered
       maxWidth="xl"
+      scrollResetKey={displayState}
     >
       {/* Intro State */}
       {displayState === "intro" && (

@@ -13,6 +13,7 @@ interface PageContainerProps {
   backButton?: BackButtonConfig;
   centered?: boolean;
   maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl";
+  scrollResetKey?: unknown;
 }
 
 const MAX_WIDTH_CLASSES = {
@@ -26,7 +27,7 @@ const MAX_WIDTH_CLASSES = {
   "5xl": "max-w-5xl",
 };
 
-export function PageContainer({ children, backButton, centered = false, maxWidth = "xl" }: PageContainerProps) {
+export function PageContainer({ children, backButton, centered = false, maxWidth = "xl", scrollResetKey }: PageContainerProps) {
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
       {/* Back button area - sticky, tidak scroll */}
@@ -46,7 +47,7 @@ export function PageContainer({ children, backButton, centered = false, maxWidth
       )}
 
       {/* Scrollable content area */}
-      <div className="flex-1 overflow-y-auto p-6 lg:p-8">
+      <div key={String(scrollResetKey)} className="flex-1 overflow-y-auto p-6 lg:p-8">
         {centered ? (
           <div className="flex min-h-full items-center justify-center">
             <div className={`w-full ${MAX_WIDTH_CLASSES[maxWidth]}`}>{children}</div>

@@ -104,7 +104,7 @@ export function VoiceAuditPage() {
 
   if (!isSupported) {
     return (
-      <PageContainer centered maxWidth="5xl">
+      <PageContainer centered maxWidth="5xl" scrollResetKey="not-supported">
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100">
             <AlertCircle className="h-8 w-8 text-yellow-600" />
@@ -123,6 +123,7 @@ export function VoiceAuditPage() {
       backButton={showBackButton ? { onClick: handleBack, mobileOnly: isMobileOnlyBack } : undefined}
       centered
       maxWidth="5xl"
+      scrollResetKey={flowState}
     >
       {flowState === "intro" && (
         <div className="mx-auto max-w-xl">

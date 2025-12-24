@@ -101,6 +101,7 @@ export function CekBahanPage() {
       backButton={showBackButton ? { onClick: handleBack, mobileOnly: isMobileOnlyBack } : undefined}
       centered
       maxWidth="5xl"
+      scrollResetKey={displayState}
     >
       {displayState === "intro" && (
         <div className="mx-auto max-w-xl">

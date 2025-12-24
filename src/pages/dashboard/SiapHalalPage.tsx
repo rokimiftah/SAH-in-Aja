@@ -101,6 +101,7 @@ export function SiapHalalPage() {
       backButton={showBackButton ? { onClick: handleBack, mobileOnly: isMobileOnlyBack } : undefined}
       centered
       maxWidth="5xl"
+      scrollResetKey={displayState}
     >
       {/* Intro State */}
       {displayState === "intro" && (
