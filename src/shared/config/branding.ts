@@ -91,7 +91,7 @@ export const BRANDING = {
  */
 export const FEATURES = {
   siapHalal: {
-    name: "Siap Halal",
+    name: "Cek Dapur Halal",
     icon: "🎯",
     tagline: "Persiapan Sertifikasi Halal MUI",
     positioning: "Cek Kesiapan Halal - Persiapan Sebelum Audit Resmi",
@@ -245,7 +245,7 @@ export const FEATURES = {
   },
 
   cekBahan: {
-    name: "Cek Bahan",
+    name: "Cek Bahan Halal",
     icon: "📦",
     tagline: "Smart Material Scanner",
     positioning: "Cek Status Halal Bahan dari Kemasan",
@@ -295,7 +295,7 @@ export const FEATURES = {
   },
 
   voiceAudit: {
-    name: "Simulasi Audit",
+    name: "Simulasi Audit Halal",
     title: "Simulasi Audit Suara",
     emoji: "🎙️",
     icon: "🎙️",

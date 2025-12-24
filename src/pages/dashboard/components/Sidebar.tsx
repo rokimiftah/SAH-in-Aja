@@ -6,6 +6,7 @@ import { useMutation, useQuery } from "convex/react";
 import {
   AlertTriangle,
   Camera,
+  ChevronDown,
   ChevronUp,
   ExternalLink,
   FileText,
@@ -146,6 +147,23 @@ const NAV_ITEMS = [
     ],
   },
   {
+    id: "cek-bahan",
+    label: FEATURES.cekBahan.name,
+    icon: Package,
+    href: "/dashboard/cek-bahan",
+    available: true,
+    activeClass: "bg-gradient-to-r from-cyan-500 to-teal-600 text-white shadow-md",
+    activeLightClass: "bg-cyan-50 text-cyan-700",
+    subItems: [
+      {
+        id: "cek-bahan-history",
+        label: "Riwayat",
+        icon: History,
+        href: "/dashboard/cek-bahan/history",
+      },
+    ],
+  },
+  {
     id: "dokumen-halal",
     label: FEATURES.dokumenHalal.name,
     icon: FileText,
@@ -176,23 +194,6 @@ const NAV_ITEMS = [
         label: "Riwayat",
         icon: History,
         href: "/dashboard/asisten-halal/history",
-      },
-    ],
-  },
-  {
-    id: "cek-bahan",
-    label: FEATURES.cekBahan.name,
-    icon: Package,
-    href: "/dashboard/cek-bahan",
-    available: true,
-    activeClass: "bg-gradient-to-r from-cyan-500 to-teal-600 text-white shadow-md",
-    activeLightClass: "bg-cyan-50 text-cyan-700",
-    subItems: [
-      {
-        id: "cek-bahan-history",
-        label: "Riwayat",
-        icon: History,
-        href: "/dashboard/cek-bahan/history",
       },
     ],
   },
@@ -231,7 +232,29 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [imageError, setImageError] = useState(false);
   const [showProcessingWarning, setShowProcessingWarning] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+  const [expandedMenus, setExpandedMenus] = useState<Set<string>>(() => {
+    // Auto-expand menu based on current location
+    const initialExpanded = new Set<string>();
+    for (const item of NAV_ITEMS) {
+      if ("subItems" in item && item.subItems && item.href !== "/dashboard" && location.startsWith(item.href)) {
+        initialExpanded.add(item.id);
+      }
+    }
+    return initialExpanded;
+  });
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  const toggleMenu = useCallback((menuId: string) => {
+    setExpandedMenus((prev) => {
+      const next = new Set(prev);
+      if (next.has(menuId)) {
+        next.delete(menuId);
+      } else {
+        next.add(menuId);
+      }
+      return next;
+    });
+  }, []);
 
   const { signOut } = useAuthActions();
   const toast = useToast();
@@ -357,7 +380,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto p-4">
-          <div className="mb-2 text-xs font-semibold tracking-wider text-gray-400 uppercase">Menu</div>
           <ul className="space-y-2">
             {NAV_ITEMS.map((item) => {
               const hasSubItems = "subItems" in item && item.subItems && item.subItems.length > 0;
@@ -369,15 +391,25 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   {isAvailable ? (
                     <>
                       {hasSubItems ? (
-                        <div
+                        <button
+                          type="button"
+                          onClick={() => toggleMenu(item.id)}
                           className={cn(
-                            "flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium",
-                            isActive ? `${item.activeLightClass} font-semibold` : "text-gray-600",
+                            "flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all",
+                            isActive
+                              ? `${item.activeLightClass} font-semibold`
+                              : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
                           )}
                         >
                           <item.icon className="h-5 w-5" />
                           {item.label}
-                        </div>
+                          <ChevronDown
+                            className={cn(
+                              "ml-auto h-4 w-4 transition-transform duration-200",
+                              expandedMenus.has(item.id) ? "rotate-180" : "",
+                            )}
+                          />
+                        </button>
                       ) : (
                         <button
                           type="button"
@@ -398,77 +430,87 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                       )}
                       {/* Submenu */}
                       {hasSubItems && (
-                        <div className="mt-2 flex flex-col gap-1 px-4">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (handleNavigation(item.href)) {
-                                navigate(item.href);
-                                onClose();
-                              }
-                            }}
-                            className={cn(
-                              "flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-2 text-sm font-medium transition-all",
-                              location === item.href ? item.activeClass : "bg-gray-100 text-gray-600 hover:bg-gray-200",
-                            )}
-                          >
-                            <item.icon className="h-4 w-4" />
-                            {item.id === "siap-halal"
-                              ? "Analisis Baru"
-                              : item.id === "asisten-halal"
-                                ? "Konsultasi Baru"
-                                : item.id === "cek-bahan"
-                                  ? "Scan Baru"
-                                  : item.id === "voice-audit"
-                                    ? "Simulasi Baru"
-                                    : "Buat Dokumen"}
-                            {dailyCredits && item.id === "siap-halal" && (
-                              <CreditBadge remaining={dailyCredits.siapHalalCredits} limit={dailyCredits.limits.siapHalal} />
-                            )}
-                            {dailyCredits && item.id === "dokumen-halal" && (
-                              <CreditBadge
-                                remaining={dailyCredits.dokumenHalalCredits}
-                                limit={dailyCredits.limits.dokumenHalal}
-                              />
-                            )}
-                            {dailyCredits && item.id === "asisten-halal" && (
-                              <CreditBadge remaining={dailyCredits.asistenHalalChats} limit={dailyCredits.limits.asistenHalal} />
-                            )}
-                            {dailyCredits && item.id === "cek-bahan" && (
-                              <CreditBadge
-                                remaining={dailyCredits.cekBahanCredits ?? dailyCredits.limits.cekBahan}
-                                limit={dailyCredits.limits.cekBahan}
-                              />
-                            )}
-                            {dailyCredits && item.id === "voice-audit" && (
-                              <CreditBadge
-                                remaining={dailyCredits.voiceAuditCredits ?? dailyCredits.limits.voiceAudit}
-                                limit={dailyCredits.limits.voiceAudit}
-                              />
-                            )}
-                          </button>
-                          {item.subItems.map((subItem) => {
-                            const isSubActive = location === subItem.href;
-                            return (
-                              <button
-                                key={subItem.id}
-                                type="button"
-                                onClick={() => {
-                                  if (handleNavigation(subItem.href)) {
-                                    navigate(subItem.href);
-                                    onClose();
-                                  }
-                                }}
-                                className={cn(
-                                  "flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-2 text-sm font-medium transition-all",
-                                  isSubActive ? item.activeClass : "bg-gray-100 text-gray-600 hover:bg-gray-200",
-                                )}
-                              >
-                                <subItem.icon className="h-4 w-4" />
-                                {subItem.label}
-                              </button>
-                            );
-                          })}
+                        <div
+                          className={cn(
+                            "grid px-4 transition-[grid-template-rows,opacity,margin] duration-300 ease-in-out",
+                            expandedMenus.has(item.id) ? "mt-2 grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+                          )}
+                        >
+                          <div className="flex flex-col gap-1 overflow-hidden">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (handleNavigation(item.href)) {
+                                  navigate(item.href);
+                                  onClose();
+                                }
+                              }}
+                              className={cn(
+                                "flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-2 text-sm font-medium transition-all",
+                                location === item.href ? item.activeClass : "bg-gray-100 text-gray-600 hover:bg-gray-200",
+                              )}
+                            >
+                              <item.icon className="h-4 w-4" />
+                              {item.id === "siap-halal"
+                                ? "Analisis Baru"
+                                : item.id === "asisten-halal"
+                                  ? "Konsultasi Baru"
+                                  : item.id === "cek-bahan"
+                                    ? "Scan Baru"
+                                    : item.id === "voice-audit"
+                                      ? "Simulasi Baru"
+                                      : "Buat Dokumen"}
+                              {dailyCredits && item.id === "siap-halal" && (
+                                <CreditBadge remaining={dailyCredits.siapHalalCredits} limit={dailyCredits.limits.siapHalal} />
+                              )}
+                              {dailyCredits && item.id === "dokumen-halal" && (
+                                <CreditBadge
+                                  remaining={dailyCredits.dokumenHalalCredits}
+                                  limit={dailyCredits.limits.dokumenHalal}
+                                />
+                              )}
+                              {dailyCredits && item.id === "asisten-halal" && (
+                                <CreditBadge
+                                  remaining={dailyCredits.asistenHalalChats}
+                                  limit={dailyCredits.limits.asistenHalal}
+                                />
+                              )}
+                              {dailyCredits && item.id === "cek-bahan" && (
+                                <CreditBadge
+                                  remaining={dailyCredits.cekBahanCredits ?? dailyCredits.limits.cekBahan}
+                                  limit={dailyCredits.limits.cekBahan}
+                                />
+                              )}
+                              {dailyCredits && item.id === "voice-audit" && (
+                                <CreditBadge
+                                  remaining={dailyCredits.voiceAuditCredits ?? dailyCredits.limits.voiceAudit}
+                                  limit={dailyCredits.limits.voiceAudit}
+                                />
+                              )}
+                            </button>
+                            {item.subItems.map((subItem) => {
+                              const isSubActive = location === subItem.href;
+                              return (
+                                <button
+                                  key={subItem.id}
+                                  type="button"
+                                  onClick={() => {
+                                    if (handleNavigation(subItem.href)) {
+                                      navigate(subItem.href);
+                                      onClose();
+                                    }
+                                  }}
+                                  className={cn(
+                                    "flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-2 text-sm font-medium transition-all",
+                                    isSubActive ? item.activeClass : "bg-gray-100 text-gray-600 hover:bg-gray-200",
+                                  )}
+                                >
+                                  <subItem.icon className="h-4 w-4" />
+                                  {subItem.label}
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
                       )}
                     </>
