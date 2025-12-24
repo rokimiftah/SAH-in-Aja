@@ -45,9 +45,15 @@ function getGreeting(): string {
   return "Selamat malam";
 }
 
+function getFirstName(name?: string): string | undefined {
+  if (!name) return undefined;
+  return name.trim().split(/\s+/)[0];
+}
+
 function buildSystemPrompt(config: AuditConfig): string {
   const title = TITLE_LABELS[config.preferredTitle];
-  const fullName = config.userName ? `${title} ${config.userName}` : title;
+  const firstName = getFirstName(config.userName);
+  const fullName = firstName ? `${title} ${firstName}` : title;
   const topic = TOPIC_LABELS[config.focusTopic];
   const greeting = getGreeting();
 
@@ -224,7 +230,8 @@ function getTopicQuestions(focusTopic: AuditConfig["focusTopic"]): string {
 function buildFirstMessage(config: AuditConfig): string {
   const greeting = getGreeting();
   const title = TITLE_LABELS[config.preferredTitle];
-  const fullName = config.userName ? `${title} ${config.userName}` : title;
+  const firstName = getFirstName(config.userName);
+  const fullName = firstName ? `${title} ${firstName}` : title;
   const topic = TOPIC_LABELS[config.focusTopic];
 
   return `${greeting} ${fullName}, saya auditor dari BPJPH. Hari ini kita akan melakukan simulasi wawancara audit halal dengan fokus pada ${topic}. Apakah ${fullName} siap untuk memulai?`;
