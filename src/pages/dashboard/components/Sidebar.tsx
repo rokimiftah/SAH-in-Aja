@@ -229,6 +229,7 @@ interface SidebarProps {
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [location, navigate] = useLocation();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const [showProcessingWarning, setShowProcessingWarning] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -286,7 +287,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   }, [name, email]);
 
   const avatarUrl =
-    image || `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(initials)}&backgroundColor=525252`;
+    image && !imageError
+      ? image
+      : `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(initials)}&backgroundColor=525252`;
 
   // Use storageId as key to force image element refresh when avatar changes
   const avatarKey = storageId ? String(storageId) : initials;
@@ -597,7 +600,14 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             onClick={() => setUserMenuOpen(!userMenuOpen)}
             className="flex w-full cursor-pointer items-center gap-3 rounded-xl bg-linear-to-br from-gray-50 to-gray-100 p-3 transition-all hover:shadow-md"
           >
-            <img key={avatarKey} src={avatarUrl} alt="Avatar" className="h-10 w-10 rounded-full shadow-sm ring-2 ring-white" />
+            <img
+              key={avatarKey}
+              src={avatarUrl}
+              alt="Avatar"
+              className="h-10 w-10 rounded-full shadow-sm ring-2 ring-white"
+              referrerPolicy="no-referrer"
+              onError={() => setImageError(true)}
+            />
             <div className="min-w-0 flex-1 text-left">
               <p className="truncate text-sm font-semibold text-gray-800">{displayName}</p>
               {name && <p className="truncate text-xs text-gray-500">{email}</p>}

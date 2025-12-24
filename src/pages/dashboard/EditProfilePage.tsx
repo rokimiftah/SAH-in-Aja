@@ -178,6 +178,7 @@ export function EditProfilePage() {
             src={avatarUrl}
             alt="Avatar"
             className="h-20 w-20 rounded-full border-4 border-white object-cover shadow-lg ring-2 ring-gray-200"
+            referrerPolicy="no-referrer"
           />
           <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
         </div>

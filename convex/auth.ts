@@ -97,8 +97,9 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         if (typedArgs.type === "oauth" && !existingUser.emailVerificationTime) {
           updates.emailVerificationTime = Date.now();
         }
-        // Only update image if user hasn't set a custom one (no storageId means using OAuth image)
-        if (image && !existingUser.image && !existingUser.storageId) {
+        // Always update image from OAuth if user hasn't set a custom uploaded one (no storageId)
+        // This ensures we sync with the latest Google profile picture
+        if (image && !existingUser.storageId && existingUser.image !== image) {
           updates.image = image;
         }
         // Only update name if user hasn't set a custom one

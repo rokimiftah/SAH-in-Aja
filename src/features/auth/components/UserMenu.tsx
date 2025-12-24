@@ -14,12 +14,14 @@ export function UserMenu() {
   const user = useQuery(api.users.getCurrentUser);
   const [, navigate] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const name = (user?.name ?? "").trim();
   const email = (user?.email ?? "").trim();
   const hasName = !!name;
   const image = typeof user?.image === "string" ? user.image : undefined;
+  const showImage = !!image && !imageError;
 
   const initials = useMemo(() => {
     const src = (name || email || "?").trim();
@@ -50,8 +52,14 @@ export function UserMenu() {
         className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-green-600 text-white ring-2 ring-green-500 ring-offset-2 ring-offset-white transition-all hover:bg-green-700"
         aria-label="Account menu"
       >
-        {image ? (
-          <img src={image} alt={hasName ? name : email || "User"} className="h-full w-full rounded-full object-cover" />
+        {showImage ? (
+          <img
+            src={image}
+            alt={hasName ? name : email || "User"}
+            className="h-full w-full rounded-full object-cover"
+            referrerPolicy="no-referrer"
+            onError={() => setImageError(true)}
+          />
         ) : (
           <span className="text-sm font-medium">{initials}</span>
         )}
