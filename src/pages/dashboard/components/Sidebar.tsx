@@ -11,7 +11,6 @@ import {
   FileText,
   Gift,
   History,
-  Infinity as InfinityIcon,
   LayoutDashboard,
   LogOut,
   MessageCircle,
@@ -87,7 +86,7 @@ function CreditBadge({ remaining, limit }: CreditBadgeProps) {
         onKeyDown={(e) => e.stopPropagation()}
         className={cn(
           "ml-auto inline-flex min-w-5 cursor-default items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold",
-          isBoosted
+          isBoosted || (!isEmpty && !isLow)
             ? "bg-linear-to-r from-purple-500 to-pink-500 text-white"
             : isEmpty
               ? "bg-red-100 text-red-600"
@@ -96,7 +95,7 @@ function CreditBadge({ remaining, limit }: CreditBadgeProps) {
                 : "bg-gray-300/80 text-gray-700",
         )}
       >
-        {isBoosted ? <InfinityIcon className="h-3 w-3" /> : `${cappedRemaining}/${limit}`}
+        {cappedRemaining}
       </span>
       {showTooltip &&
         createPortal(
