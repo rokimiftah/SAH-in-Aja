@@ -35,7 +35,9 @@ export const HeroSection = () => {
         <img
           src="/landing/dashboard.avif"
           alt="Dashboard SAH-in Aja"
-          className="w-full rounded-lg border border-gray-200 shadow-[0_20px_40px_-15px_rgba(0,168,132,0.4)] sm:rounded-xl sm:shadow-[0_35px_60px_-20px_rgba(0,168,132,0.5)]"
+          width={1920}
+          height={959}
+          className="h-auto w-full rounded-lg border border-gray-200 shadow-[0_20px_40px_-15px_rgba(0,168,132,0.4)] sm:rounded-xl sm:shadow-[0_35px_60px_-20px_rgba(0,168,132,0.5)]"
         />
       </div>
     </section>
