@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import { Link } from "wouter";
@@ -9,6 +11,8 @@ const fadeIn = {
 };
 
 export const HeroSection = () => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   return (
     <section className="pt-20 pb-12 sm:pt-24 sm:pb-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -38,18 +42,17 @@ export const HeroSection = () => {
         </motion.div>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="mx-auto mt-8 max-w-7xl px-4 sm:mt-12 sm:px-6"
-      >
-        <img
+      <div className="mx-auto mt-8 max-w-7xl px-4 sm:mt-12 sm:px-6">
+        <motion.img
           src="/landing/dashboard.avif"
           alt="Dashboard SAH-in Aja"
+          onLoad={() => setImageLoaded(true)}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: imageLoaded ? 1 : 0 }}
+          transition={{ duration: 0.6 }}
           className="w-full rounded-lg border border-gray-200 shadow-[0_20px_40px_-15px_rgba(0,168,132,0.4)] sm:rounded-xl sm:shadow-[0_35px_60px_-20px_rgba(0,168,132,0.5)]"
         />
-      </motion.div>
+      </div>
     </section>
   );
 };
