@@ -31,7 +31,6 @@
 - [Struktur Proyek](#struktur-proyek)
 - [Sistem Kredit](#sistem-kredit)
 - [Environment Variables](#environment-variables)
-- [Screenshots](#screenshots)
 - [Disclaimer](#disclaimer)
 - [Kontribusi](#kontribusi)
 - [License](#license)
@@ -716,9 +715,13 @@ PUBLIC_VAPI_PUBLIC_KEY=your_vapi_public_key
 ```env
 AUTH_GOOGLE_ID=
 AUTH_GOOGLE_SECRET=
+CUSTOM_AUTH_SITE_URL=
 JWKS=
 JWT_PRIVATE_KEY=
-KOLOSAL_API_KEY=
+LLM_API_KEY=
+LLM_API_URL=
+LLM_MODEL_TEXT=
+LLM_MODEL_VISION=
 RESEND_API_KEY=
 SITE_URL=
 ```
