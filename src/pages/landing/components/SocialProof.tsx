@@ -1,8 +1,14 @@
 import { Star, Zap } from "lucide-react";
+import { motion } from "motion/react";
 
 export const SocialProof = () => {
   return (
-    <section className="border-y border-gray-200 bg-gray-50 py-8">
+    <motion.section
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4, delay: 0.6 }}
+      className="border-y border-gray-200 bg-gray-50 py-8"
+    >
       <div className="mx-auto max-w-6xl px-6">
         <div className="flex flex-col items-center justify-center gap-6 sm:flex-row sm:gap-12">
           <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -36,6 +42,6 @@ export const SocialProof = () => {
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };

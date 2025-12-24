@@ -2,9 +2,9 @@ import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import { Link } from "wouter";
 
-const fadeInUp = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
+const fadeIn = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
   transition: { duration: 0.5 },
 };
 
@@ -12,7 +12,7 @@ export const HeroSection = () => {
   return (
     <section className="pt-20 pb-12 sm:pt-24 sm:pb-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <motion.div {...fadeInUp} className="mx-auto max-w-3xl pt-6 text-center sm:pt-8">
+        <motion.div {...fadeIn} className="mx-auto max-w-3xl pt-6 text-center sm:pt-16">
           <h1 className="mb-4 text-3xl font-semibold tracking-tight text-gray-900 sm:mb-5 sm:text-5xl lg:text-6xl">
             Persiapan Sertifikasi Halal Lebih Mudah
           </h1>
@@ -37,8 +37,8 @@ export const HeroSection = () => {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           className="mt-8 sm:mt-12"
         >
