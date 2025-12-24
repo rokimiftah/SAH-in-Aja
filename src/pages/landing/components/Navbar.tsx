@@ -1,8 +1,14 @@
+import { motion } from "motion/react";
 import { Link } from "wouter";
 
 export const Navbar = () => {
   return (
-    <nav className="fixed top-0 z-50 w-full border-b border-gray-200 bg-white">
+    <motion.nav
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="fixed top-0 z-50 w-full border-b border-gray-200 bg-white"
+    >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-1 sm:px-6">
         <Link href="/" className="flex items-center gap-2">
           <img src="/logo.avif" alt="SAH-in Aja!" className="h-10 w-auto sm:h-11" />
@@ -22,6 +28,6 @@ export const Navbar = () => {
           </Link>
         </div>
       </div>
-    </nav>
+    </motion.nav>
   );
 };
