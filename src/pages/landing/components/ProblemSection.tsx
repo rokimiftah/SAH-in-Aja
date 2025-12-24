@@ -8,7 +8,7 @@ export const ProblemSection = () => {
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.5 }}
           className="mx-auto mb-8 max-w-2xl text-center sm:mb-12"
         >
@@ -22,7 +22,7 @@ export const ProblemSection = () => {
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-100px" }}
             className="rounded-lg border border-gray-200 bg-white p-5 shadow-[0_4px_15px_rgba(239,68,68,0.1)] sm:rounded-xl sm:p-6"
           >
             <h3 className="mb-2 flex items-center gap-2 text-lg font-semibold tracking-tight text-gray-900 sm:text-xl">
@@ -37,7 +37,7 @@ export const ProblemSection = () => {
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-100px" }}
             className="rounded-lg border border-gray-200 bg-white p-5 shadow-[0_4px_15px_rgba(239,68,68,0.1)] sm:rounded-xl sm:p-6"
           >
             <h3 className="mb-2 flex items-center gap-2 text-lg font-semibold tracking-tight text-gray-900 sm:text-xl">
