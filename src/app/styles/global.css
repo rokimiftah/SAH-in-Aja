@@ -26,6 +26,11 @@ html {
   background-color: #f3f4f6; /* gray-100 - neutral default */
 }
 
+/* Motion animation initial state - prevents flash before JS hydration */
+.motion-hidden {
+  opacity: 0 !important;
+}
+
 /* Hide scrollbar for all browsers */
 *,
 *::before,
