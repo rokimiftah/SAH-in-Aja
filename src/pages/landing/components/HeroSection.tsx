@@ -14,7 +14,7 @@ export const HeroSection = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
-    <section className="pt-20 pb-12 sm:pt-24 sm:pb-16">
+    <section className="relative z-10 bg-white pt-20 pb-12 sm:pt-24 sm:pb-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <motion.div {...fadeIn} className="mx-auto max-w-3xl pt-6 text-center sm:pt-16">
           <h1 className="mb-4 text-3xl font-semibold tracking-tight text-gray-900 sm:mb-5 sm:text-5xl lg:text-6xl">
