@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { useQuery } from "convex/react";
-import { Camera, FileText, MessageCircle } from "lucide-react";
+import { Camera, FileText, MessageCircle, Mic, Package } from "lucide-react";
 
 import { FEATURES } from "@shared/config/branding";
 
@@ -21,8 +21,10 @@ function getTimeBasedGreeting(): string {
 export function DashboardHomePage() {
   const user = useQuery(api.users.getCurrentUser);
   const scans = useQuery(api.halalScans.getMyScans);
+  const materialScans = useQuery(api.materialScans.getMyScans);
   const documents = useQuery(api.halalDocuments.getMyDocuments);
   const consultations = useQuery(api.halalConsultations.getByUser, user?._id ? { userId: user._id } : "skip");
+  const voiceAuditHistory = useQuery(api.voiceAudit.getMyHistory, { limit: 100 });
   const name = (user?.name ?? "").trim();
   const email = (user?.email ?? "").trim();
   const displayName = name || email?.split("@")[0] || "";
@@ -52,10 +54,12 @@ export function DashboardHomePage() {
         </div>
 
         {/* Stats */}
-        <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <StatsCard label="Total Scan" value={scans?.length ?? 0} icon={Camera} variant="emerald" />
+        <div className="mb-4 flex flex-col gap-3 sm:grid sm:grid-cols-3 lg:grid-cols-5">
+          <StatsCard label="Cek Dapur" value={scans?.length ?? 0} icon={Camera} variant="emerald" />
+          <StatsCard label="Cek Bahan" value={materialScans?.length ?? 0} icon={Package} variant="cyan" />
           <StatsCard label="Dokumen" value={documents?.length ?? 0} icon={FileText} variant="blue" />
           <StatsCard label="Konsultasi" value={consultations?.length ?? 0} icon={MessageCircle} variant="orange" />
+          <StatsCard label="Voice Audit" value={voiceAuditHistory?.length ?? 0} icon={Mic} variant="rose" />
         </div>
 
         {/* Tips */}
@@ -66,7 +70,7 @@ export function DashboardHomePage() {
         {/* Features */}
         <div className="lg:flex lg:flex-1 lg:flex-col">
           <h2 className="mb-4 text-lg font-semibold text-gray-800">Fitur Utama</h2>
-          <div className="grid gap-4 md:grid-cols-3 lg:flex-1">
+          <div className="grid gap-4 sm:grid-cols-2 lg:flex-1 lg:grid-cols-3 xl:grid-cols-5">
             <FeatureCard
               icon={<Camera className="h-6 w-6 text-white" />}
               name={FEATURES.siapHalal.name}
@@ -75,6 +79,16 @@ export function DashboardHomePage() {
               ctaText={FEATURES.siapHalal.cta.primary}
               href="/dashboard/siap-halal"
               gradient="bg-gradient-to-br from-emerald-500 to-teal-600"
+              available={true}
+            />
+            <FeatureCard
+              icon={<Package className="h-6 w-6 text-white" />}
+              name={FEATURES.cekBahan.name}
+              tagline={FEATURES.cekBahan.tagline}
+              description="Foto kemasan bahan, cek logo halal dan status bahan."
+              ctaText={FEATURES.cekBahan.cta.primary}
+              href="/dashboard/cek-bahan"
+              gradient="bg-gradient-to-br from-cyan-500 to-teal-600"
               available={true}
             />
             <FeatureCard
@@ -95,6 +109,16 @@ export function DashboardHomePage() {
               ctaText={FEATURES.asistenHalal.cta.primary}
               href="/dashboard/asisten-halal"
               gradient="bg-gradient-to-br from-orange-500 to-rose-500"
+              available={true}
+            />
+            <FeatureCard
+              icon={<Mic className="h-6 w-6 text-white" />}
+              name={FEATURES.voiceAudit.name}
+              tagline={FEATURES.voiceAudit.tagline}
+              description="Simulasi wawancara audit halal dengan AI auditor."
+              ctaText={FEATURES.voiceAudit.cta.primary}
+              href="/dashboard/voice-audit"
+              gradient="bg-gradient-to-br from-rose-500 to-pink-600"
               available={true}
             />
           </div>

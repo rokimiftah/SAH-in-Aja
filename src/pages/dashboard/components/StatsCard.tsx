@@ -6,7 +6,7 @@ interface StatsCardProps {
   label: string;
   value: number;
   icon: LucideIcon;
-  variant: "emerald" | "blue" | "orange";
+  variant: "emerald" | "cyan" | "blue" | "orange" | "rose";
 }
 
 export function StatsCard({ label, value, icon: Icon, variant }: StatsCardProps) {
@@ -16,6 +16,12 @@ export function StatsCard({ label, value, icon: Icon, variant }: StatsCardProps)
       iconBg: "bg-emerald-50 group-hover:bg-emerald-100",
       iconColor: "text-emerald-600",
       decoration: "text-emerald-600/5",
+    },
+    cyan: {
+      border: "group-hover:border-cyan-200",
+      iconBg: "bg-cyan-50 group-hover:bg-cyan-100",
+      iconColor: "text-cyan-600",
+      decoration: "text-cyan-600/5",
     },
     blue: {
       border: "group-hover:border-blue-200",
@@ -28,6 +34,12 @@ export function StatsCard({ label, value, icon: Icon, variant }: StatsCardProps)
       iconBg: "bg-orange-50 group-hover:bg-orange-100",
       iconColor: "text-orange-600",
       decoration: "text-orange-600/5",
+    },
+    rose: {
+      border: "group-hover:border-rose-200",
+      iconBg: "bg-rose-50 group-hover:bg-rose-100",
+      iconColor: "text-rose-600",
+      decoration: "text-rose-600/5",
     },
   };
 
@@ -50,16 +62,16 @@ export function StatsCard({ label, value, icon: Icon, variant }: StatsCardProps)
         >
           <Icon className="h-8 w-8" />
         </div>
-        <div>
-          <p className="font-medium text-gray-500">{label}</p>
-          <h3 className="mt-0.5 text-4xl font-extrabold tracking-tight text-gray-900">{value}</h3>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-medium text-gray-500 sm:text-lg">{label}</p>
+          <h3 className="mt-0.5 text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">{value}</h3>
         </div>
       </div>
 
       {/* Background Decoration */}
       <Icon
         className={cn(
-          "absolute -right-4 -bottom-4 h-24 w-24 rotate-12 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-0",
+          "absolute -right-4 -bottom-4 h-16 w-16 rotate-12 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-0 sm:h-20 sm:w-20 lg:h-24 lg:w-24",
           style.decoration,
         )}
       />
