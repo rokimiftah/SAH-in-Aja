@@ -1,7 +1,7 @@
 import type { Doc } from "../../../convex/_generated/dataModel";
 
 import { useQuery } from "convex/react";
-import { Calendar, Clock, MessageSquare, Mic } from "lucide-react";
+import { Calendar, MessageSquare, Mic } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 import { FEATURES } from "@shared/config/branding";
@@ -20,13 +20,6 @@ function formatDate(timestamp: number) {
   });
 }
 
-function formatDuration(seconds?: number) {
-  if (!seconds) return "-";
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, "0")}`;
-}
-
 function SessionListItem({ session }: { session: Doc<"voice_audit_sessions"> }) {
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-gray-200 bg-white p-4 text-left shadow-sm transition-all hover:border-gray-300 hover:shadow-md sm:p-5">
@@ -38,18 +31,6 @@ function SessionListItem({ session }: { session: Doc<"voice_audit_sessions"> }) 
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-x-2">
               <h3 className="text-text-dark truncate font-semibold capitalize">Topik: {session.focusTopic}</h3>
-              <span
-                className={cn(
-                  "rounded-full px-2 py-0.5 text-xs font-medium",
-                  session.status === "completed"
-                    ? "bg-green-100 text-green-700"
-                    : session.status === "abandoned"
-                      ? "bg-gray-100 text-gray-600"
-                      : "bg-yellow-100 text-yellow-700",
-                )}
-              >
-                {session.status === "completed" ? "Selesai" : session.status === "abandoned" ? "Dibatalkan" : "Aktif"}
-              </span>
             </div>
 
             {session.summary && <p className="mt-1 line-clamp-2 text-sm text-gray-600">{session.summary}</p>}
@@ -58,14 +39,6 @@ function SessionListItem({ session }: { session: Doc<"voice_audit_sessions"> }) 
               <div className="flex items-center gap-1.5">
                 <Calendar className="h-3.5 w-3.5 shrink-0" />
                 <span>{formatDate(session.createdAt)}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Clock className="h-3.5 w-3.5 shrink-0" />
-                <span>{formatDuration(session.durationSeconds)}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <MessageSquare className="h-3.5 w-3.5 shrink-0" />
-                <span>{session.transcript.length} pesan</span>
               </div>
             </div>
 
