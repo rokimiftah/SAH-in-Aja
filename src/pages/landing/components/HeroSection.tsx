@@ -17,7 +17,8 @@ export const HeroSection = () => {
             Persiapan Sertifikasi Halal Lebih Mudah
           </h1>
           <p className="mx-auto mb-6 max-w-2xl text-base text-gray-500 sm:mb-8 sm:text-lg">
-            Asisten AI yang membantu UMKM mempersiapkan sertifikasi halal. Dari pengecekan kesiapan hingga pembuatan dokumen.
+            Platform AI lengkap untuk persiapan sertifikasi halal UMKM. Cek kesiapan, analisis bahan, buat dokumen, konsultasi,
+            dan latihan audit.
           </p>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
@@ -35,22 +36,20 @@ export const HeroSection = () => {
             </a>
           </div>
         </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-8 sm:mt-12"
-        >
-          <div className="mx-auto">
-            <img
-              src="/landing/dashboard.avif"
-              alt="Dashboard SAH-in Aja"
-              className="w-full rounded-lg border border-gray-200 shadow-[0_15px_40px_-10px_rgba(0,168,132,0.3)] sm:rounded-xl sm:shadow-[0_25px_60px_-15px_rgba(0,168,132,0.35)]"
-            />
-          </div>
-        </motion.div>
       </div>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="mx-auto mt-8 max-w-7xl px-4 sm:mt-12 sm:px-6"
+      >
+        <img
+          src="/landing/dashboard.avif"
+          alt="Dashboard SAH-in Aja"
+          className="w-full rounded-lg border border-gray-200 shadow-[0_20px_40px_-15px_rgba(0,168,132,0.4)] sm:rounded-xl sm:shadow-[0_35px_60px_-20px_rgba(0,168,132,0.5)]"
+        />
+      </motion.div>
     </section>
   );
 };

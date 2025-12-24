@@ -1,9 +1,9 @@
-import { Camera, CheckCircle2, FileText, MessageCircle } from "lucide-react";
+import { Camera, CheckCircle2, FileText, MessageCircle, Mic, Package } from "lucide-react";
 import { motion } from "motion/react";
 
-const fadeInUp = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
+const fadeIn = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
   transition: { duration: 0.5 },
 };
 
@@ -11,15 +11,28 @@ const features = [
   {
     id: "siap-halal",
     icon: Camera,
-    label: "Siap Halal",
+    label: "Cek Dapur Halal",
     title: "Cek Kesiapan dengan AI Vision",
     description:
       "Foto area produksimu, dan AI kami akan menganalisis kesiapan halal secara otomatis. Dapatkan skor dan rekomendasi perbaikan dalam hitungan menit.",
     items: ["Analisis foto area produksi", "Skor kesiapan halal otomatis", "Rekomendasi perbaikan detail", "Hasil dalam 2 menit"],
-    image: "/landing/siap_halal.avif",
-    color: "text-primary-green",
-    shadow: "shadow-[0_6px_20px_rgba(0,168,132,0.15)]",
+    image: "/landing/cek_dapur_halal.avif",
+    color: "text-emerald-600",
+    shadow: "shadow-[0_6px_20px_rgba(16,185,129,0.15)]",
     imagePosition: "right",
+  },
+  {
+    id: "cek-bahan",
+    icon: Package,
+    label: "Cek Bahan Halal",
+    title: "Smart Material Scanner",
+    description:
+      "Foto kemasan produk, AI deteksi logo halal, cek Positive List, dan analisis komposisi bahan untuk memastikan status halal sebelum digunakan.",
+    items: ["Deteksi logo halal otomatis", "Cek bahan kritis E-Number", "Analisis komposisi bahan", "Hasil instan 10 detik"],
+    image: "/landing/cek_bahan_halal.avif",
+    color: "text-cyan-600",
+    shadow: "shadow-[0_6px_20px_rgba(6,182,212,0.15)]",
+    imagePosition: "left",
   },
   {
     id: "dokumen-halal",
@@ -30,9 +43,9 @@ const features = [
       "Buat dokumen wajib untuk sertifikasi halal secara otomatis. Dari SOP produksi hingga daftar bahan baku, semua tersedia dalam format siap pakai.",
     items: ["SOP Produksi Halal", "Manual SJPH lengkap", "Daftar Bahan Baku", "Template siap pakai"],
     image: "/landing/dokumen_halal.avif",
-    color: "text-primary-blue",
-    shadow: "shadow-[0_6px_20px_rgba(61,127,255,0.15)]",
-    imagePosition: "left",
+    color: "text-blue-600",
+    shadow: "shadow-[0_6px_20px_rgba(37,99,235,0.15)]",
+    imagePosition: "right",
   },
   {
     id: "asisten-halal",
@@ -43,8 +56,21 @@ const features = [
       "Tanya jawab seputar sertifikasi halal kapan saja. Asisten AI kami siap membantu menjawab pertanyaan dan memberikan panduan step-by-step.",
     items: ["Panduan BPJPH lengkap", "Jawaban real-time", "Rekomendasi supplier halal", "Tips lulus audit"],
     image: "/landing/asisten_halal.avif",
-    color: "text-primary-orange",
-    shadow: "shadow-[0_6px_20px_rgba(245,166,35,0.15)]",
+    color: "text-orange-600",
+    shadow: "shadow-[0_6px_20px_rgba(234,88,12,0.15)]",
+    imagePosition: "left",
+  },
+  {
+    id: "voice-audit",
+    icon: Mic,
+    label: "Simulasi Audit Halal",
+    title: "Latih Mental Menghadapi Auditor",
+    description:
+      "Simulasi wawancara suara dengan AI sebagai auditor BPJPH. Latih mental dan pelajari jawaban yang benar sebelum menghadapi audit resmi.",
+    items: ["Wawancara suara real-time", "Auditor AI yang supportif", "Feedback langsung", "Referensi standar SJPH"],
+    image: "/landing/simulasi_audit_halal.avif",
+    color: "text-rose-600",
+    shadow: "shadow-[0_6px_20px_rgba(225,29,72,0.15)]",
     imagePosition: "right",
   },
 ];
@@ -53,8 +79,8 @@ export const FeaturesSection = () => {
   return (
     <section id="features" className="bg-gray-50 py-12 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <motion.div {...fadeInUp} className="mx-auto mb-10 max-w-2xl text-center sm:mb-16">
-          <h2 className="mb-2 text-xl font-semibold text-gray-900 sm:mb-3 sm:text-3xl">3 Fitur Utama</h2>
+        <motion.div {...fadeIn} className="mx-auto mb-10 max-w-2xl text-center sm:mb-16">
+          <h2 className="mb-2 text-xl font-semibold text-gray-900 sm:mb-3 sm:text-3xl">5 Fitur Utama</h2>
           <p className="text-sm text-gray-500 sm:text-base">Semua yang kamu butuhkan untuk persiapan sertifikasi halal</p>
         </motion.div>
 
@@ -62,8 +88,8 @@ export const FeaturesSection = () => {
           {features.map((feature) => (
             <motion.div
               key={feature.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               className="grid items-center gap-6 sm:gap-10 lg:grid-cols-2"
             >
