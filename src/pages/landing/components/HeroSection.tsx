@@ -1,7 +1,11 @@
-import { ArrowRight } from "lucide-react";
+import { useState } from "react";
+
+import { ArrowRight, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 
 export const HeroSection = () => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   return (
     <section className="bg-white pt-20 pb-12 sm:pt-24 sm:pb-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -31,12 +35,18 @@ export const HeroSection = () => {
         </div>
       </div>
 
-      <div className="mx-auto mt-8 max-w-7xl px-4 sm:mt-12 sm:px-6">
+      <div className="relative mx-auto mt-8 max-w-7xl px-4 sm:mt-12 sm:px-6">
+        {!imageLoaded && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Loader2 className="text-primary-green h-8 w-8 animate-spin" />
+          </div>
+        )}
         <img
           src="/landing/dashboard.avif"
           alt="Dashboard SAH-in Aja"
           width={1920}
           height={959}
+          onLoad={() => setImageLoaded(true)}
           className="h-auto w-full rounded-lg border border-gray-200 shadow-[0_20px_40px_-15px_rgba(0,168,132,0.4)] sm:rounded-xl sm:shadow-[0_35px_60px_-20px_rgba(0,168,132,0.5)]"
         />
       </div>
