@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 
 import { ArrowLeft } from "lucide-react";
+import { motion } from "motion/react";
+import { useLocation } from "wouter";
 
 interface BackButtonConfig {
   label?: string;
@@ -28,6 +30,8 @@ const MAX_WIDTH_CLASSES = {
 };
 
 export function PageContainer({ children, backButton, centered = false, maxWidth = "xl", scrollResetKey }: PageContainerProps) {
+  const [location] = useLocation();
+
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
       {/* Back button area - sticky, tidak scroll */}
@@ -47,7 +51,13 @@ export function PageContainer({ children, backButton, centered = false, maxWidth
       )}
 
       {/* Scrollable content area */}
-      <div key={String(scrollResetKey)} className="flex-1 overflow-y-auto p-6 lg:p-8">
+      <motion.div
+        key={scrollResetKey ? `${location}-${String(scrollResetKey)}` : location}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeInOut" }}
+        className="flex-1 overflow-y-auto p-6 lg:p-8"
+      >
         {centered ? (
           <div className="flex min-h-full items-center justify-center">
             <div className={`w-full ${MAX_WIDTH_CLASSES[maxWidth]}`}>{children}</div>
@@ -55,7 +65,7 @@ export function PageContainer({ children, backButton, centered = false, maxWidth
         ) : (
           <div className={`mx-auto w-full ${MAX_WIDTH_CLASSES[maxWidth]}`}>{children}</div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

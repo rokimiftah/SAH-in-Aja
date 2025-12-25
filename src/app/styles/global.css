@@ -28,7 +28,7 @@ html {
 
 /* Motion animation initial state - prevents flash before JS hydration */
 .motion-hidden {
-  opacity: 0 !important;
+  opacity: 0;
 }
 
 /* Hide scrollbar for all browsers */

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { useQuery } from "convex/react";
 import { Camera, FileText, MessageCircle, Mic, Package } from "lucide-react";
+import { motion } from "motion/react";
 
 import { FEATURES } from "@shared/config/branding";
 
@@ -39,7 +40,12 @@ export function DashboardHomePage() {
   }, []);
 
   return (
-    <div className="h-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, ease: "easeInOut" }}
+      className="h-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
+    >
       <div className="h-full overflow-y-auto p-6 lg:flex lg:flex-col lg:overflow-hidden lg:p-8">
         {/* Welcome */}
         <div className="mb-4">
@@ -124,6 +130,6 @@ export function DashboardHomePage() {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
