@@ -74,6 +74,21 @@ export function DokumenHalalPage() {
     return () => setProcessing(false);
   }, [flowState, stage, setProcessing]);
 
+  // Prevent accidental page close/refresh during form filling
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      const hasFilledData =
+        flowState !== "intro" && flowState !== "preview" && (businessInfo.name || businessInfo.owner || selectedTemplate);
+      if (hasFilledData) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [flowState, businessInfo, selectedTemplate]);
+
   const handleStartCreate = () => setFlowState("template");
   const handleSelectTemplate = (template: TemplateType) => setSelectedTemplate(template);
 
@@ -291,19 +306,19 @@ export function DokumenHalalPage() {
           <h3 className="text-text-dark mb-2 text-lg font-semibold">
             {error?.includes("Kredit") ? "Kredit Habis" : "Terjadi Kesalahan"}
           </h3>
-          <p className="mb-6 text-sm text-gray-600">{error || "Gagal generate dokumen. Silakan coba lagi."}</p>
-          <div className="flex justify-center gap-3">
+          <p className="mb-6 text-sm wrap-break-word text-gray-600">{error || "Gagal generate dokumen. Silakan coba lagi."}</p>
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-center">
             <button
               type="button"
               onClick={handleReset}
-              className="cursor-pointer rounded-xl border border-gray-300 px-6 py-3 font-medium text-gray-700 hover:bg-gray-50"
+              className="w-full cursor-pointer rounded-xl border border-gray-300 px-6 py-3 font-medium text-gray-700 hover:bg-gray-50 sm:w-auto"
             >
               Mulai Ulang
             </button>
             <button
               type="button"
               onClick={handleRetry}
-              className="bg-primary-blue flex cursor-pointer items-center gap-2 rounded-xl px-6 py-3 font-semibold text-white"
+              className="bg-primary-blue flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-6 py-3 font-semibold text-white sm:w-auto"
             >
               <RefreshCw className="h-4 w-4" />
               Coba Lagi

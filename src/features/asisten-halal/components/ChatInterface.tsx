@@ -49,6 +49,20 @@ export function ChatInterface() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
 
+  // Prevent accidental page close/refresh during active chat
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      // Only protect if there are user messages (> 1 because first is system greeting)
+      if (messages.length > 1) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [messages.length]);
+
   const showQuickQuestions = messages.length <= 1;
 
   return (

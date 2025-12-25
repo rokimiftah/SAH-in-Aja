@@ -13,6 +13,7 @@ const DAILY_LIMITS = {
   asistenHalal: 5,
   cekBahan: 10,
   voiceAudit: 2,
+  training: 3,
 };
 
 // Get current date in UTC+7 (Asia/Jakarta)
@@ -56,6 +57,7 @@ async function getOrCreateDailyCredits(ctx: MutationCtx, userId: Id<"users">) {
     asistenHalalChats: DAILY_LIMITS.asistenHalal,
     cekBahanCredits: DAILY_LIMITS.cekBahan,
     voiceAuditCredits: DAILY_LIMITS.voiceAudit,
+    trainingCredits: DAILY_LIMITS.training,
   });
 
   return {
@@ -67,6 +69,7 @@ async function getOrCreateDailyCredits(ctx: MutationCtx, userId: Id<"users">) {
     asistenHalalChats: DAILY_LIMITS.asistenHalal,
     cekBahanCredits: DAILY_LIMITS.cekBahan,
     voiceAuditCredits: DAILY_LIMITS.voiceAudit,
+    trainingCredits: DAILY_LIMITS.training,
   };
 }
 
@@ -86,6 +89,7 @@ export const getMyDailyCredits = query({
     const asistenHalal = credits?.asistenHalalChats ?? DAILY_LIMITS.asistenHalal;
     const cekBahan = credits?.cekBahanCredits ?? DAILY_LIMITS.cekBahan;
     const voiceAudit = credits?.voiceAuditCredits ?? DAILY_LIMITS.voiceAudit;
+    const training = credits?.trainingCredits ?? DAILY_LIMITS.training;
 
     return {
       siapHalalCredits: siapHalal > DAILY_LIMITS.siapHalal ? siapHalal : Math.min(siapHalal, DAILY_LIMITS.siapHalal),
@@ -95,6 +99,7 @@ export const getMyDailyCredits = query({
         asistenHalal > DAILY_LIMITS.asistenHalal ? asistenHalal : Math.min(asistenHalal, DAILY_LIMITS.asistenHalal),
       cekBahanCredits: cekBahan > DAILY_LIMITS.cekBahan ? cekBahan : Math.min(cekBahan, DAILY_LIMITS.cekBahan),
       voiceAuditCredits: voiceAudit > DAILY_LIMITS.voiceAudit ? voiceAudit : Math.min(voiceAudit, DAILY_LIMITS.voiceAudit),
+      trainingCredits: training > DAILY_LIMITS.training ? training : Math.min(training, DAILY_LIMITS.training),
       limits: DAILY_LIMITS,
     };
   },
@@ -109,6 +114,7 @@ export const checkCredits = query({
       v.literal("asistenHalal"),
       v.literal("cekBahan"),
       v.literal("voiceAudit"),
+      v.literal("training"),
     ),
   },
   handler: async (ctx, args) => {
@@ -144,6 +150,11 @@ export const checkCredits = query({
       case "voiceAudit":
         limit = DAILY_LIMITS.voiceAudit;
         remaining = credits?.voiceAuditCredits ?? limit;
+        if (remaining <= limit) remaining = Math.min(remaining, limit);
+        break;
+      case "training":
+        limit = DAILY_LIMITS.training;
+        remaining = credits?.trainingCredits ?? limit;
         if (remaining <= limit) remaining = Math.min(remaining, limit);
         break;
     }
@@ -293,6 +304,35 @@ export const useVoiceAuditCredit = mutation({
   },
 });
 
+// Use credit for Training (kuis pelatihan halal)
+export const useTrainingCredit = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Silakan login terlebih dahulu");
+
+    const credits = await getOrCreateDailyCredits(ctx, userId);
+
+    const currentCredits = credits.trainingCredits ?? DAILY_LIMITS.training;
+    const cappedCredits =
+      currentCredits > DAILY_LIMITS.training ? currentCredits : Math.min(currentCredits, DAILY_LIMITS.training);
+
+    if (cappedCredits <= 0) {
+      throw new ConvexError("Kredit Pelatihan Halal habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
+    }
+
+    const newCredits = cappedCredits - 1;
+    await ctx.db.patch(credits._id, {
+      trainingCredits: newCredits,
+    });
+
+    return {
+      remaining: newCredits,
+      limit: DAILY_LIMITS.training,
+    };
+  },
+});
+
 // Apply promo code
 export const applyPromoCode = mutation({
   args: {
@@ -348,7 +388,8 @@ export const applyPromoCode = mutation({
       dokumenHalalCredits: credits.dokumenHalalCredits + promoCode.credits,
       asistenHalalChats: credits.asistenHalalChats + promoCode.credits,
       cekBahanCredits: credits.cekBahanCredits + promoCode.credits,
-      voiceAuditCredits: (credits.voiceAuditCredits ?? DAILY_LIMITS.voiceAudit) + promoCode.credits,
+      voiceAuditCredits: credits.voiceAuditCredits + promoCode.credits,
+      trainingCredits: credits.trainingCredits + promoCode.credits,
     });
 
     // Record usage
@@ -400,6 +441,7 @@ export const migrateExistingUsers = internalMutation({
         asistenHalalChats: DAILY_LIMITS.asistenHalal,
         cekBahanCredits: DAILY_LIMITS.cekBahan,
         voiceAuditCredits: DAILY_LIMITS.voiceAudit,
+        trainingCredits: DAILY_LIMITS.training,
       });
       created++;
     }
@@ -434,6 +476,7 @@ export const createDailyCreditsForUser = internalMutation({
       asistenHalalChats: DAILY_LIMITS.asistenHalal,
       cekBahanCredits: DAILY_LIMITS.cekBahan,
       voiceAuditCredits: DAILY_LIMITS.voiceAudit,
+      trainingCredits: DAILY_LIMITS.training,
     });
 
     return { id: newId, created: true };
@@ -469,16 +512,15 @@ export const resetAllDailyCredits = internalMutation({
       let bonusAsistenHalal = 0;
       let bonusCekBahan = 0;
       let bonusVoiceAudit = 0;
+      let bonusTraining = 0;
 
       if (latestPreviousRecord) {
         bonusSiapHalal = Math.max(0, latestPreviousRecord.siapHalalCredits - DAILY_LIMITS.siapHalal);
         bonusDokumenHalal = Math.max(0, latestPreviousRecord.dokumenHalalCredits - DAILY_LIMITS.dokumenHalal);
         bonusAsistenHalal = Math.max(0, latestPreviousRecord.asistenHalalChats - DAILY_LIMITS.asistenHalal);
         bonusCekBahan = Math.max(0, latestPreviousRecord.cekBahanCredits - DAILY_LIMITS.cekBahan);
-        bonusVoiceAudit = Math.max(
-          0,
-          (latestPreviousRecord.voiceAuditCredits ?? DAILY_LIMITS.voiceAudit) - DAILY_LIMITS.voiceAudit,
-        );
+        bonusVoiceAudit = Math.max(0, latestPreviousRecord.voiceAuditCredits - DAILY_LIMITS.voiceAudit);
+        bonusTraining = Math.max(0, latestPreviousRecord.trainingCredits - DAILY_LIMITS.training);
       }
 
       // Check if user has a record for today
@@ -495,6 +537,7 @@ export const resetAllDailyCredits = internalMutation({
           asistenHalalChats: DAILY_LIMITS.asistenHalal + bonusAsistenHalal,
           cekBahanCredits: DAILY_LIMITS.cekBahan + bonusCekBahan,
           voiceAuditCredits: DAILY_LIMITS.voiceAudit + bonusVoiceAudit,
+          trainingCredits: DAILY_LIMITS.training + bonusTraining,
         });
         updated++;
       } else {
@@ -507,6 +550,7 @@ export const resetAllDailyCredits = internalMutation({
           asistenHalalChats: DAILY_LIMITS.asistenHalal + bonusAsistenHalal,
           cekBahanCredits: DAILY_LIMITS.cekBahan + bonusCekBahan,
           voiceAuditCredits: DAILY_LIMITS.voiceAudit + bonusVoiceAudit,
+          trainingCredits: DAILY_LIMITS.training + bonusTraining,
         });
         created++;
       }

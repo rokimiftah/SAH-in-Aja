@@ -9,6 +9,7 @@ import { useLocation } from "wouter";
 import { useVapiAudit } from "@features/voice-audit";
 import { TitleSelector, TopicSelector } from "@features/voice-audit/components";
 import { FEATURES } from "@shared/config/branding";
+import { useProcessing } from "@shared/contexts";
 
 import { api } from "../../../convex/_generated/api";
 import { PageContainer } from "./components";
@@ -54,6 +55,7 @@ export function VoiceAuditPage() {
   const creditStatus = useQuery(api.credits.checkCredits, { feature: "voiceAudit" });
   const isLoadingCredits = creditStatus === undefined;
   const hasCredits = creditStatus?.hasCredits ?? false;
+  const { setProcessing } = useProcessing();
 
   // Set userName from user profile
   useEffect(() => {
@@ -62,6 +64,13 @@ export function VoiceAuditPage() {
     }
   }, [user?.name]);
 
+  // Protect active call state from navigation
+  useEffect(() => {
+    const isCallActive = flowState === "active";
+    setProcessing(isCallActive, "Simulasi audit sedang berlangsung...");
+    return () => setProcessing(false);
+  }, [flowState, setProcessing]);
+
   // Handle call ended from Vapi (e.g., meeting ended by server)
   useEffect(() => {
     if (callEnded && flowState === "active") {
@@ -69,6 +78,19 @@ export function VoiceAuditPage() {
       resetCallEnded();
     }
   }, [callEnded, flowState, resetCallEnded]);
+
+  // Prevent accidental page close/refresh during active call
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (flowState === "active") {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [flowState]);
 
   const handleGoToConfig = () => setFlowState("config");
 

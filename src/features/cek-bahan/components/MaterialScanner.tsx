@@ -31,6 +31,20 @@ export function MaterialScanner({ onPhotoComplete }: MaterialScannerProps) {
   const [compressionError, setCompressionError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Prevent accidental page close/refresh during photo capture
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      const hasPhotos = Object.values(photos).some((photo) => photo !== null);
+      if (hasPhotos) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [photos]);
+
   useEffect(() => {
     return () => {
       Object.values(photos).forEach((photo) => {

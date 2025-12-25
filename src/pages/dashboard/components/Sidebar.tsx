@@ -5,9 +5,11 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { useMutation, useQuery } from "convex/react";
 import {
   AlertTriangle,
+  BookOpen,
   Camera,
   ChevronDown,
   ChevronUp,
+  ClipboardCheck,
   ExternalLink,
   FileText,
   Gift,
@@ -17,6 +19,7 @@ import {
   MessageCircle,
   Mic,
   Package,
+  Table,
   UserPen,
   X,
 } from "lucide-react";
@@ -130,6 +133,22 @@ const NAV_ITEMS = [
     activeClass: "bg-primary-green text-white shadow-md",
   },
   {
+    id: "cek-jalur",
+    label: "Cek Jalur Sertifikasi",
+    icon: ClipboardCheck,
+    href: "/dashboard/cek-jalur",
+    available: true,
+    activeClass: "bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-md",
+  },
+  {
+    id: "traceability",
+    label: "Data Produk & Bahan",
+    icon: Table,
+    href: "/dashboard/traceability",
+    available: true,
+    activeClass: "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md",
+  },
+  {
     id: "siap-halal",
     label: FEATURES.siapHalal.name,
     icon: Camera,
@@ -194,6 +213,23 @@ const NAV_ITEMS = [
         label: "Riwayat",
         icon: History,
         href: "/dashboard/asisten-halal/history",
+      },
+    ],
+  },
+  {
+    id: "pelatihan",
+    label: "Pelatihan Halal",
+    icon: BookOpen,
+    href: "/dashboard/pelatihan",
+    available: true,
+    activeClass: "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md",
+    activeLightClass: "bg-cyan-50 text-cyan-700",
+    subItems: [
+      {
+        id: "pelatihan-history",
+        label: "Riwayat",
+        icon: History,
+        href: "/dashboard/pelatihan/history",
       },
     ],
   },
@@ -459,7 +495,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                                     ? "Scan Baru"
                                     : item.id === "voice-audit"
                                       ? "Simulasi Baru"
-                                      : "Buat Dokumen"}
+                                      : item.id === "pelatihan"
+                                        ? "Mulai Quiz"
+                                        : "Buat Dokumen"}
                               {dailyCredits && item.id === "siap-halal" && (
                                 <CreditBadge remaining={dailyCredits.siapHalalCredits} limit={dailyCredits.limits.siapHalal} />
                               )}
@@ -485,6 +523,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                                 <CreditBadge
                                   remaining={dailyCredits.voiceAuditCredits ?? dailyCredits.limits.voiceAudit}
                                   limit={dailyCredits.limits.voiceAudit}
+                                />
+                              )}
+                              {dailyCredits && item.id === "pelatihan" && (
+                                <CreditBadge
+                                  remaining={dailyCredits.trainingCredits ?? dailyCredits.limits.training}
+                                  limit={dailyCredits.limits.training}
                                 />
                               )}
                             </button>

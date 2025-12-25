@@ -8,6 +8,7 @@ interface BackButtonConfig {
   label?: string;
   onClick: () => void;
   mobileOnly?: boolean;
+  disabled?: boolean;
 }
 
 interface PageContainerProps {
@@ -41,7 +42,8 @@ export function PageContainer({ children, backButton, centered = false, maxWidth
             <button
               type="button"
               onClick={backButton.onClick}
-              className="flex w-fit cursor-pointer items-center gap-2 text-sm text-gray-600 transition-colors hover:text-gray-800"
+              disabled={backButton.disabled}
+              className="flex w-fit cursor-pointer items-center gap-2 text-sm text-gray-600 transition-colors hover:text-gray-800 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-gray-600"
             >
               <ArrowLeft className="h-4 w-4" />
               {backButton.label || "Kembali"}

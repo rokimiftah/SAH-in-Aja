@@ -51,6 +51,65 @@ const TEMPLATE_PROMPTS: Record<string, string> = {
 5. Komitmen Pelatihan Karyawan
 6. Komitmen Audit Internal
 7. Tanda Tangan dan Materai`,
+
+  sop_pencucian_najis: `Buat SOP Pencucian Najis (Samak) yang mencakup:
+1. Tujuan dan Ruang Lingkup
+   - Tujuan prosedur samak
+   - Peralatan yang tercakup
+2. Definisi Najis
+   - Najis Mughallazhah (berat): babi dan anjing
+   - Najis Mutawassithah (sedang): darah, kotoran
+   - Najis Mukhaffafah (ringan): air kencing bayi
+3. Prosedur Identifikasi Kontaminasi
+   - Checklist inspeksi visual
+   - Dokumentasi penemuan kontaminasi
+4. Prosedur Pencucian (Samak)
+   - Untuk Najis Mughallazhah: 7x pencucian, salah satunya dengan tanah/debu
+   - Untuk Najis Mutawassithah: pencucian hingga hilang warna, bau, rasa
+   - Untuk Najis Mukhaffafah: cukup percikan air
+5. Bahan dan Peralatan Pencucian
+   - Jenis air yang digunakan (air mutlak)
+   - Tanah/debu untuk samak (jika diperlukan)
+   - Alat pembersih yang digunakan
+6. Dokumentasi dan Pencatatan
+   - Form pencatatan kejadian kontaminasi
+   - Form checklist prosedur pencucian
+   - Verifikasi oleh Penyelia Halal
+7. Tindakan Pencegahan
+   - Pemisahan area produksi
+   - Pelatihan karyawan
+   - Inspeksi berkala`,
+
+  pernyataan_bebas_babi: `Buat Surat Pernyataan Bebas Babi yang mencakup:
+1. Kop Surat
+   - Logo perusahaan (placeholder)
+   - Nama dan alamat perusahaan
+2. Judul: SURAT PERNYATAAN BEBAS BABI DAN TURUNANNYA
+3. Identitas Pelaku Usaha
+   - Nama pemilik/penanggung jawab
+   - Jabatan
+   - Nama usaha
+   - Alamat usaha
+   - Nomor telepon
+4. Pernyataan Resmi
+   - Menyatakan dengan sebenar-benarnya bahwa:
+   - Tidak menggunakan daging babi dalam proses produksi
+   - Tidak menggunakan lemak babi (lard) atau minyak babi
+   - Tidak menggunakan gelatin dari babi
+   - Tidak menggunakan turunan babi lainnya (kolagen, enzim, emulsifier)
+   - Tidak menggunakan peralatan yang pernah bersentuhan dengan babi
+5. Daftar Bahan yang Digunakan
+   - Nama bahan
+   - Sumber/asal bahan
+   - Status halal (jika ada sertifikat)
+6. Komitmen
+   - Bersedia menerima sanksi jika pernyataan tidak benar
+   - Bersedia diaudit sewaktu-waktu
+   - Menjamin kehalalan produk dari kontaminasi babi
+7. Penutup
+   - Tempat dan tanggal
+   - Tanda tangan bermaterai
+   - Nama terang dan jabatan`,
 };
 
 export const generateHalalDocument = action({
@@ -103,11 +162,8 @@ Buat dokumen lengkap dalam bahasa Indonesia formal. Gunakan tahun ${new Date().t
             content: userContent,
           },
         ],
-        temperature: 1,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0,
-        max_tokens: 8192,
+        temperature: 0.7,
+        max_tokens: 4096,
       });
 
       const message = response.choices[0]?.message;
@@ -121,7 +177,33 @@ Buat dokumen lengkap dalam bahasa Indonesia formal. Gunakan tahun ${new Date().t
       return { content };
     } catch (error) {
       console.error("Error generating document:", error);
-      throw new Error(`Gagal generate dokumen: ${error instanceof Error ? error.message : "Unknown error"}`);
+
+      // Handle specific error types
+      if (error instanceof Error) {
+        const message = error.message;
+
+        // API rate limit or quota errors
+        if (message.includes("429") || message.includes("rate limit")) {
+          throw new Error("Layanan sedang sibuk. Silakan coba lagi dalam beberapa menit.");
+        }
+
+        // API key or authentication errors
+        if (message.includes("401") || message.includes("403") || message.includes("authentication")) {
+          throw new Error("Terjadi kesalahan sistem. Silakan coba lagi nanti.");
+        }
+
+        // Bad request errors (400)
+        if (message.includes("400")) {
+          throw new Error("Terjadi kesalahan saat memproses permintaan. Silakan coba lagi.");
+        }
+
+        // Server errors
+        if (message.includes("500") || message.includes("502") || message.includes("503")) {
+          throw new Error("Layanan sedang tidak tersedia. Silakan coba lagi nanti.");
+        }
+      }
+
+      throw new Error("Gagal generate dokumen. Silakan coba lagi.");
     }
   },
 });

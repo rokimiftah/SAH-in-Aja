@@ -9,7 +9,15 @@ interface TemplateSelectorProps {
   onSelect: (template: TemplateType) => void;
 }
 
-const TEMPLATE_ORDER: TemplateType[] = ["sop_produksi", "perjanjian_supplier", "daftar_bahan", "traceability", "komitmen_halal"];
+const TEMPLATE_ORDER: TemplateType[] = [
+  "sop_produksi",
+  "sop_pencucian_najis",
+  "pernyataan_bebas_babi",
+  "perjanjian_supplier",
+  "daftar_bahan",
+  "traceability",
+  "komitmen_halal",
+];
 
 export function TemplateSelector({ selected, onSelect }: TemplateSelectorProps) {
   return (

@@ -77,6 +77,8 @@ export const create = mutation({
       v.literal("daftar_bahan"),
       v.literal("traceability"),
       v.literal("komitmen_halal"),
+      v.literal("sop_pencucian_najis"),
+      v.literal("pernyataan_bebas_babi"),
     ),
     businessInfo: v.object({
       name: v.string(),

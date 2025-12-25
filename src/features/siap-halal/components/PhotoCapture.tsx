@@ -97,6 +97,19 @@ export function PhotoCapture({ onPhotosComplete }: PhotoCaptureProps) {
   const currentGuide = PHOTO_GUIDES[currentStep];
   const isComplete = capturedPhotos.length === PHOTO_GUIDES.length;
 
+  // Prevent accidental page close/refresh during photo capture
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (capturedPhotos.length > 0 && !isComplete) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [capturedPhotos.length, isComplete]);
+
   // Cleanup object URLs on unmount
   useEffect(() => {
     return () => {

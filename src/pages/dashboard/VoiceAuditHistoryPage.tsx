@@ -23,39 +23,33 @@ function formatDate(timestamp: number) {
 function SessionListItem({ session }: { session: Doc<"voice_audit_sessions"> }) {
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-gray-200 bg-white p-4 text-left shadow-sm transition-all hover:border-gray-300 hover:shadow-md sm:p-5">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 flex-1 items-start gap-3 sm:gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-rose-100 text-2xl sm:h-14 sm:w-14">
-            😊
+      <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-rose-100 text-2xl sm:h-14 sm:w-14">
+          😊
+        </div>
+        <div className="min-w-0 flex-1">
+          <h3 className="text-text-dark truncate font-semibold capitalize">Topik: {session.focusTopic}</h3>
+
+          {session.summary && <p className="mt-1 line-clamp-2 text-sm text-gray-600">{session.summary}</p>}
+
+          <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-500">
+            <Calendar className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">{formatDate(session.createdAt)}</span>
           </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-x-2">
-              <h3 className="text-text-dark truncate font-semibold capitalize">Topik: {session.focusTopic}</h3>
+
+          {session.score !== undefined && (
+            <div className="mt-2 flex items-center gap-2">
+              <span className="text-sm text-gray-600">Skor:</span>
+              <span
+                className={cn(
+                  "font-semibold",
+                  session.score >= 70 ? "text-green-600" : session.score >= 50 ? "text-yellow-600" : "text-red-600",
+                )}
+              >
+                {session.score}/100
+              </span>
             </div>
-
-            {session.summary && <p className="mt-1 line-clamp-2 text-sm text-gray-600">{session.summary}</p>}
-
-            <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-gray-500">
-              <div className="flex items-center gap-1.5">
-                <Calendar className="h-3.5 w-3.5 shrink-0" />
-                <span>{formatDate(session.createdAt)}</span>
-              </div>
-            </div>
-
-            {session.score !== undefined && (
-              <div className="mt-3 flex items-center gap-2">
-                <span className="text-sm text-gray-600">Skor:</span>
-                <span
-                  className={cn(
-                    "font-semibold",
-                    session.score >= 70 ? "text-green-600" : session.score >= 50 ? "text-yellow-600" : "text-red-600",
-                  )}
-                >
-                  {session.score}/100
-                </span>
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </div>
     </div>

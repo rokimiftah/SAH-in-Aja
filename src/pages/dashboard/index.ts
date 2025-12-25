@@ -10,3 +10,7 @@ export { CekBahanPage } from "./CekBahanPage";
 export { CekBahanHistoryPage } from "./CekBahanHistoryPage";
 export { VoiceAuditPage } from "./VoiceAuditPage";
 export { VoiceAuditHistoryPage } from "./VoiceAuditHistoryPage";
+export { EligibilityCheckPage } from "./EligibilityCheckPage";
+export { TraceabilityPage } from "./TraceabilityPage";
+export { TrainingPage } from "./TrainingPage";
+export { TrainingHistoryPage } from "./TrainingHistoryPage";

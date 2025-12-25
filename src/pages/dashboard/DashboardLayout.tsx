@@ -15,8 +15,12 @@ import { DashboardHomePage } from "./DashboardHomePage";
 import { DokumenHalalHistoryPage } from "./DokumenHalalHistoryPage";
 import { DokumenHalalPage } from "./DokumenHalalPage";
 import { EditProfilePage } from "./EditProfilePage";
+import { EligibilityCheckPage } from "./EligibilityCheckPage";
 import { SiapHalalHistoryPage } from "./SiapHalalHistoryPage";
 import { SiapHalalPage } from "./SiapHalalPage";
+import { TraceabilityPage } from "./TraceabilityPage";
+import { TrainingHistoryPage } from "./TrainingHistoryPage";
+import { TrainingPage } from "./TrainingPage";
 import { VoiceAuditHistoryPage } from "./VoiceAuditHistoryPage";
 import { VoiceAuditPage } from "./VoiceAuditPage";
 
@@ -66,6 +70,10 @@ export function DashboardLayout() {
               <Route path="/dashboard/cek-bahan" component={CekBahanPage} />
               <Route path="/dashboard/voice-audit/history" component={VoiceAuditHistoryPage} />
               <Route path="/dashboard/voice-audit" component={VoiceAuditPage} />
+              <Route path="/dashboard/cek-jalur" component={EligibilityCheckPage} />
+              <Route path="/dashboard/traceability" component={TraceabilityPage} />
+              <Route path="/dashboard/pelatihan/history" component={TrainingHistoryPage} />
+              <Route path="/dashboard/pelatihan" component={TrainingPage} />
               <Route path="/dashboard/profile" component={EditProfilePage} />
               <Route>
                 <div className="flex h-full flex-col items-center justify-center gap-4 rounded-2xl border border-gray-200 bg-white">

@@ -1,4 +1,11 @@
-export type TemplateType = "sop_produksi" | "perjanjian_supplier" | "daftar_bahan" | "traceability" | "komitmen_halal";
+export type TemplateType =
+  | "sop_produksi"
+  | "perjanjian_supplier"
+  | "daftar_bahan"
+  | "traceability"
+  | "komitmen_halal"
+  | "sop_pencucian_najis"
+  | "pernyataan_bebas_babi";
 
 export interface BusinessInfo {
   name: string;
@@ -46,5 +53,15 @@ export const TEMPLATE_INFO: Record<TemplateType, { name: string; description: st
     name: "Surat Komitmen Halal",
     description: "Surat pernyataan komitmen menjaga kehalalan produk",
     icon: "✍️",
+  },
+  sop_pencucian_najis: {
+    name: "SOP Pencucian Najis",
+    description: "Prosedur pencucian peralatan yang terkontaminasi najis (samak)",
+    icon: "🧼",
+  },
+  pernyataan_bebas_babi: {
+    name: "Pernyataan Bebas Babi",
+    description: "Surat pernyataan tidak menggunakan bahan babi dan turunannya",
+    icon: "🐷",
   },
 };

@@ -35,6 +35,7 @@ export default defineSchema({
     asistenHalalChats: v.number(), // Max 5 new chats per day
     cekBahanCredits: v.number(), // Max 10 per day
     voiceAuditCredits: v.number(), // Max 2 per day
+    trainingCredits: v.number(), // Max 3 per day
   })
     .index("by_user", ["userId"])
     .index("by_user_date", ["userId", "date"]),
@@ -117,6 +118,8 @@ export default defineSchema({
       v.literal("daftar_bahan"),
       v.literal("traceability"),
       v.literal("komitmen_halal"),
+      v.literal("sop_pencucian_najis"),
+      v.literal("pernyataan_bebas_babi"),
     ),
     businessInfo: v.object({
       name: v.string(),
@@ -184,5 +187,69 @@ export default defineSchema({
     creditsUsed: v.number(),
     createdAt: v.number(),
     completedAt: v.optional(v.number()),
+  }).index("by_user", ["userId"]),
+
+  // Certification Eligibility (Self-Declare vs Reguler pathway screening)
+  certification_eligibility: defineTable({
+    userId: v.id("users"),
+    certificationPath: v.union(v.literal("self_declare"), v.literal("reguler")),
+    riskLevel: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    disqualifyingFactors: v.array(v.string()),
+    eligibilityAnswers: v.object({
+      hasSlaughteredMeat: v.boolean(),
+      hasHighTechProcess: v.boolean(),
+      hasAnimalDerivatives: v.boolean(),
+      productionScale: v.union(v.literal("mikro"), v.literal("kecil"), v.literal("menengah")),
+    }),
+    createdAt: v.number(),
+    updatedAt: v.optional(v.number()),
+  }).index("by_user", ["userId"]),
+
+  // Products table (for traceability matrix)
+  products: defineTable({
+    userId: v.id("users"),
+    name: v.string(),
+    productCode: v.optional(v.string()),
+    description: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index("by_user", ["userId"]),
+
+  // Ingredients table (standalone for traceability)
+  ingredients: defineTable({
+    userId: v.id("users"),
+    name: v.string(),
+    supplier: v.string(),
+    halalCertNumber: v.optional(v.string()),
+    certExpiryDate: v.optional(v.number()),
+    halalStatus: v.union(v.literal("halal"), v.literal("dalam_proses"), v.literal("perlu_verifikasi"), v.literal("alami")),
+    createdAt: v.number(),
+  }).index("by_user", ["userId"]),
+
+  // Product-Ingredient junction table (many-to-many traceability)
+  product_ingredients: defineTable({
+    userId: v.id("users"),
+    productId: v.id("products"),
+    ingredientId: v.id("ingredients"),
+  })
+    .index("by_product", ["productId"])
+    .index("by_ingredient", ["ingredientId"])
+    .index("by_user", ["userId"]),
+
+  // Training sessions table (halal awareness quiz)
+  training_sessions: defineTable({
+    userId: v.id("users"),
+    participantName: v.string(),
+    quizAnswers: v.array(
+      v.object({
+        questionId: v.string(),
+        selectedAnswer: v.string(),
+        isCorrect: v.boolean(),
+      }),
+    ),
+    quizScore: v.number(),
+    passed: v.boolean(),
+    certificateNumber: v.optional(v.string()),
+    certificatePdfUrl: v.optional(v.string()),
+    createdAt: v.number(),
   }).index("by_user", ["userId"]),
 });

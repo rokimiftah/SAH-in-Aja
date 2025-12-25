@@ -95,10 +95,13 @@ export function SiapHalalPage() {
   const displayState = currentFlowState();
   const showBackButton = displayState !== "processing";
   const isMobileOnlyBack = displayState === "intro";
+  const isBackButtonDisabled = displayState === "capture" && false; // Allow back during capture
 
   return (
     <PageContainer
-      backButton={showBackButton ? { onClick: handleBack, mobileOnly: isMobileOnlyBack } : undefined}
+      backButton={
+        showBackButton ? { onClick: handleBack, mobileOnly: isMobileOnlyBack, disabled: isBackButtonDisabled } : undefined
+      }
       centered
       maxWidth="5xl"
       scrollResetKey={displayState}
@@ -204,7 +207,7 @@ export function SiapHalalPage() {
           <h3 className="text-text-dark mb-2 text-lg font-semibold">
             {error?.includes("Kredit") ? "Kredit Habis" : "Terjadi Kesalahan"}
           </h3>
-          <p className="mb-6 text-sm text-gray-600">{error || "Gagal menganalisis foto. Silakan coba lagi."}</p>
+          <p className="mb-6 text-sm wrap-break-word text-gray-600">{error || "Gagal menganalisis foto. Silakan coba lagi."}</p>
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-center">
             <button
               type="button"
