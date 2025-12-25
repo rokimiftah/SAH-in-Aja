@@ -117,7 +117,7 @@ export function AsistenHalalPage() {
           type="button"
           onClick={handleStartChat}
           disabled={isLoadingCredits || !hasCredits}
-          className="bg-primary-orange inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold text-white shadow-md transition-shadow hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none sm:w-auto sm:gap-3 sm:px-6 sm:text-base lg:px-8 lg:py-4 lg:text-lg"
+          className="bg-primary-orange inline-flex w-full min-w-60 cursor-pointer items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold text-white shadow-md transition-shadow hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none sm:w-auto sm:min-w-70 sm:gap-3 sm:px-6 sm:text-base lg:min-w-[320px] lg:px-8 lg:py-4 lg:text-lg"
         >
           {isLoadingCredits ? (
             <>

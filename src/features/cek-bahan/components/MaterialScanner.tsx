@@ -123,7 +123,7 @@ export function MaterialScanner({ onPhotoComplete }: MaterialScannerProps) {
             </div>
             <div>
               <h3 className="text-text-dark font-semibold">Tips Foto Terbaik</h3>
-              <p className="text-sm text-gray-500">Pastikan tulisan komposisi/ingredients terlihat jelas</p>
+              <p className="text-sm text-gray-500">Pastikan tulisan komposisi terlihat jelas</p>
             </div>
           </div>
         </div>
