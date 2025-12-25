@@ -10,6 +10,7 @@ import { LandingPage } from "@pages/landing";
 import { PrivacyPage, TermsPage } from "@pages/legal";
 import { NotFoundPage } from "@pages/not-found";
 import { PageTransition } from "@shared/components";
+import { BRANDING } from "@shared/config/branding";
 
 import { api } from "../../convex/_generated/api";
 
@@ -17,8 +18,8 @@ import "./styles/global.css";
 
 function AuthLoading() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-orange-500" />
+    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <img src="/logo.avif" alt={BRANDING.name} className="h-24 w-auto animate-none" />
     </div>
   );
 }
