@@ -1,15 +1,9 @@
-import { useEffect } from "react";
-
 import { ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
 
 import { Footer, Navbar } from "@pages/landing/components";
 
 export const TermsPage = () => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   return (
     <div className="font-poppins min-h-screen bg-white">
       <Navbar />

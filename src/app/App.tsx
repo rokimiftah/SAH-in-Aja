@@ -41,7 +41,12 @@ export const App = () => {
   };
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence
+      mode="wait"
+      onExitComplete={() => {
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }}
+    >
       <PageTransition key={getTransitionKey()}>
         <Switch location={location}>
           <Route path="/" component={LandingPage} />

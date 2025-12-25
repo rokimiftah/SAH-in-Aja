@@ -3,6 +3,11 @@ import ReactDOM from "react-dom/client";
 
 import { App, Providers } from "@app/index";
 
+// Disable browser scroll restoration - we handle it manually
+if ("scrollRestoration" in history) {
+  history.scrollRestoration = "manual";
+}
+
 const rootEl = document.getElementById("root");
 
 if (rootEl) {
