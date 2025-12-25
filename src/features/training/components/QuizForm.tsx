@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
 
-import { getShuffledQuestions, PASSING_SCORE } from "../types";
+import { getShuffledQuestions } from "../types";
 
 function toTitleCase(str: string): string {
   return str
@@ -16,7 +16,7 @@ function toTitleCase(str: string): string {
 
 interface QuizFormProps {
   participantName: string;
-  onComplete: (answers: QuizAnswer[], score: number, passed: boolean) => void;
+  onComplete: (answers: QuizAnswer[]) => void;
 }
 
 export function QuizForm({ participantName, onComplete }: QuizFormProps) {
@@ -62,11 +62,7 @@ export function QuizForm({ participantName, onComplete }: QuizFormProps) {
       isCorrect: answers[q.id] === q.correctAnswer,
     }));
 
-    const correctCount = quizAnswers.filter((a) => a.isCorrect).length;
-    const score = Math.round((correctCount / totalQuestions) * 100);
-    const passed = score >= PASSING_SCORE;
-
-    onComplete(quizAnswers, score, passed);
+    onComplete(quizAnswers);
   };
 
   const isAllAnswered = answeredCount === totalQuestions;

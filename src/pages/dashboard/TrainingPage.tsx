@@ -100,19 +100,21 @@ export function TrainingPage() {
     }
   };
 
-  const handleQuizComplete = async (answers: QuizAnswer[], score: number, passed: boolean) => {
+  const handleQuizComplete = async (answers: QuizAnswer[]) => {
     try {
+      // Server validates answers and calculates score
       const result = await submitQuiz({
         participantName: toTitleCase(participantName.trim()),
-        quizAnswers: answers,
-        quizScore: score,
-        passed,
+        quizAnswers: answers.map((a) => ({
+          questionId: a.questionId,
+          selectedAnswer: a.selectedAnswer,
+        })),
       });
 
       setQuizResult({
         answers,
-        score,
-        passed,
+        score: result.quizScore,
+        passed: result.passed,
         certificateNumber: result.certificateNumber ?? undefined,
       });
       setView("result");
