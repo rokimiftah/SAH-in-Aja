@@ -2,10 +2,18 @@ import { useState } from "react";
 
 import { useQuery } from "convex/react";
 import { format } from "date-fns";
-import { ArrowLeft, Building2, Calendar, Filter, Mail, Phone, Search, Shield, User } from "lucide-react";
+import { ArrowLeft, Building2, Calendar, Mail, Phone, Search, Shield, User } from "lucide-react";
 import { Link } from "wouter";
 
+import { Select } from "@shared/components/ui";
+
 import { api } from "../../../convex/_generated/api";
+
+const ROLE_OPTIONS = [
+  { value: "all", label: "All Roles" },
+  { value: "admin", label: "Admins Only", color: "bg-purple-500" },
+  { value: "user", label: "Users Only", color: "bg-gray-500" },
+];
 
 export function UsersPage() {
   const users = useQuery(api.admin.getAllUsers);
@@ -72,24 +80,7 @@ export function UsersPage() {
               />
             </div>
             <div className="flex items-center gap-2">
-              <div className="relative w-full sm:w-auto">
-                <Filter className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <select
-                  value={roleFilter}
-                  onChange={(e) => setRoleFilter(e.target.value)}
-                  className="w-full appearance-none rounded-lg border border-gray-200 bg-white py-2 pr-8 pl-9 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none sm:w-auto"
-                >
-                  <option value="all">All Roles</option>
-                  <option value="admin">Admins Only</option>
-                  <option value="user">Users Only</option>
-                </select>
-                {/* Custom dropdown arrow to ensure consistent look */}
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                  <svg className="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                  </svg>
-                </div>
-              </div>
+              <Select value={roleFilter} onChange={setRoleFilter} options={ROLE_OPTIONS} className="w-full sm:w-40" />
             </div>
           </div>
 
