@@ -8,7 +8,7 @@ import { internalMutation, mutation, query } from "./_generated/server";
 
 // Daily credit limits
 const DAILY_LIMITS = {
-  siapHalal: 3,
+  cekDapur: 3,
   dokumenHalal: 3,
   asistenHalal: 5,
   cekBahan: 10,
@@ -52,7 +52,7 @@ async function getOrCreateDailyCredits(ctx: MutationCtx, userId: Id<"users">) {
   const newId = await ctx.db.insert("user_daily_credits", {
     userId,
     date: today,
-    siapHalalCredits: DAILY_LIMITS.siapHalal,
+    cekDapurCredits: DAILY_LIMITS.cekDapur,
     dokumenHalalCredits: DAILY_LIMITS.dokumenHalal,
     asistenHalalChats: DAILY_LIMITS.asistenHalal,
     cekBahanCredits: DAILY_LIMITS.cekBahan,
@@ -64,7 +64,7 @@ async function getOrCreateDailyCredits(ctx: MutationCtx, userId: Id<"users">) {
     _id: newId,
     userId,
     date: today,
-    siapHalalCredits: DAILY_LIMITS.siapHalal,
+    cekDapurCredits: DAILY_LIMITS.cekDapur,
     dokumenHalalCredits: DAILY_LIMITS.dokumenHalal,
     asistenHalalChats: DAILY_LIMITS.asistenHalal,
     cekBahanCredits: DAILY_LIMITS.cekBahan,
@@ -84,7 +84,7 @@ export const getMyDailyCredits = query({
 
     // Return defaults if no record exists yet (will be created on first use)
     // Only cap if value <= daily limit (not boosted by promo code)
-    const siapHalal = credits?.siapHalalCredits ?? DAILY_LIMITS.siapHalal;
+    const cekDapur = credits?.cekDapurCredits ?? DAILY_LIMITS.cekDapur;
     const dokumenHalal = credits?.dokumenHalalCredits ?? DAILY_LIMITS.dokumenHalal;
     const asistenHalal = credits?.asistenHalalChats ?? DAILY_LIMITS.asistenHalal;
     const cekBahan = credits?.cekBahanCredits ?? DAILY_LIMITS.cekBahan;
@@ -92,7 +92,7 @@ export const getMyDailyCredits = query({
     const training = credits?.trainingCredits ?? DAILY_LIMITS.training;
 
     return {
-      siapHalalCredits: siapHalal > DAILY_LIMITS.siapHalal ? siapHalal : Math.min(siapHalal, DAILY_LIMITS.siapHalal),
+      cekDapurCredits: cekDapur > DAILY_LIMITS.cekDapur ? cekDapur : Math.min(cekDapur, DAILY_LIMITS.cekDapur),
       dokumenHalalCredits:
         dokumenHalal > DAILY_LIMITS.dokumenHalal ? dokumenHalal : Math.min(dokumenHalal, DAILY_LIMITS.dokumenHalal),
       asistenHalalChats:
@@ -109,7 +109,7 @@ export const getMyDailyCredits = query({
 export const checkCredits = query({
   args: {
     feature: v.union(
-      v.literal("siapHalal"),
+      v.literal("cekDapur"),
       v.literal("dokumenHalal"),
       v.literal("asistenHalal"),
       v.literal("cekBahan"),
@@ -127,9 +127,9 @@ export const checkCredits = query({
     let limit: number;
 
     switch (args.feature) {
-      case "siapHalal":
-        limit = DAILY_LIMITS.siapHalal;
-        remaining = credits?.siapHalalCredits ?? limit;
+      case "cekDapur":
+        limit = DAILY_LIMITS.cekDapur;
+        remaining = credits?.cekDapurCredits ?? limit;
         if (remaining <= limit) remaining = Math.min(remaining, limit);
         break;
       case "dokumenHalal":
@@ -167,8 +167,8 @@ export const checkCredits = query({
   },
 });
 
-// Use credit for Siap Halal
-export const useSiapHalalCredit = mutation({
+// Use credit for Cek Dapur
+export const useCekDapurCredit = mutation({
   args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
@@ -176,17 +176,17 @@ export const useSiapHalalCredit = mutation({
 
     const credits = await getOrCreateDailyCredits(ctx, userId);
 
-    if (credits.siapHalalCredits <= 0) {
-      throw new ConvexError("Kredit Siap Halal habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
+    if (credits.cekDapurCredits <= 0) {
+      throw new ConvexError("Kredit Cek Dapur Halal habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
     }
 
     await ctx.db.patch(credits._id, {
-      siapHalalCredits: credits.siapHalalCredits - 1,
+      cekDapurCredits: credits.cekDapurCredits - 1,
     });
 
     return {
-      remaining: credits.siapHalalCredits - 1,
-      limit: DAILY_LIMITS.siapHalal,
+      remaining: credits.cekDapurCredits - 1,
+      limit: DAILY_LIMITS.cekDapur,
     };
   },
 });
@@ -384,7 +384,7 @@ export const applyPromoCode = mutation({
 
     // Add credits from promo code
     await ctx.db.patch(credits._id, {
-      siapHalalCredits: credits.siapHalalCredits + promoCode.credits,
+      cekDapurCredits: credits.cekDapurCredits + promoCode.credits,
       dokumenHalalCredits: credits.dokumenHalalCredits + promoCode.credits,
       asistenHalalChats: credits.asistenHalalChats + promoCode.credits,
       cekBahanCredits: credits.cekBahanCredits + promoCode.credits,
@@ -436,7 +436,7 @@ export const migrateExistingUsers = internalMutation({
       await ctx.db.insert("user_daily_credits", {
         userId: user._id,
         date: today,
-        siapHalalCredits: DAILY_LIMITS.siapHalal,
+        cekDapurCredits: DAILY_LIMITS.cekDapur,
         dokumenHalalCredits: DAILY_LIMITS.dokumenHalal,
         asistenHalalChats: DAILY_LIMITS.asistenHalal,
         cekBahanCredits: DAILY_LIMITS.cekBahan,
@@ -471,7 +471,7 @@ export const createDailyCreditsForUser = internalMutation({
     const newId = await ctx.db.insert("user_daily_credits", {
       userId: args.userId,
       date: today,
-      siapHalalCredits: DAILY_LIMITS.siapHalal,
+      cekDapurCredits: DAILY_LIMITS.cekDapur,
       dokumenHalalCredits: DAILY_LIMITS.dokumenHalal,
       asistenHalalChats: DAILY_LIMITS.asistenHalal,
       cekBahanCredits: DAILY_LIMITS.cekBahan,
@@ -507,7 +507,7 @@ export const resetAllDailyCredits = internalMutation({
       const latestPreviousRecord = oldRecords.filter((r) => r.date !== today).sort((a, b) => b.date.localeCompare(a.date))[0];
 
       // Calculate bonus credits (credits above daily limit) to carry over
-      let bonusSiapHalal = 0;
+      let bonusCekDapur = 0;
       let bonusDokumenHalal = 0;
       let bonusAsistenHalal = 0;
       let bonusCekBahan = 0;
@@ -515,7 +515,7 @@ export const resetAllDailyCredits = internalMutation({
       let bonusTraining = 0;
 
       if (latestPreviousRecord) {
-        bonusSiapHalal = Math.max(0, latestPreviousRecord.siapHalalCredits - DAILY_LIMITS.siapHalal);
+        bonusCekDapur = Math.max(0, latestPreviousRecord.cekDapurCredits - DAILY_LIMITS.cekDapur);
         bonusDokumenHalal = Math.max(0, latestPreviousRecord.dokumenHalalCredits - DAILY_LIMITS.dokumenHalal);
         bonusAsistenHalal = Math.max(0, latestPreviousRecord.asistenHalalChats - DAILY_LIMITS.asistenHalal);
         bonusCekBahan = Math.max(0, latestPreviousRecord.cekBahanCredits - DAILY_LIMITS.cekBahan);
@@ -532,7 +532,7 @@ export const resetAllDailyCredits = internalMutation({
       if (existingToday) {
         // Reset to daily limit + preserve bonus credits
         await ctx.db.patch(existingToday._id, {
-          siapHalalCredits: DAILY_LIMITS.siapHalal + bonusSiapHalal,
+          cekDapurCredits: DAILY_LIMITS.cekDapur + bonusCekDapur,
           dokumenHalalCredits: DAILY_LIMITS.dokumenHalal + bonusDokumenHalal,
           asistenHalalChats: DAILY_LIMITS.asistenHalal + bonusAsistenHalal,
           cekBahanCredits: DAILY_LIMITS.cekBahan + bonusCekBahan,
@@ -545,7 +545,7 @@ export const resetAllDailyCredits = internalMutation({
         await ctx.db.insert("user_daily_credits", {
           userId: user._id,
           date: today,
-          siapHalalCredits: DAILY_LIMITS.siapHalal + bonusSiapHalal,
+          cekDapurCredits: DAILY_LIMITS.cekDapur + bonusCekDapur,
           dokumenHalalCredits: DAILY_LIMITS.dokumenHalal + bonusDokumenHalal,
           asistenHalalChats: DAILY_LIMITS.asistenHalal + bonusAsistenHalal,
           cekBahanCredits: DAILY_LIMITS.cekBahan + bonusCekBahan,

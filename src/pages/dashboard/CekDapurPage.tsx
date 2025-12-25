@@ -4,7 +4,7 @@ import { useQuery } from "convex/react";
 import { AlertCircle, Camera, CheckCircle2, Clock, History, RefreshCw, Sparkles, Target, Zap } from "lucide-react";
 import { useLocation } from "wouter";
 
-import { AnalysisResults, PhotoCapture, UploadProgress, useSiapHalal } from "@features/siap-halal";
+import { AnalysisResults, PhotoCapture, UploadProgress, useCekDapur } from "@features/cek-dapur";
 import { FEATURES } from "@shared/config/branding";
 import { useProcessing } from "@shared/contexts";
 
@@ -37,12 +37,12 @@ const INTRO_FEATURES = [
   },
 ];
 
-export function SiapHalalPage() {
+export function CekDapurPage() {
   const [, navigate] = useLocation();
   const [flowState, setFlowState] = useState<FlowState>("intro");
 
-  const { stage, progress, currentPhoto, totalPhotos, result, error, analyzePhotos, reset } = useSiapHalal();
-  const creditStatus = useQuery(api.credits.checkCredits, { feature: "siapHalal" });
+  const { stage, progress, currentPhoto, totalPhotos, result, error, analyzePhotos, reset } = useCekDapur();
+  const creditStatus = useQuery(api.credits.checkCredits, { feature: "cekDapur" });
   const isLoadingCredits = creditStatus === undefined;
   const hasCredits = creditStatus?.hasCredits ?? false;
   const { setProcessing } = useProcessing();
@@ -113,11 +113,11 @@ export function SiapHalalPage() {
             <div className="mb-4 flex justify-center">
               <div className="bg-primary-green/10 inline-flex flex-nowrap items-center gap-2 rounded-full px-4 py-2">
                 <Target className="text-primary-green h-4 w-4 shrink-0" />
-                <span className="text-primary-green text-sm font-medium whitespace-nowrap">{FEATURES.siapHalal.tagline}</span>
+                <span className="text-primary-green text-sm font-medium whitespace-nowrap">{FEATURES.cekDapur.tagline}</span>
               </div>
             </div>
-            <h1 className="text-text-dark mb-3 text-3xl font-bold tracking-tight">{FEATURES.siapHalal.name}</h1>
-            <p className="mx-auto max-w-md text-gray-600">{FEATURES.siapHalal.description}</p>
+            <h1 className="text-text-dark mb-3 text-3xl font-bold tracking-tight">{FEATURES.cekDapur.name}</h1>
+            <p className="mx-auto max-w-md text-gray-600">{FEATURES.cekDapur.description}</p>
           </div>
 
           <div className="mb-8 grid gap-4 sm:grid-cols-3">
@@ -133,7 +133,7 @@ export function SiapHalalPage() {
           </div>
 
           <div className="mb-8 flex flex-wrap justify-center gap-3">
-            {FEATURES.siapHalal.benefits.map((benefit, idx) => {
+            {FEATURES.cekDapur.benefits.map((benefit, idx) => {
               const icons = [CheckCircle2, Zap, Clock];
               const Icon = icons[idx];
               return (
@@ -169,13 +169,13 @@ export function SiapHalalPage() {
               ) : (
                 <>
                   <Camera className="h-6 w-6 shrink-0" />
-                  <span className="whitespace-nowrap">{FEATURES.siapHalal.cta.primary}</span>
+                  <span className="whitespace-nowrap">{FEATURES.cekDapur.cta.primary}</span>
                 </>
               )}
             </button>
             <button
               type="button"
-              onClick={() => navigate("/dashboard/siap-halal/history")}
+              onClick={() => navigate("/dashboard/cek-dapur/history")}
               className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-600 transition-colors hover:text-gray-800"
             >
               <History className="h-4 w-4" />

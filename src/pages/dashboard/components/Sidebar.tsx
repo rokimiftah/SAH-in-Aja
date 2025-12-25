@@ -149,23 +149,6 @@ const NAV_ITEMS = [
     activeClass: "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md",
   },
   {
-    id: "siap-halal",
-    label: FEATURES.siapHalal.name,
-    icon: Camera,
-    href: "/dashboard/siap-halal",
-    available: true,
-    activeClass: "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md",
-    activeLightClass: "bg-emerald-50 text-emerald-700",
-    subItems: [
-      {
-        id: "siap-halal-history",
-        label: "Riwayat",
-        icon: History,
-        href: "/dashboard/siap-halal/history",
-      },
-    ],
-  },
-  {
     id: "cek-bahan",
     label: FEATURES.cekBahan.name,
     icon: Package,
@@ -179,6 +162,23 @@ const NAV_ITEMS = [
         label: "Riwayat",
         icon: History,
         href: "/dashboard/cek-bahan/history",
+      },
+    ],
+  },
+  {
+    id: "cek-dapur",
+    label: FEATURES.cekDapur.name,
+    icon: Camera,
+    href: "/dashboard/cek-dapur",
+    available: true,
+    activeClass: "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md",
+    activeLightClass: "bg-emerald-50 text-emerald-700",
+    subItems: [
+      {
+        id: "cek-dapur-history",
+        label: "Riwayat",
+        icon: History,
+        href: "/dashboard/cek-dapur/history",
       },
     ],
   },
@@ -487,7 +487,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                               )}
                             >
                               <item.icon className="h-4 w-4" />
-                              {item.id === "siap-halal"
+                              {item.id === "cek-dapur"
                                 ? "Analisis Baru"
                                 : item.id === "asisten-halal"
                                   ? "Konsultasi Baru"
@@ -498,8 +498,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                                       : item.id === "pelatihan"
                                         ? "Mulai Quiz"
                                         : "Buat Dokumen"}
-                              {dailyCredits && item.id === "siap-halal" && (
-                                <CreditBadge remaining={dailyCredits.siapHalalCredits} limit={dailyCredits.limits.siapHalal} />
+                              {dailyCredits && item.id === "cek-dapur" && (
+                                <CreditBadge remaining={dailyCredits.cekDapurCredits} limit={dailyCredits.limits.cekDapur} />
                               )}
                               {dailyCredits && item.id === "dokumen-halal" && (
                                 <CreditBadge

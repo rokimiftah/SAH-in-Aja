@@ -90,7 +90,7 @@ export const BRANDING = {
  * Feature-specific messaging
  */
 export const FEATURES = {
-  siapHalal: {
+  cekDapur: {
     name: "Cek Dapur Halal",
     icon: "🎯",
     tagline: "Persiapan Sertifikasi Halal MUI",
@@ -460,7 +460,7 @@ export const SEO = {
  * Social media hashtags
  */
 export const HASHTAGS = {
-  primary: ["#UMKM", "#SertifikasiHalal", "#HalalMUI", "#BPJPH", "#SiapHalal"],
+  primary: ["#UMKM", "#SertifikasiHalal", "#HalalMUI", "#BPJPH", "#CekDapurHalal"],
   avoid: ["#JasaHalal", "#BeliSertifikatHalal"],
 } as const;
 

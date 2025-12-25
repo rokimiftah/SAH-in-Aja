@@ -79,11 +79,11 @@ export function DashboardHomePage() {
           <div className="grid gap-4 sm:grid-cols-2 lg:flex-1 lg:grid-cols-3 xl:grid-cols-5">
             <FeatureCard
               icon={<Camera className="h-6 w-6 text-white" />}
-              name={FEATURES.siapHalal.name}
-              tagline={FEATURES.siapHalal.tagline}
+              name={FEATURES.cekDapur.name}
+              tagline={FEATURES.cekDapur.tagline}
               description="Foto area produksi, AI analisis kesiapan sertifikasi halal."
-              ctaText={FEATURES.siapHalal.cta.primary}
-              href="/dashboard/siap-halal"
+              ctaText={FEATURES.cekDapur.cta.primary}
+              href="/dashboard/cek-dapur"
               gradient="bg-gradient-to-br from-emerald-500 to-teal-600"
               available={true}
             />

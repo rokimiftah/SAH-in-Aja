@@ -41,6 +41,7 @@ interface MaterialAnalysisResult {
     detected: boolean;
     number?: string;
     issuer?: string;
+    expiryDate?: string; // ISO date string
   };
   positiveListDetected?: boolean;
   extractedIngredients: string[];
@@ -158,6 +159,7 @@ export const analyzeMaterial = action({
               detected: Boolean(result.halalCertificate.detected),
               number: result.halalCertificate.number || undefined,
               issuer: result.halalCertificate.issuer || undefined,
+              expiryDate: result.halalCertificate.expiryDate || undefined,
             }
           : undefined,
         positiveListDetected: result.positiveListDetected ?? undefined,

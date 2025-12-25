@@ -39,13 +39,16 @@
 
 ## Tentang Proyek
 
-**SAH-in Aja!** adalah platform berbasis AI yang membantu UMKM Indonesia mempersiapkan sertifikasi halal BPJPH/MUI. Platform ini menyediakan:
+**SAH-in Aja!** adalah platform berbasis AI yang membantu UMKM Indonesia mempersiapkan sertifikasi halal BPJPH/MUI secara sistematis dan terstruktur. Platform ini menyediakan:
 
+- **Cek jalur sertifikasi** untuk menentukan jalur Self-Declare atau Reguler yang tepat
+- **Data produk & bahan** dengan sistem traceability dan tracking sertifikat halal
+- **Cek bahan** (OCR + AI) untuk verifikasi komposisi dan validasi status halal
 - **Assessment dapur** kesiapan halal melalui foto area produksi
-- **Cek bahan** (OCR + AI) untuk verifikasi komposisi produk
-- **Generator dokumen SJPH** (Sistem Jaminan Produk Halal) otomatis
+- **Generator dokumen SJPH** (Sistem Jaminan Produk Halal) otomatis dari data master
 - **Konsultasi AI 24/7** seputar proses sertifikasi halal
-- **Simulasi audit** dengan AI Voice untuk latihan wawancara audit
+- **Pelatihan kesadaran halal** dengan quiz interaktif dan sertifikat PDF
+- **Simulasi audit** dengan AI Voice untuk latihan wawancara audit real-time
 
 ---
 
@@ -93,26 +96,40 @@ Waktu proses sertifikasi yang **lama**
 
 <td width="25%" valign="top">
 
-### 1. Cek Dapur Halal
+### 1. Cek Jalur Sertifikasi
 
-**Vision AI Assessment**
+**Eligibility Checker**
 
-Foto area produksi, AI analisis, Skor kesiapan + Action plan
+Tentukan jalur sertifikasi yang tepat
 
-- Analisis hingga 5 foto sekaligus
-- Deteksi bahan berpotensi non-halal
-- Skor kesiapan 0-100
-- Standar SJPH HAS 23000
-- Rekomendasi perbaikan detail
-- Hasil dalam < 2 menit
-
-**Model:** Claude Sonnet 4.5 (Vision)
+- Skrining Self-Declare vs Reguler
+- Analisis skala produksi
+- Evaluasi risiko bahan
+- Rekomendasi jalur sertifikasi
+- Identifikasi faktor diskualifikasi
 
 </td>
 
 <td width="25%" valign="top">
 
-### 4. Cek Bahan Halal
+### 2. Data Produk & Bahan
+
+**Traceability Management**
+
+Kelola produk, bahan, dan matriks
+
+- Master data produk
+- Master data bahan baku
+- Matriks traceability
+- Status sertifikat halal bahan
+- Tracking supplier
+- Export untuk dokumen SJPH
+
+</td>
+
+<td width="25%" valign="top">
+
+### 3. Cek Bahan Halal
 
 **Smart Material Scanner**
 
@@ -131,7 +148,28 @@ Foto label produk, AI baca komposisi + validasi halal
 
 <td width="25%" valign="top">
 
-### 2. Dokumen Halal
+### 4. Cek Dapur Halal
+
+**Vision AI Assessment**
+
+Foto area produksi, AI analisis, Skor kesiapan + Action plan
+
+- Analisis hingga 5 foto sekaligus
+- Deteksi bahan berpotensi non-halal
+- Skor kesiapan 0-100
+- Standar SJPH HAS 23000
+- Rekomendasi perbaikan detail
+- Hasil dalam < 2 menit
+
+**Model:** Claude Sonnet 4.5 (Vision)
+
+</td>
+</tr>
+
+<tr>
+<td width="25%" valign="top">
+
+### 5. Dokumen Halal
 
 **AI Document Generator**
 
@@ -142,17 +180,17 @@ Pilih template, Isi data, Generate dokumen
 - Daftar Bahan Baku
 - Form Traceability
 - Surat Komitmen Halal
+- SOP Pencucian Najis (Samak)
+- Pernyataan Bebas Babi
 - Export ke DOCX
 
 **Model:** Claude Sonnet 4.5
 
 </td>
-</tr>
 
-<tr>
 <td width="25%" valign="top">
 
-### 3. Asisten Halal
+### 6. Asisten Halal
 
 **AI Chatbot 24/7**
 
@@ -171,7 +209,24 @@ Tanya, Jawab instan, Panduan lengkap
 
 <td width="25%" valign="top">
 
-### 5. Simulasi Audit Halal
+### 7. Pelatihan Kesadaran Halal
+
+**Interactive Quiz & Certificate**
+
+Uji pengetahuan halal dengan sertifikat
+
+- Quiz 10 pertanyaan acak
+- Passing score 100%
+- Sertifikat PDF otomatis
+- Nomor sertifikat unik
+- Dapat diulang tanpa batas
+- Bukti pelatihan SJPH
+
+</td>
+
+<td width="25%" valign="top">
+
+### 8. Simulasi Audit Halal
 
 **AI Voice Simulator**
 
@@ -185,10 +240,12 @@ Latihan wawancara audit dengan AI auditor
 **Model:** Vapi.ai (Voice AI)
 
 </td>
+</tr>
 
+<tr>
 <td width="25%" valign="top">
 
-### 6. Admin Dashboard
+### 9. Admin Dashboard
 
 **Pusat Kontrol Platform**
 
@@ -199,8 +256,60 @@ Kelola user, promo, dan analytics
 - Real-time Analytics (usage stats)
 
 </td>
+
+<td colspan="3" width="75%" valign="top">
+
+### 10. Sistem Riwayat & Profile
+
+**Comprehensive Tracking**
+
+Semua aktivitas tersimpan dan dapat diakses kembali
+
+- Riwayat Cek Dapur Halal (foto & hasil analisis)
+- Riwayat Cek Bahan Halal (scan & validasi)
+- Riwayat Dokumen Halal (download ulang)
+- Riwayat Asisten Halal (lanjutkan percakapan)
+- Riwayat Simulasi Audit (transkrip & feedback)
+- Riwayat Pelatihan (sertifikat & score)
+- Edit Profile (data bisnis, preferensi)
+
+</td>
 </tr>
 </table>
+
+---
+
+## 🎯 Alur Persiapan Sertifikasi Halal yang Benar
+
+Untuk mempersiapkan sertifikasi halal dengan optimal, **ikuti urutan fitur ini secara berurutan**:
+
+```
+📚 FASE 1: EDUKASI & PEMAHAMAN
+1. Pelatihan Kesadaran Halal → Dapatkan sertifikat pelatihan internal
+2. Asisten Halal → Konsultasi awal tentang proses dan persyaratan
+
+🔍 FASE 2: ASSESSMENT & IDENTIFIKASI
+3. Cek Jalur Sertifikasi → Tentukan jalur Self-Declare atau Reguler
+4. Cek Bahan Halal → Validasi status halal semua bahan baku
+5. Cek Dapur Halal → Assessment kesiapan area produksi
+
+🛠️ FASE 3: PERBAIKAN
+6. Lakukan Perbaikan → Ganti bahan & perbaiki dapur berdasarkan hasil assessment
+
+📊 FASE 4: DATA MASTER
+7. Data Produk & Bahan → Input master data untuk matriks traceability
+
+📄 FASE 5: DOKUMENTASI
+8. Dokumen Halal → Generate 7 dokumen SJPH wajib
+
+🎤 FASE 6: LATIHAN AUDIT
+9. Simulasi Audit Halal → Latihan wawancara dengan AI auditor
+
+📝 FASE 7: PENGAJUAN
+10. Daftar ke BPJPH → Upload dokumen ke halal.go.id
+```
+
+**⚠️ PENTING:** Jangan skip atau acak urutan! Kesalahan urutan bisa menyebabkan penolakan saat audit.
 
 ---
 
@@ -215,7 +324,149 @@ Kelola user, promo, dan analytics
    - **Magic Link** - Masukkan email, klik link yang dikirim ke inbox
 4. Setelah login, Anda akan diarahkan ke Dashboard
 
-### 2. Menggunakan Cek Dapur Halal
+---
+
+### 📚 FASE 1: EDUKASI & PEMAHAMAN DASAR
+
+#### 2. Pelatihan Kesadaran Halal (WAJIB PERTAMA!)
+
+**Mengapa pertama?** Platform ini berprinsip _"Paham Dulu, Baru Usahamu SAH!"_ - Anda harus memahami dasar-dasar kehalalan sebelum melakukan assessment.
+
+**Tujuan:** Memahami konsep halal, SJPH, dan persyaratan BPJPH + mendapat **sertifikat pelatihan internal** (syarat SJPH).
+
+**Langkah-langkah:**
+
+1. Dari Dashboard, klik menu **"Pelatihan Kesadaran Halal"**
+2. Klik tombol **"Mulai Pelatihan"**
+3. Masukkan nama peserta
+4. Klik **"Mulai Quiz"**
+5. Jawab 10 pertanyaan pilihan ganda (acak setiap kali)
+6. Jika benar semua (100%), sertifikat akan otomatis dibuat
+7. Download sertifikat PDF sebagai bukti pelatihan
+
+**Catatan:**
+
+- **Passing score 100%** (harus benar semua)
+- Jika gagal, bisa mengulang kembali
+- Sertifikat memiliki nomor unik
+- Pertanyaan berbeda setiap kali mengulang
+- **Sertifikat ini wajib dilampirkan** dalam dokumen SJPH
+
+**Durasi:** 10-15 menit
+
+---
+
+#### 3. Asisten Halal (Konsultasi Awal)
+
+**Mengapa kedua?** Untuk klarifikasi pertanyaan spesifik tentang usaha Anda sebelum mulai assessment.
+
+**Tujuan:** Konsultasi gratis 24/7 seputar proses sertifikasi halal.
+
+**Langkah-langkah:**
+
+1. Dari Dashboard, klik menu **"Asisten Halal - Konsultasi Baru"**
+2. Ketik pertanyaan di kolom chat, contoh:
+   - "Bagaimana cara daftar sertifikasi halal?"
+   - "Apa saja dokumen yang diperlukan?"
+   - "Berapa biaya sertifikasi halal untuk UMKM?"
+   - "Apakah gelatin halal?"
+   - "Bagaimana prosedur audit halal?"
+3. Tekan Enter atau klik tombol kirim
+4. AI akan menjawab dengan informasi lengkap
+5. Lanjutkan bertanya untuk klarifikasi
+
+**Topik yang bisa ditanyakan:**
+
+| Kategori    | Contoh Pertanyaan                          |
+| ----------- | ------------------------------------------ |
+| Pendaftaran | Cara daftar di halal.go.id, program SEHATI |
+| Dokumen     | Persyaratan SJPH, cara membuat SOP         |
+| Biaya       | Tarif sertifikasi, program gratis UMKM     |
+| Bahan       | Status halal gelatin, emulsifier, enzim    |
+| Audit       | Persiapan audit, tips lulus, LPH terdekat  |
+| Proses      | Waktu proses, perpanjangan sertifikat      |
+
+**Catatan:** Asisten Halal memiliki guardrails yang hanya menjawab pertanyaan terkait halal. Pertanyaan di luar topik akan diarahkan kembali.
+
+---
+
+### 🔍 FASE 2: ASSESSMENT & IDENTIFIKASI MASALAH
+
+#### 4. Cek Jalur Sertifikasi (CRITICAL!)
+
+**Mengapa penting?** ⚠️ **Kesalahan jalur = Penolakan 100%!** Produk berisiko (daging, high-tech) yang masuk jalur Self-Declare akan otomatis ditolak di sidang fatwa.
+
+**Tujuan:** Menentukan jalur yang tepat untuk usaha Anda.
+
+**Langkah-langkah:**
+
+1. Dari Dashboard, klik menu **"Cek Jalur Sertifikasi"**
+2. Klik tombol **"Mulai Cek Jalur"**
+3. Jawab pertanyaan tentang usaha Anda:
+   - Apakah produk mengandung **daging sembelihan**?
+   - Apakah menggunakan **proses teknologi tinggi**?
+   - Apakah menggunakan **bahan turunan hewan**?
+   - Skala produksi (Mikro/Kecil/Menengah)
+4. Lihat hasil rekomendasi:
+   - **Jalur Self-Declare** - untuk UMKM dengan risiko rendah (GRATIS via SEHATI)
+   - **Jalur Reguler** - untuk produk dengan risiko lebih tinggi (berbayar Rp 2-10 juta)
+   - Faktor diskualifikasi (jika ada)
+   - Langkah selanjutnya yang harus dilakukan
+
+**Contoh:**
+
+- ✅ **Self-Declare**: Kue kering, sambal botol (tanpa daging), keripik singkong
+- ❌ **Reguler**: Bakso daging, rendang, nugget ayam, olahan susu
+
+---
+
+#### 5. Cek Bahan Halal (Smart Scanner)
+
+**Mengapa sebelum Cek Dapur?** Harus tahu bahan mana yang bermasalah dulu, baru cek fasilitas penyimpanannya.
+
+**Tujuan:** Verifikasi status halal **semua bahan baku** yang digunakan.
+
+**Langkah-langkah:**
+
+1. Dari Dashboard, klik menu **"Cek Bahan Halal - Scan Baru"**
+2. Klik tombol **"Foto Kemasan Bahan"**
+3. Upload foto label kemasan (maksimal 2 foto):
+   - Bagian depan kemasan (logo halal jika ada)
+   - Bagian belakang (komposisi/ingredients)
+4. Klik **"Analisis"**
+5. Tunggu ~1 menit, AI akan membaca dan menganalisis
+6. Lihat hasil:
+   - **Logo Halal** - Deteksi sertifikat halal (MUI/BPJPH) + nomor sertifikat
+   - **Positive List** - Status bahan alam yang otomatis halal
+   - **Komposisi** - Daftar bahan yang terdeteksi OCR
+   - **Analisis per Bahan** - Status (Aman/Meragukan/Tidak Halal) + alasan
+   - **Status Keseluruhan** - Kesimpulan final
+   - **Rekomendasi** - Tindakan yang perlu dilakukan
+
+**Tips untuk hasil optimal:**
+
+- Foto harus jelas dan fokus pada bagian komposisi/ingredients
+- Pastikan pencahayaan cukup (tidak gelap/silau)
+- Fokus pada teks komposisi, hindari background yang ramai
+- Untuk produk import, pastikan ada label Indonesia/BPOM
+
+**Apa yang dicek AI:**
+
+| Kategori             | Contoh Bahan                       |
+| -------------------- | ---------------------------------- |
+| Logo Halal           | MUI, BPJPH, JAKIM, IFANCA          |
+| Positive List        | Gula pasir, garam, sayur segar     |
+| Bahan Kritis E-codes | E471, E120, E441 (gelatin), E422   |
+| Enzim                | Rennet, Pepsin, Lipase             |
+| Lemak                | Shortening, Lard, Tallow           |
+| Produk Susu          | Whey, Casein, L-Cysteine (E920)    |
+| Bahan Haram          | Pork, Babi, Bacon, Wine, Rum, Sake |
+
+**Action:** Catat bahan yang "Meragukan" atau "Tidak Halal" untuk diganti!
+
+---
+
+#### 6. Cek Dapur Halal (Vision AI Assessment)
 
 Fitur ini menganalisis foto area produksi/dapur Anda untuk menilai kesiapan sertifikasi halal.
 
@@ -237,6 +488,10 @@ Fitur ini menganalisis foto area produksi/dapur Anda untuk menilai kesiapan sert
    - **Action Items** - langkah perbaikan yang harus dilakukan
    - **Pesan Keseluruhan** - ringkasan dan motivasi
 
+**Mengapa setelah Cek Bahan?** Setelah tahu bahan mana yang bermasalah, sekarang cek apakah fasilitas penyimpanan dan produksi sudah memadai.
+
+**Tujuan:** Assessment kesiapan area produksi/dapur untuk sertifikasi halal.
+
 **Tips untuk hasil optimal:**
 
 - Pastikan pencahayaan cukup
@@ -244,9 +499,76 @@ Fitur ini menganalisis foto area produksi/dapur Anda untuk menilai kesiapan sert
 - Tampilkan label produk/bahan yang ada
 - Foto dari berbagai sudut
 
-### 5. Menggunakan Cek Bahan
+**Target:** Skor minimal **80/100** sebelum lanjut ke fase berikutnya!
 
-Fitur ini menganalisis label produk untuk memvalidasi status halal bahan-bahan yang tertera.
+---
+
+### 🛠️ FASE 3: PERBAIKAN BERDASARKAN ASSESSMENT
+
+#### 7. Lakukan Perbaikan Fisik
+
+**Mengapa penting?** Hasil assessment Cek Bahan dan Cek Dapur akan menunjukkan area yang harus diperbaiki.
+
+**Action items berdasarkan assessment:**
+
+**Dari Cek Bahan:**
+
+- Ganti bahan yang berstatus "Tidak Halal" atau "Meragukan"
+- Cari supplier baru yang memiliki sertifikat halal
+- Pastikan semua bahan memiliki **nomor sertifikat halal** dan **belum kadaluarsa**
+
+**Dari Cek Dapur:**
+
+- Perbaiki area yang dapat skor rendah (< 60)
+- Pisahkan rak penyimpanan bahan halal dan non-halal (jika ada)
+- Bersihkan area kontaminasi
+- Lengkapi dokumentasi SOP di area produksi
+- Re-scan area yang sudah diperbaiki hingga skor >80
+
+**Catatan:** Jangan lanjut ke fase berikutnya jika masih ada finding CRITICAL!
+
+---
+
+### 📊 FASE 4: DATA MASTER & TRACEABILITY
+
+#### 8. Data Produk & Bahan
+
+**Mengapa di sini?** Setelah semua bahan sudah aman dan dapur sudah siap, sekarang saatnya input data master untuk membuat **Matriks Traceability** (wajib SJPH!).
+
+**Tujuan:** Buat database produk-bahan untuk dokumen SJPH.
+
+**Langkah-langkah:**
+
+1. Dari Dashboard, klik menu **"Data Produk & Bahan"**
+2. Pilih tab yang ingin dikelola:
+   - **Produk** - Daftar produk yang diproduksi
+   - **Bahan** - Daftar bahan baku yang digunakan
+   - **Matriks** - Hubungan produk dan bahan
+3. Tambah data baru dengan klik tombol **"Tambah"**
+4. Isi informasi yang diperlukan:
+   - **Produk**: Nama, kode, deskripsi
+   - **Bahan**: Nama, supplier, **nomor sertifikat halal**, **tanggal kadaluarsa**, status
+5. Di tab Matriks, hubungkan produk dengan bahan yang digunakan
+6. Data ini akan otomatis digunakan untuk generate dokumen SJPH
+
+**⚠️ PENTING:**
+
+- Input **nomor sertifikat halal** untuk semua bahan (jika ada)
+- Input **tanggal kadaluarsa** sertifikat halal (wajib!)
+- Platform akan warning jika sertifikat < 30 hari lagi kadaluarsa
+- Platform akan **block simpan** jika sertifikat sudah kadaluarsa
+
+**Compliance:** Matriks Bahan vs Produk adalah **titik kritis audit** - auditor akan cek apakah semua bahan tercatat dan tersertifikasi halal.
+
+---
+
+### 📄 FASE 5: PEMBUATAN DOKUMEN SJPH
+
+#### 9. Dokumen Halal (Auto Generator)
+
+**Mengapa setelah Data Master?** Generator dokumen akan otomatis mengambil data dari Traceability untuk mengisi template SJPH.
+
+**Tujuan:** Generate **7 dokumen wajib SJPH** sesuai standar BPJPH HAS 23000.
 
 **Langkah-langkah:**
 
@@ -284,10 +606,6 @@ Fitur ini menganalisis label produk untuk memvalidasi status halal bahan-bahan y
 | Produk Susu          | Whey, Casein, L-Cysteine (E920)    |
 | Bahan Haram          | Pork, Babi, Bacon, Wine, Rum, Sake |
 
-### 3. Menggunakan Dokumen Halal
-
-Fitur ini membuat dokumen SJPH (Sistem Jaminan Produk Halal) secara otomatis.
-
 **Langkah-langkah:**
 
 1. Dari Dashboard, klik menu **"Dokumen Halal - Buat Dokumen"**
@@ -295,62 +613,47 @@ Fitur ini membuat dokumen SJPH (Sistem Jaminan Produk Halal) secara otomatis.
 3. Pilih jenis dokumen yang ingin dibuat:
    - **SOP Produksi Halal** - Prosedur standar produksi
    - **Perjanjian Supplier Halal** - Kontrak dengan supplier
-   - **Daftar Bahan Baku** - List bahan dengan status halal
-   - **Form Traceability** - Pelacakan bahan dari supplier
+   - **Daftar Bahan Baku** - List bahan dengan status halal (otomatis dari Data Produk & Bahan)
+   - **Form Traceability** - Pelacakan bahan dari supplier (otomatis dari Matriks)
    - **Surat Komitmen Halal** - Pernyataan komitmen pemilik
+   - **SOP Pencucian Najis** - Prosedur samak (wajib SJPH!)
+   - **Pernyataan Bebas Babi** - Surat pernyataan
 4. Isi informasi usaha:
    - Nama usaha
    - Nama pemilik
    - Alamat usaha
    - Jenis produk
-5. Tambahkan daftar bahan baku (nama, supplier, status halal)
-6. Klik **"Lanjut"**
-7. Preview dokumen yang dihasilkan
-8. Klik **"Download DOCX"** untuk mengunduh
+5. Klik **"Lanjut"**
+6. Preview dokumen yang dihasilkan
+7. Klik **"Download DOCX"** untuk mengunduh
 
 **Jenis dokumen yang tersedia:**
 
-| Dokumen             | Kegunaan                                                     |
-| ------------------- | ------------------------------------------------------------ |
-| SOP Produksi Halal  | Prosedur operasional standar untuk menjamin kehalalan produk |
-| Perjanjian Supplier | Kontrak komitmen supplier menyediakan bahan halal            |
-| Daftar Bahan Baku   | Inventaris bahan dengan sertifikat halal masing-masing       |
-| Form Traceability   | Dokumentasi pelacakan bahan dari supplier ke produk jadi     |
-| Surat Komitmen      | Pernyataan resmi komitmen menjaga kehalalan                  |
+| Dokumen               | Kegunaan                                                     | Sumber Data               |
+| --------------------- | ------------------------------------------------------------ | ------------------------- |
+| SOP Produksi Halal    | Prosedur operasional standar untuk menjamin kehalalan produk | Manual input              |
+| Perjanjian Supplier   | Kontrak komitmen supplier menyediakan bahan halal            | Data Bahan (supplier)     |
+| Daftar Bahan Baku     | Inventaris bahan dengan sertifikat halal masing-masing       | **Data Bahan** (otomatis) |
+| Form Traceability     | Dokumentasi pelacakan bahan dari supplier ke produk jadi     | **Matriks** (otomatis)    |
+| Surat Komitmen Halal  | Pernyataan resmi komitmen menjaga kehalalan                  | Manual input              |
+| SOP Pencucian Najis   | Prosedur samak untuk membersihkan kontaminasi najis          | Manual input              |
+| Pernyataan Bebas Babi | Surat pernyataan tidak menggunakan babi dan turunannya       | Manual input              |
 
-### 4. Menggunakan Asisten Halal
+**Catatan:**
 
-Fitur ini menjawab pertanyaan seputar sertifikasi halal 24/7.
+- Dokumen "Daftar Bahan Baku" dan "Form Traceability" akan otomatis mengambil data dari fitur **Data Produk & Bahan**
+- Pastikan sudah input data di FASE 4 sebelum generate dokumen ini
+- Semua dokumen sudah sesuai standar BPJPH HAS 23000
 
-**Langkah-langkah:**
+---
 
-1. Dari Dashboard, klik menu **"Asisten Halal - Konsultasi Baru"**
-2. Ketik pertanyaan di kolom chat, contoh:
-   - "Bagaimana cara daftar sertifikasi halal?"
-   - "Apa saja dokumen yang diperlukan?"
-   - "Berapa biaya sertifikasi halal untuk UMKM?"
-   - "Apakah gelatin halal?"
-   - "Bagaimana prosedur audit halal?"
-3. Tekan Enter atau klik tombol kirim
-4. AI akan menjawab dengan informasi lengkap
-5. Lanjutkan bertanya untuk klarifikasi
+### 🎤 FASE 6: LATIHAN PERSIAPAN AUDIT
 
-**Topik yang bisa ditanyakan:**
+#### 10. Simulasi Audit Halal (Voice AI Simulator)
 
-| Kategori    | Contoh Pertanyaan                          |
-| ----------- | ------------------------------------------ |
-| Pendaftaran | Cara daftar di halal.go.id, program SEHATI |
-| Dokumen     | Persyaratan SJPH, cara membuat SOP         |
-| Biaya       | Tarif sertifikasi, program gratis UMKM     |
-| Bahan       | Status halal gelatin, emulsifier, enzim    |
-| Audit       | Persiapan audit, tips lulus, LPH terdekat  |
-| Proses      | Waktu proses, perpanjangan sertifikat      |
+**Mengapa terakhir sebelum daftar?** Latihan agar tidak grogi saat audit sesungguhnya dengan LPH atau Pendamping PPH.
 
-**Catatan:** Asisten Halal memiliki guardrails yang hanya menjawab pertanyaan terkait halal. Pertanyaan di luar topik akan diarahkan kembali.
-
-### 6. Menggunakan Simulasi Audit Halal
-
-Fitur ini memberikan simulasi wawancara audit halal dengan AI auditor menggunakan voice conversation.
+**Tujuan:** Latihan wawancara dengan **AI Auditor** menggunakan voice conversation.
 
 **Langkah-langkah:**
 
@@ -383,7 +686,46 @@ Fitur ini memberikan simulasi wawancara audit halal dengan AI auditor menggunaka
 | SOP             | Apakah ada SOP tertulis? Siapa yang bertanggung?   |
 | Umum            | Mix dari semua topik di atas                       |
 
-### 7. Melihat Riwayat
+---
+
+### 📝 FASE 7: PENGAJUAN RESMI KE BPJPH
+
+#### 11. Daftar ke BPJPH via halal.go.id
+
+**Platform:** [halal.go.id](https://halal.go.id)
+
+**Langkah-langkah:**
+
+1. Buka website [halal.go.id](https://halal.go.id)
+2. Registrasi akun baru (jika belum punya)
+3. Login dan pilih "Ajukan Sertifikasi"
+4. Pilih jalur sesuai hasil **Cek Jalur Sertifikasi**:
+   - **Self-Declare** via SEHATI (gratis untuk 1 juta UMKM pertama)
+   - **Reguler** (berbayar Rp 2-10 juta)
+5. Upload semua dokumen yang sudah di-generate dari SAH-in Aja!:
+   - ✅ SOP Produksi Halal
+   - ✅ Perjanjian Supplier Halal
+   - ✅ Daftar Bahan Baku
+   - ✅ Form Traceability
+   - ✅ Surat Komitmen Halal
+   - ✅ SOP Pencucian Najis
+   - ✅ Pernyataan Bebas Babi
+   - ✅ Sertifikat Pelatihan Internal (dari Pelatihan Kesadaran Halal)
+6. Bayar biaya (jika jalur Reguler)
+7. Tunggu jadwal:
+   - **Self-Declare:** Verifikasi oleh Pendamping PPH
+   - **Reguler:** Audit oleh LPH terakreditasi
+8. Ikuti audit dengan percaya diri (sudah latihan di Simulasi Audit!)
+9. Jika lolos, terima **Sertifikat Halal BPJPH** (berlaku 4 tahun)
+
+**Estimasi Waktu:**
+
+- **Self-Declare:** 7-14 hari (verifikasi dokumen)
+- **Reguler:** 1-3 bulan (audit + sidang fatwa MUI)
+
+---
+
+### 12. Melihat Riwayat
 
 Setiap fitur menyimpan riwayat penggunaan:
 
@@ -392,6 +734,7 @@ Setiap fitur menyimpan riwayat penggunaan:
 - **Riwayat Dokumen Halal** - Klik "Riwayat" di halaman Dokumen Halal untuk melihat dokumen yang sudah dibuat
 - **Riwayat Asisten Halal** - Klik "Riwayat" di halaman Asisten Halal untuk melanjutkan percakapan sebelumnya
 - **Riwayat Simulasi Audit Halal** - Klik "Riwayat" di halaman Simulasi Audit Halal untuk melihat sesi sebelumnya
+- **Riwayat Pelatihan Kesadaran Halal** - Klik "Riwayat" di halaman Pelatihan untuk melihat sertifikat yang sudah didapat
 
 ---
 
@@ -445,7 +788,7 @@ Setiap fitur menyimpan riwayat penggunaan:
 
 Platform ini menggunakan **Kolosal AI** (Claude Sonnet 4.5) dan **Vapi.ai** sebagai provider AI utama:
 
-### Vision AI - Siap Halal & Cek Bahan
+### Vision AI - Cek Dapur & Cek Bahan
 
 ```
 Model: global.anthropic.claude-sonnet-4-5-20250929-v1:0
@@ -505,7 +848,7 @@ Features: Speech-to-Text, Text-to-Speech, Conversational AI
 │  │  ├── Landing Page (/)                               │    │
 │  │  ├── Auth (/login, /link)                           │    │
 │  │  ├── Dashboard (/dashboard/*)                       │    │
-│  │  │   ├── Siap Halal (Vision AI)                     │    │
+│  │  │   ├── Cek Dapur Halal (Vision AI)                │    │
 │  │  │   ├── Dokumen Halal (Document Gen)               │    │
 │  │  │   ├── Asisten Halal (Chat AI)                    │    │
 │  │  │   ├── Cek Bahan (Material Scanner)               │    │
@@ -615,6 +958,15 @@ SAH-in-Aja/
 │   │   ├── voice-audit/        # Voice simulator
 │   │   │   ├── components/
 │   │   │   └── hooks/
+│   │   ├── eligibility-check/  # Certification path checker
+│   │   │   ├── components/
+│   │   │   └── hooks/
+│   │   ├── traceability/       # Product & ingredient management
+│   │   │   ├── components/
+│   │   │   └── hooks/
+│   │   ├── training/           # Halal awareness quiz
+│   │   │   ├── components/
+│   │   │   └── hooks/
 │   │   └── auth/               # Authentication
 │   ├── pages/                  # Page components
 │   │   ├── landing/            # Landing page
@@ -625,6 +977,9 @@ SAH-in-Aja/
 │   │   │   ├── AsistenHalalPage.tsx
 │   │   │   ├── CekBahanPage.tsx
 │   │   │   ├── VoiceAuditPage.tsx
+│   │   │   ├── EligibilityCheckPage.tsx
+│   │   │   ├── TraceabilityPage.tsx
+│   │   │   ├── TrainingPage.tsx
 │   │   │   ├── EditProfilePage.tsx
 │   │   │   └── *HistoryPage.tsx (riwayat)
 │   │   ├── admin/              # Admin pages
@@ -643,14 +998,23 @@ SAH-in-Aja/
 │   ├── schema.ts               # Database schema
 │   ├── auth.ts                 # Authentication
 │   ├── auth.config.ts          # Auth configuration
-│   ├── analyzeHalal.ts         # Vision AI action (Siap Halal)
+│   ├── analyzeHalal.ts         # Vision AI action (Cek Dapur)
 │   ├── analyzeMaterial.ts      # Vision AI action (Cek Bahan)
 │   ├── generateDocument.ts     # Document AI action
 │   ├── consultHalal.ts         # Chat AI action
 │   ├── voiceAudit.ts           # Voice audit mutations
+│   ├── eligibility.ts          # Certification path checker
+│   ├── traceability.ts         # Product-ingredient mapping
+│   ├── products.ts             # Product management
+│   ├── ingredients.ts          # Ingredient management
+│   ├── training.ts             # Quiz & certificate generation
 │   ├── credits.ts              # Credit system
 │   ├── crons.ts                # Daily credit reset
 │   ├── admin.ts                # Admin functions
+│   ├── halalScans.ts           # Halal scan queries
+│   ├── materialScans.ts        # Material scan queries
+│   ├── halalDocuments.ts       # Document queries
+│   ├── halalConsultations.ts   # Consultation queries
 │   ├── lib/
 │   │   ├── llmClient.ts        # LLM client & prompts
 │   │   └── magicLink.ts        # Email auth provider
@@ -674,13 +1038,14 @@ Platform menggunakan sistem kredit harian untuk mengontrol penggunaan:
 
 ### Free Tier (Reset Setiap Hari UTC+7)
 
-| Fitur         | Kredit Harian | Keterangan                    |
-| ------------- | ------------- | ----------------------------- |
-| Siap Halal    | 3x            | 3 scan foto per hari          |
-| Dokumen Halal | 3x            | 3 dokumen per hari            |
-| Asisten Halal | 5x            | 5 chat session per hari       |
-| Cek Bahan     | 10x           | 10 scan label produk per hari |
-| Audit Suara   | 2x            | 2 simulasi wawancara per hari |
+| Fitur                     | Kredit Harian | Keterangan                    |
+| ------------------------- | ------------- | ----------------------------- |
+| Cek Dapur Halal           | 3x            | 3 scan foto per hari          |
+| Dokumen Halal             | 3x            | 3 dokumen per hari            |
+| Asisten Halal             | 5x            | 5 chat session per hari       |
+| Cek Bahan                 | 10x           | 10 scan label produk per hari |
+| Simulasi Audit Halal      | 2x            | 2 simulasi wawancara per hari |
+| Pelatihan Kesadaran Halal | 3x            | 3 quiz attempt per hari       |
 
 ### Promo Code
 

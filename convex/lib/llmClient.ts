@@ -189,9 +189,12 @@ JENIS DOKUMEN:
 
 TUGAS ANDA (BERTINGKAT):
 
-STEP 1 - DETEKSI LOGO HALAL:
+STEP 1 - DETEKSI LOGO & NOMOR SERTIFIKAT HALAL:
 Periksa apakah ada logo halal resmi di kemasan (MUI, BPJPH, atau lembaga halal internasional yang diakui).
-- Jika ADA logo halal → Auto-pass, ekstrak nomor sertifikat jika terlihat.
+- Jika ADA logo halal → Auto-pass, **EKSTRAK NOMOR SERTIFIKAT HALAL** jika terlihat.
+  - Cari pola nomor seperti: "LPPOM-MUI-12345678", "00010...", "ID-xxxxx", atau kombinasi huruf-angka.
+  - Cari juga **TANGGAL KADALUARSA SERTIFIKAT** (format DD/MM/YYYY, MM/YYYY, atau keterangan "Berlaku hingga...")
+  - Identifikasi **PENERBIT** (MUI, BPJPH, JAKIM, IFANCA, MUI Provinsi, dll)
 - Jika TIDAK ADA logo → Lanjut ke Step 2.
 
 STEP 2 - CEK POSITIVE LIST (KMA No. 335/2022):
@@ -230,8 +233,9 @@ OUTPUT FORMAT (WAJIB JSON VALID):
 {
   "halalCertificate": {
     "detected": true/false,
-    "number": "nomor sertifikat jika terlihat",
-    "issuer": "MUI/BPJPH/lainnya"
+    "number": "nomor sertifikat jika terlihat (contoh: LPPOM-MUI-12345678, 00010012345678, ID-xxxx)",
+    "issuer": "MUI/BPJPH/JAKIM/IFANCA/lainnya",
+    "expiryDate": "YYYY-MM-DD jika terlihat (convert dari DD/MM/YYYY atau MM/YYYY)"
   },
   "positiveListDetected": true/false,
   "extractedIngredients": ["bahan 1", "bahan 2", ...],
@@ -246,6 +250,13 @@ OUTPUT FORMAT (WAJIB JSON VALID):
   "overallStatus": "aman" | "meragukan" | "tidak_halal",
   "summary": "kesimpulan dalam 1-2 kalimat bahasa Indonesia sederhana"
 }
+
+CATATAN PENTING EKSTRAKSI NOMOR SERTIFIKAT:
+- Nomor sertifikat halal biasanya terlihat di dekat logo halal
+- Format bervariasi: "LPPOM-MUI-xxxxx", "00010xxxxx", "MUI/xxxx/yyyy", "IDxxxx"
+- Cari teks yang mengandung kata kunci: "No. Sertifikat", "No. Reg", "Sertifikat Halal", atau angka panjang di sekitar logo
+- Tanggal kadaluarsa biasanya tertulis: "Berlaku hingga", "Valid until", atau format tanggal DD/MM/YYYY
+- Jika tidak jelas terlihat, set ke undefined (jangan mengarang!)
 
 PANDUAN BAHASA:
 - Gunakan bahasa Indonesia SEDERHANA seperti berbicara dengan ibu-ibu UMKM

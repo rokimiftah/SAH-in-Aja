@@ -6,7 +6,7 @@ import { useQuery } from "convex/react";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
-import { AnalysisResults } from "@features/siap-halal";
+import { AnalysisResults } from "@features/cek-dapur";
 import { FEATURES } from "@shared/config/branding";
 import { cn } from "@shared/lib";
 
@@ -63,14 +63,14 @@ function ScanListItem({ scan, onClick }: { scan: Scan; onClick: () => void }) {
   );
 }
 
-export function SiapHalalHistoryPage() {
+export function CekDapurHistoryPage() {
   const [, navigate] = useLocation();
   const [selectedScan, setSelectedScan] = useState<Scan | null>(null);
   const scans = useQuery(api.halalScans.getMyScans);
 
   const isLoading = scans === undefined;
 
-  const handleNewScan = () => navigate("/dashboard/siap-halal");
+  const handleNewScan = () => navigate("/dashboard/cek-dapur");
   const handleGenerateDocuments = () => navigate("/dashboard/dokumen-halal");
   const handleConsultFindings = () => navigate("/dashboard/asisten-halal");
 
@@ -107,9 +107,9 @@ export function SiapHalalHistoryPage() {
 
   // List view
   return (
-    <PageContainer backButton={{ onClick: () => navigate("/dashboard/siap-halal") }} maxWidth="3xl">
+    <PageContainer backButton={{ onClick: () => navigate("/dashboard/cek-dapur") }} maxWidth="3xl">
       <div className="mb-8 text-center lg:text-left">
-        <h1 className="text-text-dark mb-2 text-2xl font-bold">Riwayat Analisis {FEATURES.siapHalal.name}</h1>
+        <h1 className="text-text-dark mb-2 text-2xl font-bold">Riwayat Analisis {FEATURES.cekDapur.name}</h1>
       </div>
 
       {scans.length === 0 && (
@@ -120,7 +120,7 @@ export function SiapHalalHistoryPage() {
           <h3 className="text-text-dark mb-2 text-lg font-semibold">Belum Ada Riwayat</h3>
           <p className="mb-6 text-gray-600">Mulai analisis pertama Anda untuk melihat riwayat di sini.</p>
           <Link
-            href="/dashboard/siap-halal"
+            href="/dashboard/cek-dapur"
             className="bg-primary-green inline-flex items-center gap-2 rounded-xl px-6 py-3 font-semibold text-white"
           >
             Mulai Analisis

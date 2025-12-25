@@ -10,14 +10,14 @@ import { AsistenHalalHistoryPage } from "./AsistenHalalHistoryPage";
 import { AsistenHalalPage } from "./AsistenHalalPage";
 import { CekBahanHistoryPage } from "./CekBahanHistoryPage";
 import { CekBahanPage } from "./CekBahanPage";
+import { CekDapurHistoryPage } from "./CekDapurHistoryPage";
+import { CekDapurPage } from "./CekDapurPage";
 import { Sidebar } from "./components";
 import { DashboardHomePage } from "./DashboardHomePage";
 import { DokumenHalalHistoryPage } from "./DokumenHalalHistoryPage";
 import { DokumenHalalPage } from "./DokumenHalalPage";
 import { EditProfilePage } from "./EditProfilePage";
 import { EligibilityCheckPage } from "./EligibilityCheckPage";
-import { SiapHalalHistoryPage } from "./SiapHalalHistoryPage";
-import { SiapHalalPage } from "./SiapHalalPage";
 import { TraceabilityPage } from "./TraceabilityPage";
 import { TrainingHistoryPage } from "./TrainingHistoryPage";
 import { TrainingPage } from "./TrainingPage";
@@ -60,8 +60,8 @@ export function DashboardLayout() {
           <div className="flex-1 overflow-hidden">
             <Switch>
               <Route path="/dashboard" component={DashboardHomePage} />
-              <Route path="/dashboard/siap-halal/history" component={SiapHalalHistoryPage} />
-              <Route path="/dashboard/siap-halal" component={SiapHalalPage} />
+              <Route path="/dashboard/cek-dapur/history" component={CekDapurHistoryPage} />
+              <Route path="/dashboard/cek-dapur" component={CekDapurPage} />
               <Route path="/dashboard/dokumen-halal/history" component={DokumenHalalHistoryPage} />
               <Route path="/dashboard/dokumen-halal" component={DokumenHalalPage} />
               <Route path="/dashboard/asisten-halal/history" component={AsistenHalalHistoryPage} />

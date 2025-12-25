@@ -417,7 +417,7 @@ https://sahin.biz.id`;
       <div className="mt-8 border-t border-gray-200 pt-6">
         <h4 className="mb-3 text-sm font-semibold text-gray-500">SUMBER RESMI</h4>
         <div className="space-y-2">
-          {FEATURES.siapHalal.officialResources.map((resource) => (
+          {FEATURES.cekDapur.officialResources.map((resource: { name: string; url: string; description?: string }) => (
             <a
               key={resource.name}
               href={resource.url}

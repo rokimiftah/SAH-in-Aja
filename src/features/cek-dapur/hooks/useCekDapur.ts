@@ -23,7 +23,7 @@ export interface AnalysisResult {
   overallMessage: string;
 }
 
-interface UseSiapHalalReturn {
+interface UseCekDapurReturn {
   stage: UploadStage;
   progress: number;
   currentPhoto: number;
@@ -35,7 +35,7 @@ interface UseSiapHalalReturn {
   reset: () => void;
 }
 
-export function useSiapHalal(): UseSiapHalalReturn {
+export function useCekDapur(): UseCekDapurReturn {
   const [stage, setStage] = useState<UploadStage>("idle");
   const [progress, setProgress] = useState(0);
   const [currentPhoto, setCurrentPhoto] = useState(0);
@@ -44,8 +44,8 @@ export function useSiapHalal(): UseSiapHalalReturn {
   const [error, setError] = useState<string | null>(null);
 
   const user = useQuery(api.users.getCurrentUser);
-  const creditStatus = useQuery(api.credits.checkCredits, { feature: "siapHalal" });
-  const deductCredit = useMutation(api.credits.useSiapHalalCredit);
+  const creditStatus = useQuery(api.credits.checkCredits, { feature: "cekDapur" });
+  const deductCredit = useMutation(api.credits.useCekDapurCredit);
   const generateUploadUrl = useMutation(api.storage.generateUploadUrl);
   const analyzeKitchen = useAction(api.analyzeHalal.analyzeKitchen);
   const saveScan = useMutation(api.halalScans.create);

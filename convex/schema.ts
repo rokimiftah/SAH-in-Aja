@@ -30,7 +30,7 @@ export default defineSchema({
   user_daily_credits: defineTable({
     userId: v.id("users"),
     date: v.string(), // Format: YYYY-MM-DD in UTC+7
-    siapHalalCredits: v.number(), // Max 3 per day
+    cekDapurCredits: v.number(), // Max 3 per day
     dokumenHalalCredits: v.number(), // Max 3 per day
     asistenHalalChats: v.number(), // Max 5 new chats per day
     cekBahanCredits: v.number(), // Max 10 per day
@@ -81,6 +81,7 @@ export default defineSchema({
         detected: v.boolean(),
         number: v.optional(v.string()),
         issuer: v.optional(v.string()), // MUI, BPJPH, etc.
+        expiryDate: v.optional(v.string()), // ISO date string from OCR
       }),
     ),
     // Optional: positive list detection

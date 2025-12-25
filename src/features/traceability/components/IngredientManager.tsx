@@ -104,8 +104,45 @@ export function IngredientManager({ ingredients, onCreate, onUpdate, onDelete }:
   const isExpiringSoon = (expiryDate?: number) => {
     if (!expiryDate) return false;
     const thirtyDaysFromNow = Date.now() + 30 * 24 * 60 * 60 * 1000;
-    return expiryDate < thirtyDaysFromNow;
+    return expiryDate < thirtyDaysFromNow && expiryDate > Date.now();
   };
+
+  const isExpired = (expiryDate?: number) => {
+    if (!expiryDate) return false;
+    return expiryDate < Date.now();
+  };
+
+  const getCertStatus = (expiryDate?: number) => {
+    if (!expiryDate) return null;
+    if (isExpired(expiryDate)) return "expired";
+    if (isExpiringSoon(expiryDate)) return "expiring";
+    return "valid";
+  };
+
+  const getExpiryWarning = () => {
+    if (!formData.certExpiryDate) return null;
+
+    const expiryTimestamp = new Date(formData.certExpiryDate).getTime();
+    const status = getCertStatus(expiryTimestamp);
+
+    if (status === "expired") {
+      return {
+        type: "error" as const,
+        message: "Sertifikat sudah kadaluarsa! Tidak bisa disimpan.",
+      };
+    }
+
+    if (status === "expiring") {
+      return {
+        type: "warning" as const,
+        message: "Sertifikat akan segera kadaluarsa dalam 30 hari. Segera perbarui!",
+      };
+    }
+
+    return null;
+  };
+
+  const expiryWarning = getExpiryWarning();
 
   return (
     <div className="space-y-4">
@@ -161,6 +198,32 @@ export function IngredientManager({ ingredients, onCreate, onUpdate, onDelete }:
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 focus:outline-none"
               />
             </div>
+
+            {/* Expiry Warning */}
+            {expiryWarning && (
+              <div
+                className={`rounded-lg border px-3 py-2 text-sm ${
+                  expiryWarning.type === "error"
+                    ? "border-red-200 bg-red-50 text-red-800"
+                    : "border-amber-200 bg-amber-50 text-amber-800"
+                }`}
+              >
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{expiryWarning.message}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Certificate Number Helper */}
+            {formData.halalCertNumber && formData.halalCertNumber.length < 5 && (
+              <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>Nomor sertifikat biasanya minimal 5 karakter (contoh: LPPOM-MUI-12345678)</span>
+                </div>
+              </div>
+            )}
             <Select
               value={formData.halalStatus}
               onChange={(value) => setFormData((p) => ({ ...p, halalStatus: value as HalalStatus }))}
@@ -178,7 +241,7 @@ export function IngredientManager({ ingredients, onCreate, onUpdate, onDelete }:
               <button
                 type="button"
                 onClick={editingId ? handleUpdate : handleAdd}
-                disabled={!formData.name.trim() || !formData.supplier.trim() || isSubmitting}
+                disabled={!formData.name.trim() || !formData.supplier.trim() || isSubmitting || expiryWarning?.type === "error"}
                 className="cursor-pointer rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isSubmitting ? "Menyimpan..." : editingId ? "Simpan" : "Tambah"}
@@ -212,18 +275,37 @@ export function IngredientManager({ ingredients, onCreate, onUpdate, onDelete }:
                     <p className="text-xs text-gray-500">No. Sertifikat: {ingredient.halalCertNumber}</p>
                   )}
                   {ingredient.certExpiryDate && (
-                    <p
-                      className={`flex items-center gap-1 text-xs ${isExpiringSoon(ingredient.certExpiryDate) ? "text-amber-600" : "text-gray-500"}`}
-                    >
-                      <Calendar className="h-3 w-3" />
-                      Berlaku s.d. {new Date(ingredient.certExpiryDate).toLocaleDateString("id-ID")}
-                      {isExpiringSoon(ingredient.certExpiryDate) && (
-                        <span className="ml-1 flex items-center gap-0.5 text-amber-600">
-                          <AlertTriangle className="h-3 w-3" />
-                          Segera berakhir
-                        </span>
-                      )}
-                    </p>
+                    <div className="flex items-center gap-1">
+                      <p
+                        className={`flex items-center gap-1 text-xs ${
+                          isExpired(ingredient.certExpiryDate)
+                            ? "font-semibold text-red-600"
+                            : isExpiringSoon(ingredient.certExpiryDate)
+                              ? "font-medium text-amber-600"
+                              : "text-gray-500"
+                        }`}
+                      >
+                        <Calendar className="h-3 w-3" />
+                        {isExpired(ingredient.certExpiryDate) ? (
+                          <>
+                            KADALUARSA: {new Date(ingredient.certExpiryDate).toLocaleDateString("id-ID")}
+                            <span className="ml-1 flex items-center gap-0.5">
+                              <AlertTriangle className="h-3 w-3" />
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            Berlaku s.d. {new Date(ingredient.certExpiryDate).toLocaleDateString("id-ID")}
+                            {isExpiringSoon(ingredient.certExpiryDate) && (
+                              <span className="ml-1 flex items-center gap-0.5 text-amber-600">
+                                <AlertTriangle className="h-3 w-3" />
+                                Segera berakhir
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </p>
+                    </div>
                   )}
                 </div>
                 <div className="ml-3 flex shrink-0 gap-1">

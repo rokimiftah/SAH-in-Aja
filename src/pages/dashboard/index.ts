@@ -1,7 +1,7 @@
 export { DashboardLayout } from "./DashboardLayout";
 export { DashboardHomePage } from "./DashboardHomePage";
-export { SiapHalalPage } from "./SiapHalalPage";
-export { SiapHalalHistoryPage } from "./SiapHalalHistoryPage";
+export { CekDapurPage } from "./CekDapurPage";
+export { CekDapurHistoryPage } from "./CekDapurHistoryPage";
 export { DokumenHalalPage } from "./DokumenHalalPage";
 export { DokumenHalalHistoryPage } from "./DokumenHalalHistoryPage";
 export { AsistenHalalPage } from "./AsistenHalalPage";
