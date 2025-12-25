@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { Menu } from "lucide-react";
-import { Link, Route, Switch } from "wouter";
+import { Link, Route, Switch, useLocation } from "wouter";
 
 import { BRANDING } from "@shared/config/branding";
 import { ProcessingProvider } from "@shared/contexts";
@@ -22,6 +22,13 @@ import { VoiceAuditPage } from "./VoiceAuditPage";
 
 export function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [location] = useLocation();
+
+  // Don't render anything if we're navigating away from dashboard
+  // This prevents 404 flash during route transitions
+  if (!location.startsWith("/dashboard")) {
+    return null;
+  }
 
   return (
     <ProcessingProvider>

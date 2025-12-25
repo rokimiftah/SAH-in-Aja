@@ -1,4 +1,4 @@
-import { Authenticated, Unauthenticated, useQuery } from "convex/react";
+import { Authenticated, Unauthenticated, useConvexAuth, useQuery } from "convex/react";
 import { AnimatePresence } from "motion/react";
 import { Redirect, Route, Switch, useLocation } from "wouter";
 
@@ -15,12 +15,64 @@ import { api } from "../../convex/_generated/api";
 
 import "./styles/global.css";
 
+function AuthLoading() {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-orange-500" />
+    </div>
+  );
+}
+
+// Wrapper for protected routes that shows loading state while auth is being determined
+function ProtectedRoute({
+  children,
+  fallback = <Redirect to="/login" />,
+}: {
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+}) {
+  const { isLoading } = useConvexAuth();
+
+  if (isLoading) {
+    return <AuthLoading />;
+  }
+
+  return (
+    <>
+      <Authenticated>{children}</Authenticated>
+      <Unauthenticated>{fallback}</Unauthenticated>
+    </>
+  );
+}
+
+// Wrapper for guest-only routes (login, magic link)
+function GuestRoute({
+  children,
+  fallback = <Redirect to="/dashboard" />,
+}: {
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+}) {
+  const { isLoading } = useConvexAuth();
+
+  if (isLoading) {
+    return <AuthLoading />;
+  }
+
+  return (
+    <>
+      <Authenticated>{fallback}</Authenticated>
+      <Unauthenticated>{children}</Unauthenticated>
+    </>
+  );
+}
+
 // Helper component to protect admin routes
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const user = useQuery(api.users.getCurrentUser);
 
   if (user === undefined) {
-    return null; // Silent loading
+    return <AuthLoading />;
   }
 
   if (!user || user.role !== "admin") {
@@ -56,94 +108,64 @@ export const App = () => {
           {/* Login Page */}
           <Route path="/login">
             {() => (
-              <>
-                <Authenticated>
-                  <Redirect to="/dashboard" />
-                </Authenticated>
-                <Unauthenticated>
-                  <LoginPage />
-                </Unauthenticated>
-              </>
+              <GuestRoute>
+                <LoginPage />
+              </GuestRoute>
             )}
           </Route>
 
           {/* Magic Link Verification */}
           <Route path="/link">
             {() => (
-              <>
-                <Authenticated>
-                  <Redirect to="/dashboard" />
-                </Authenticated>
-                <Unauthenticated>
-                  <MagicLinkPage />
-                </Unauthenticated>
-              </>
+              <GuestRoute>
+                <MagicLinkPage />
+              </GuestRoute>
             )}
           </Route>
 
           {/* Admin Routes - Flat structure to avoid wouter nesting issues */}
           <Route path="/admin">
             {() => (
-              <>
-                <Authenticated>
-                  <AdminRoute>
-                    <AdminLayout>
-                      <AdminDashboard />
-                    </AdminLayout>
-                  </AdminRoute>
-                </Authenticated>
-                <Unauthenticated>
-                  <Redirect to="/login" />
-                </Unauthenticated>
-              </>
+              <ProtectedRoute>
+                <AdminRoute>
+                  <AdminLayout>
+                    <AdminDashboard />
+                  </AdminLayout>
+                </AdminRoute>
+              </ProtectedRoute>
             )}
           </Route>
 
           <Route path="/admin/promos">
             {() => (
-              <>
-                <Authenticated>
-                  <AdminRoute>
-                    <AdminLayout>
-                      <PromoCodesPage />
-                    </AdminLayout>
-                  </AdminRoute>
-                </Authenticated>
-                <Unauthenticated>
-                  <Redirect to="/login" />
-                </Unauthenticated>
-              </>
+              <ProtectedRoute>
+                <AdminRoute>
+                  <AdminLayout>
+                    <PromoCodesPage />
+                  </AdminLayout>
+                </AdminRoute>
+              </ProtectedRoute>
             )}
           </Route>
 
           <Route path="/admin/users">
             {() => (
-              <>
-                <Authenticated>
-                  <AdminRoute>
-                    <AdminLayout>
-                      <UsersPage />
-                    </AdminLayout>
-                  </AdminRoute>
-                </Authenticated>
-                <Unauthenticated>
-                  <Redirect to="/login" />
-                </Unauthenticated>
-              </>
+              <ProtectedRoute>
+                <AdminRoute>
+                  <AdminLayout>
+                    <UsersPage />
+                  </AdminLayout>
+                </AdminRoute>
+              </ProtectedRoute>
             )}
           </Route>
 
           {/* Protected Dashboard Routes */}
           <Route path="/dashboard/*?">
             {() => (
-              <>
-                <Authenticated>
-                  <DashboardLayout />
-                </Authenticated>
-                <Unauthenticated>
-                  <Redirect to="/login" />
-                </Unauthenticated>
-              </>
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
             )}
           </Route>
 
