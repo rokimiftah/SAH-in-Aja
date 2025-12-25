@@ -68,6 +68,7 @@ export function TrainingPage() {
   const [, navigate] = useLocation();
   const [view, setView] = useState<View>("intro");
   const [participantName, setParticipantName] = useState("");
+  const [quizKey, setQuizKey] = useState(0); // Force remount QuizForm for new questions
   const [quizResult, setQuizResult] = useState<{
     answers: QuizAnswer[];
     score: number;
@@ -94,6 +95,7 @@ export function TrainingPage() {
     try {
       // biome-ignore lint/correctness/useHookAtTopLevel: useCreditMutation is a Convex mutation function, not a React hook
       await useCreditMutation();
+      setQuizKey((prev) => prev + 1); // Increment key to force new questions
       setView("quiz");
     } catch (error) {
       console.error("Failed to use credit:", error);
@@ -129,8 +131,282 @@ export function TrainingPage() {
   };
 
   const handleDownloadCertificate = () => {
-    // TODO: Implement certificate PDF generation
-    alert("Fitur unduh sertifikat akan segera tersedia!");
+    if (!quizResult?.certificateNumber) return;
+
+    const name = toTitleCase(participantName.trim());
+    const certNumber = quizResult.certificateNumber;
+    const date = new Date().toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
+    // Create print window with certificate
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      alert("Popup diblokir. Silakan izinkan popup untuk mengunduh sertifikat.");
+      return;
+    }
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Sertifikat Pelatihan Halal - ${name}</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap');
+          
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          
+          @page { 
+            size: A4 landscape; 
+            margin: 0; 
+          }
+          
+          body {
+            font-family: 'Inter', sans-serif;
+            background: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+          }
+          
+          .certificate {
+            width: 297mm;
+            height: 210mm;
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border: 12px solid #059669;
+            border-radius: 8px;
+            padding: 40px 60px;
+            position: relative;
+            overflow: hidden;
+          }
+          
+          .certificate::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 2px solid #10b981;
+            border-radius: 4px;
+            pointer-events: none;
+          }
+          
+          .corner-ornament {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 3px solid #059669;
+          }
+          
+          .corner-ornament.top-left { top: 30px; left: 30px; border-right: none; border-bottom: none; }
+          .corner-ornament.top-right { top: 30px; right: 30px; border-left: none; border-bottom: none; }
+          .corner-ornament.bottom-left { bottom: 30px; left: 30px; border-right: none; border-top: none; }
+          .corner-ornament.bottom-right { bottom: 30px; right: 30px; border-left: none; border-top: none; }
+          
+          .content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+          }
+          
+          .header {
+            margin-bottom: 20px;
+          }
+          
+          .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #059669;
+            margin-bottom: 8px;
+          }
+          
+          .title {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            color: #064e3b;
+            margin-bottom: 8px;
+            letter-spacing: 4px;
+          }
+          
+          .subtitle {
+            font-size: 16px;
+            color: #047857;
+            font-weight: 500;
+          }
+          
+          .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+          }
+          
+          .awarded-to {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 8px;
+          }
+          
+          .name {
+            font-family: 'Playfair Display', serif;
+            font-size: 38px;
+            color: #064e3b;
+            margin-bottom: 20px;
+            padding: 10px 0;
+            border-bottom: 2px solid #10b981;
+            display: inline-block;
+          }
+          
+          .description {
+            font-size: 15px;
+            color: #374151;
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto;
+          }
+          
+          .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 30px;
+          }
+          
+          .cert-info {
+            text-align: left;
+          }
+          
+          .cert-number {
+            font-size: 12px;
+            color: #6b7280;
+          }
+          
+          .cert-number strong {
+            color: #059669;
+            font-family: monospace;
+            font-size: 13px;
+          }
+          
+          .cert-date {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+          }
+          
+          .signature {
+            text-align: center;
+          }
+          
+          .signature-line {
+            width: 180px;
+            border-bottom: 1px solid #374151;
+            margin-bottom: 8px;
+          }
+          
+          .signature-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+          }
+          
+          .signature-title {
+            font-size: 11px;
+            color: #6b7280;
+          }
+          
+          .qr-placeholder {
+            text-align: right;
+          }
+          
+          .qr-box {
+            width: 70px;
+            height: 70px;
+            border: 1px solid #d1d5db;
+            background: #f9fafb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: #9ca3af;
+          }
+          
+          @media print {
+            body { 
+              background: white; 
+              padding: 0; 
+              margin: 0;
+            }
+            .certificate {
+              box-shadow: none;
+              margin: 0;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="certificate">
+          <div class="corner-ornament top-left"></div>
+          <div class="corner-ornament top-right"></div>
+          <div class="corner-ornament bottom-left"></div>
+          <div class="corner-ornament bottom-right"></div>
+          
+          <div class="content">
+            <div class="header">
+              <div class="logo">SAH-in Aja!</div>
+              <h1 class="title">SERTIFIKAT</h1>
+              <p class="subtitle">Pelatihan Kesadaran Halal</p>
+            </div>
+            
+            <div class="main">
+              <p class="awarded-to">Diberikan kepada:</p>
+              <h2 class="name">${name}</h2>
+              <p class="description">
+                Telah berhasil menyelesaikan Pelatihan Kesadaran Halal dan dinyatakan 
+                <strong>LULUS</strong> dengan memahami dasar-dasar kehalalan produk, 
+                sistem jaminan halal (SJPH), serta prosedur penanganan kontaminasi 
+                sesuai persyaratan sertifikasi halal Indonesia.
+              </p>
+            </div>
+            
+            <div class="footer">
+              <div class="cert-info">
+                <p class="cert-number">No. Sertifikat: <strong>${certNumber}</strong></p>
+                <p class="cert-date">Tanggal: ${date}</p>
+              </div>
+              
+              <div class="signature">
+                <div class="signature-line"></div>
+                <p class="signature-name">SAH-in Aja!</p>
+                <p class="signature-title">Platform Sertifikasi Halal</p>
+              </div>
+              
+              <div class="qr-placeholder">
+                <div class="qr-box">Scan untuk verifikasi</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+            }, 500);
+          };
+        </script>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   const isMobileOnlyBack = view === "intro";
@@ -285,7 +561,7 @@ export function TrainingPage() {
         </div>
       )}
 
-      {view === "quiz" && <QuizForm participantName={participantName} onComplete={handleQuizComplete} />}
+      {view === "quiz" && <QuizForm key={quizKey} participantName={participantName} onComplete={handleQuizComplete} />}
 
       {view === "result" && quizResult && (
         <QuizResult
