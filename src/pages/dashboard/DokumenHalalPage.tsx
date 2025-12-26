@@ -3,7 +3,19 @@ import type { BusinessInfo, Ingredient, Product, TemplateType } from "@features/
 import { useEffect, useState } from "react";
 
 import { useQuery } from "convex/react";
-import { AlertCircle, ArrowRight, CheckCircle2, FileText, History, RefreshCw, Sparkles, Target, Zap } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowRight,
+  CheckCircle2,
+  Database,
+  FileText,
+  History,
+  PenLine,
+  RefreshCw,
+  Sparkles,
+  Target,
+  Zap,
+} from "lucide-react";
 import { useLocation } from "wouter";
 
 import {
@@ -22,7 +34,16 @@ import { useProcessing } from "@shared/contexts";
 import { api } from "../../../convex/_generated/api";
 import { PageContainer } from "./components";
 
-type FlowState = "intro" | "template" | "business" | "products" | "ingredients" | "generating" | "preview" | "error";
+type FlowState =
+  | "intro"
+  | "template"
+  | "business"
+  | "data-source"
+  | "products"
+  | "ingredients"
+  | "generating"
+  | "preview"
+  | "error";
 
 const INTRO_FEATURES = [
   {
@@ -71,10 +92,13 @@ export function DokumenHalalPage() {
   const { stage, result, error, generateDocument, reset } = useDokumenHalal();
   const creditStatus = useQuery(api.credits.checkCredits, { feature: "dokumenHalal" });
   const eligibility = useQuery(api.eligibility.getMyEligibility);
+  const traceabilityData = useQuery(api.traceability.getTraceabilityMatrix);
 
   const isLoadingCredits = creditStatus === undefined;
   const hasCredits = creditStatus?.hasCredits ?? false;
   const { setProcessing } = useProcessing();
+
+  const hasExistingData = traceabilityData && (traceabilityData.products.length > 0 || traceabilityData.ingredients.length > 0);
 
   useEffect(() => {
     const isProcessing = flowState === "generating" && stage !== "complete" && stage !== "error";
@@ -127,8 +151,37 @@ export function DokumenHalalPage() {
 
   const handleNextFromBusiness = () => {
     if (businessInfo.name && businessInfo.owner && businessInfo.address && businessInfo.productType) {
-      setFlowState("products");
+      if (hasExistingData) {
+        setFlowState("data-source");
+      } else {
+        setFlowState("products");
+      }
     }
+  };
+
+  const handleSelectDataSource = (mode: "existing" | "manual") => {
+    if (mode === "existing" && traceabilityData) {
+      const convertedProducts: Product[] = traceabilityData.products.map((p) => ({
+        id: p._id,
+        name: p.name,
+      }));
+      setProducts(convertedProducts.length > 0 ? convertedProducts : INITIAL_PRODUCTS);
+
+      const convertedIngredients: Ingredient[] = traceabilityData.ingredients.map((ing) => {
+        const productMappings = traceabilityData.mappings.filter((m) => m.ingredientId === ing._id).map((m) => m.productId);
+        return {
+          name: ing.name,
+          supplier: ing.supplier,
+          halalStatus: ing.halalStatus,
+          productsUsedIn: productMappings,
+        };
+      });
+      setIngredients(convertedIngredients.length > 0 ? convertedIngredients : INITIAL_INGREDIENTS);
+    } else {
+      setProducts(INITIAL_PRODUCTS);
+      setIngredients(INITIAL_INGREDIENTS);
+    }
+    setFlowState("products");
   };
 
   const handleNextFromProducts = () => {
@@ -152,8 +205,14 @@ export function DokumenHalalPage() {
     if (flowState === "intro") navigate("/dashboard");
     else if (flowState === "template") setFlowState("intro");
     else if (flowState === "business") setFlowState("template");
-    else if (flowState === "products") setFlowState("business");
-    else if (flowState === "ingredients") setFlowState("products");
+    else if (flowState === "data-source") setFlowState("business");
+    else if (flowState === "products") {
+      if (hasExistingData) {
+        setFlowState("data-source");
+      } else {
+        setFlowState("business");
+      }
+    } else if (flowState === "ingredients") setFlowState("products");
     else if (flowState === "generating" && stage === "complete") {
       reset();
       setFlowState("intro");
@@ -192,6 +251,7 @@ export function DokumenHalalPage() {
     displayState === "intro" ||
     displayState === "template" ||
     displayState === "business" ||
+    displayState === "data-source" ||
     displayState === "products" ||
     displayState === "ingredients" ||
     displayState === "preview";
@@ -318,6 +378,51 @@ export function DokumenHalalPage() {
               >
                 Lanjut
                 <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Data Source Selection */}
+        {displayState === "data-source" && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-text-dark text-xl font-bold">Sumber Data Produk & Bahan</h2>
+              <p className="mt-1 text-sm text-gray-600">
+                Anda memiliki data produk dan bahan dari Traceability Matrix. Pilih sumber data:
+              </p>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => handleSelectDataSource("existing")}
+                className="group cursor-pointer rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-6 text-left transition-all hover:border-emerald-400 hover:shadow-lg"
+              >
+                <div className="mb-3 inline-flex rounded-xl bg-emerald-100 p-3">
+                  <Database className="h-6 w-6 text-emerald-600" />
+                </div>
+                <h3 className="text-text-dark mb-1 font-semibold">Gunakan Data yang Ada</h3>
+                <p className="text-sm text-gray-600">
+                  Ambil {traceabilityData?.products.length || 0} produk dan {traceabilityData?.ingredients.length || 0} bahan dari
+                  Traceability Matrix
+                </p>
+                <div className="mt-3 flex items-center gap-1 text-sm font-medium text-emerald-600">
+                  <CheckCircle2 className="h-4 w-4" />
+                  Disarankan
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleSelectDataSource("manual")}
+                className="group cursor-pointer rounded-2xl border-2 border-gray-200 bg-gray-50 p-6 text-left transition-all hover:border-gray-400 hover:shadow-lg"
+              >
+                <div className="mb-3 inline-flex rounded-xl bg-gray-100 p-3">
+                  <PenLine className="h-6 w-6 text-gray-600" />
+                </div>
+                <h3 className="text-text-dark mb-1 font-semibold">Input Manual</h3>
+                <p className="text-sm text-gray-600">Masukkan data produk dan bahan baru secara manual untuk dokumen ini</p>
               </button>
             </div>
           </div>
