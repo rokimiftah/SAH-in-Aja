@@ -3,19 +3,6 @@ import { motion } from "motion/react";
 
 const features = [
   {
-    id: "siap-halal",
-    icon: Camera,
-    label: "Cek Dapur Halal",
-    title: "Cek Kesiapan dengan AI Vision",
-    description:
-      "Foto area produksimu, dan AI kami akan menganalisis kesiapan halal secara otomatis. Dapatkan skor dan rekomendasi perbaikan dalam hitungan menit.",
-    items: ["Analisis foto area produksi", "Skor kesiapan halal otomatis", "Rekomendasi perbaikan detail", "Hasil dalam 2 menit"],
-    image: "/landing/cek_dapur_halal.avif",
-    color: "text-emerald-600",
-    shadow: "shadow-[0_6px_20px_rgba(16,185,129,0.15)]",
-    imagePosition: "right",
-  },
-  {
     id: "cek-bahan",
     icon: Package,
     label: "Cek Bahan Halal",
@@ -26,6 +13,19 @@ const features = [
     image: "/landing/cek_bahan_halal.avif",
     color: "text-cyan-600",
     shadow: "shadow-[0_6px_20px_rgba(6,182,212,0.15)]",
+    imagePosition: "right",
+  },
+  {
+    id: "siap-halal",
+    icon: Camera,
+    label: "Cek Dapur Halal",
+    title: "Cek Kesiapan dengan AI Vision",
+    description:
+      "Foto area produksimu, dan AI kami akan menganalisis kesiapan halal secara otomatis. Dapatkan skor dan rekomendasi perbaikan dalam hitungan menit.",
+    items: ["Analisis foto area produksi", "Skor kesiapan halal otomatis", "Rekomendasi perbaikan detail", "Hasil dalam 2 menit"],
+    image: "/landing/cek_dapur_halal.avif",
+    color: "text-emerald-600",
+    shadow: "shadow-[0_6px_20px_rgba(16,185,129,0.15)]",
     imagePosition: "left",
   },
   {
