@@ -1,6 +1,6 @@
 import type { QuizAnswer, QuizQuestion } from "../types";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
 
@@ -20,7 +20,7 @@ interface QuizFormProps {
 }
 
 export function QuizForm({ participantName, onComplete }: QuizFormProps) {
-  const questions = useMemo<QuizQuestion[]>(() => getShuffledQuestions(), []);
+  const [questions] = useState<QuizQuestion[]>(() => getShuffledQuestions());
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const currentQuestion = questions[currentIndex];
