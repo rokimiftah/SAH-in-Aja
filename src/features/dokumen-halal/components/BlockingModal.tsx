@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { AlertTriangle, ArrowRight, ClipboardCheck, Info, ShieldCheck, X } from "lucide-react";
+import { AlertTriangle, ArrowRight, ClipboardCheck, Info, ShieldCheck } from "lucide-react";
 
 interface BlockingModalProps {
   type: "not_eligible" | "high_risk";
@@ -23,16 +23,6 @@ export function BlockingModal({ type, onClose, onAction }: BlockingModalProps) {
           {/* Gradient Header */}
           <div className="relative bg-linear-to-br from-blue-500 via-blue-600 to-indigo-600 px-6 pt-8 pb-12">
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bTAtMThjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30" />
-
-            {onClose && (
-              <button
-                type="button"
-                onClick={onClose}
-                className="absolute top-4 right-4 z-10 cursor-pointer rounded-full bg-white/20 p-3 text-white/80 backdrop-blur-sm transition-all hover:bg-white/30 hover:text-white"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            )}
 
             <div className="relative text-center">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
@@ -64,7 +54,7 @@ export function BlockingModal({ type, onClose, onAction }: BlockingModalProps) {
                 className="group flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-blue-500 to-indigo-600 px-4 py-4 text-base font-bold text-white shadow-lg shadow-blue-500/25 transition-all hover:shadow-xl hover:shadow-blue-500/30 active:scale-[0.98]"
               >
                 <ShieldCheck className="h-5 w-5" />
-                Cek Jalur Sekarang
+                <span className="whitespace-nowrap">Cek Jalur Sekarang</span>
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </button>
 
@@ -91,16 +81,6 @@ export function BlockingModal({ type, onClose, onAction }: BlockingModalProps) {
         {/* Gradient Header */}
         <div className="relative bg-linear-to-br from-red-500 via-red-600 to-orange-600 px-6 pt-8 pb-12">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bTAtMThjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30" />
-
-          {onClose && (
-            <button
-              type="button"
-              onClick={onClose}
-              className="absolute top-4 right-4 z-10 cursor-pointer rounded-full bg-white/20 p-3 text-white/80 backdrop-blur-sm transition-all hover:bg-white/30 hover:text-white"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          )}
 
           <div className="relative text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
