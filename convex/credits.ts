@@ -19,10 +19,11 @@ const DAILY_LIMITS = {
 // Get current date in UTC+7 (Asia/Jakarta)
 function getDateInUTC7(): string {
   const now = new Date();
-  // UTC+7 = UTC + 7 hours
-  const utc7Offset = 7 * 60 * 60 * 1000;
-  const utc7Date = new Date(now.getTime() + utc7Offset);
-  return utc7Date.toISOString().split("T")[0];
+  const jakartaDate = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
+  const year = jakartaDate.getFullYear();
+  const month = String(jakartaDate.getMonth() + 1).padStart(2, "0");
+  const day = String(jakartaDate.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 // Get daily credit record for user (query only - no creation)
@@ -176,16 +177,21 @@ export const useCekDapurCredit = mutation({
 
     const credits = await getOrCreateDailyCredits(ctx, userId);
 
-    if (credits.cekDapurCredits <= 0) {
+    // Re-fetch to get latest value (prevents race condition)
+    const freshCredits = await ctx.db.get(credits._id);
+    if (!freshCredits) throw new ConvexError("Data kredit tidak ditemukan");
+
+    if (freshCredits.cekDapurCredits <= 0) {
       throw new ConvexError("Kredit Cek Dapur Halal habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
     }
 
+    const newCredits = freshCredits.cekDapurCredits - 1;
     await ctx.db.patch(credits._id, {
-      cekDapurCredits: credits.cekDapurCredits - 1,
+      cekDapurCredits: newCredits,
     });
 
     return {
-      remaining: credits.cekDapurCredits - 1,
+      remaining: newCredits,
       limit: DAILY_LIMITS.cekDapur,
     };
   },
@@ -200,16 +206,21 @@ export const useDokumenHalalCredit = mutation({
 
     const credits = await getOrCreateDailyCredits(ctx, userId);
 
-    if (credits.dokumenHalalCredits <= 0) {
+    // Re-fetch to get latest value (prevents race condition)
+    const freshCredits = await ctx.db.get(credits._id);
+    if (!freshCredits) throw new ConvexError("Data kredit tidak ditemukan");
+
+    if (freshCredits.dokumenHalalCredits <= 0) {
       throw new ConvexError("Kredit Dokumen Halal habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
     }
 
+    const newCredits = freshCredits.dokumenHalalCredits - 1;
     await ctx.db.patch(credits._id, {
-      dokumenHalalCredits: credits.dokumenHalalCredits - 1,
+      dokumenHalalCredits: newCredits,
     });
 
     return {
-      remaining: credits.dokumenHalalCredits - 1,
+      remaining: newCredits,
       limit: DAILY_LIMITS.dokumenHalal,
     };
   },
@@ -224,11 +235,15 @@ export const useAsistenHalalCredit = mutation({
 
     const credits = await getOrCreateDailyCredits(ctx, userId);
 
+    // Re-fetch to get latest value (prevents race condition)
+    const freshCredits = await ctx.db.get(credits._id);
+    if (!freshCredits) throw new ConvexError("Data kredit tidak ditemukan");
+
     // Only cap if not boosted (credits <= limit means not boosted)
     const currentCredits =
-      credits.asistenHalalChats > DAILY_LIMITS.asistenHalal
-        ? credits.asistenHalalChats
-        : Math.min(credits.asistenHalalChats, DAILY_LIMITS.asistenHalal);
+      freshCredits.asistenHalalChats > DAILY_LIMITS.asistenHalal
+        ? freshCredits.asistenHalalChats
+        : Math.min(freshCredits.asistenHalalChats, DAILY_LIMITS.asistenHalal);
 
     if (currentCredits <= 0) {
       throw new ConvexError("Kredit chat Asisten Halal habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
@@ -255,7 +270,11 @@ export const useCekBahanCredit = mutation({
 
     const credits = await getOrCreateDailyCredits(ctx, userId);
 
-    const currentCredits = credits.cekBahanCredits ?? DAILY_LIMITS.cekBahan;
+    // Re-fetch to get latest value (prevents race condition)
+    const freshCredits = await ctx.db.get(credits._id);
+    if (!freshCredits) throw new ConvexError("Data kredit tidak ditemukan");
+
+    const currentCredits = freshCredits.cekBahanCredits ?? DAILY_LIMITS.cekBahan;
     const cappedCredits =
       currentCredits > DAILY_LIMITS.cekBahan ? currentCredits : Math.min(currentCredits, DAILY_LIMITS.cekBahan);
 
@@ -284,7 +303,11 @@ export const useVoiceAuditCredit = mutation({
 
     const credits = await getOrCreateDailyCredits(ctx, userId);
 
-    const currentCredits = credits.voiceAuditCredits ?? DAILY_LIMITS.voiceAudit;
+    // Re-fetch to get latest value (prevents race condition)
+    const freshCredits = await ctx.db.get(credits._id);
+    if (!freshCredits) throw new ConvexError("Data kredit tidak ditemukan");
+
+    const currentCredits = freshCredits.voiceAuditCredits ?? DAILY_LIMITS.voiceAudit;
     const cappedCredits =
       currentCredits > DAILY_LIMITS.voiceAudit ? currentCredits : Math.min(currentCredits, DAILY_LIMITS.voiceAudit);
 
@@ -313,7 +336,11 @@ export const useTrainingCredit = mutation({
 
     const credits = await getOrCreateDailyCredits(ctx, userId);
 
-    const currentCredits = credits.trainingCredits ?? DAILY_LIMITS.training;
+    // Re-fetch to get latest value (prevents race condition)
+    const freshCredits = await ctx.db.get(credits._id);
+    if (!freshCredits) throw new ConvexError("Data kredit tidak ditemukan");
+
+    const currentCredits = freshCredits.trainingCredits ?? DAILY_LIMITS.training;
     const cappedCredits =
       currentCredits > DAILY_LIMITS.training ? currentCredits : Math.min(currentCredits, DAILY_LIMITS.training);
 

@@ -1,4 +1,5 @@
-import { v } from "convex/values";
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { ConvexError, v } from "convex/values";
 
 import { action } from "./_generated/server";
 import { createLLMClient, getLLMModel, SYSTEM_PROMPTS } from "./lib/llmClient";
@@ -27,6 +28,12 @@ export const analyzeKitchen = action({
     photoStorageIds: v.array(v.id("_storage")),
   },
   handler: async (ctx, args) => {
+    // Auth check
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError("Silakan login terlebih dahulu");
+    }
+
     // Convert storage IDs to URLs and then to base64
     const photoUrls: string[] = [];
     const imageBase64List: string[] = [];
@@ -106,11 +113,11 @@ export const analyzeKitchen = action({
     try {
       const result = JSON.parse(jsonContent);
       return {
-        score: result.score || 0,
-        findings: result.findings || [],
-        actionItems: result.actionItems || [],
-        summaryPoints: result.summaryPoints || [],
-        overallMessage: result.overallMessage || "",
+        score: typeof result.score === "number" ? result.score : 0,
+        findings: Array.isArray(result.findings) ? result.findings : [],
+        actionItems: Array.isArray(result.actionItems) ? result.actionItems : [],
+        summaryPoints: Array.isArray(result.summaryPoints) ? result.summaryPoints : [],
+        overallMessage: typeof result.overallMessage === "string" ? result.overallMessage : "",
         photoUrls,
       };
     } catch {

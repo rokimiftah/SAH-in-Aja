@@ -120,13 +120,18 @@ Jawab dengan format JSON (tanpa markdown):
       return { isHalalRelated: true, reason: "fallback" };
     }
 
-    // Parse JSON response
-    const cleanedContent = content.replace(/```json\n?|\n?```/g, "").trim();
-    const result = JSON.parse(cleanedContent);
-    return {
-      isHalalRelated: result.isHalalRelated === true,
-      reason: result.reason || "",
-    };
+    // Parse JSON response with safe error handling
+    try {
+      const cleanedContent = content.replace(/```json\n?|\n?```/g, "").trim();
+      const result = JSON.parse(cleanedContent);
+      return {
+        isHalalRelated: result.isHalalRelated === true,
+        reason: typeof result.reason === "string" ? result.reason : "",
+      };
+    } catch {
+      // JSON parsing failed, fallback to allow the message
+      return { isHalalRelated: true, reason: "json_parse_error" };
+    }
   } catch {
     // Fallback: jika gagal classify, allow the message (lebih baik false positive)
     return { isHalalRelated: true, reason: "classification_error" };
