@@ -180,7 +180,7 @@ Buat dokumen lengkap dalam bahasa Indonesia formal. Gunakan tahun ${new Date().t
           },
         ],
         temperature: 0.7,
-        max_tokens: 16384,
+        max_tokens: 4096,
       });
 
       const message = response.choices[0]?.message;
@@ -209,7 +209,7 @@ Buat dokumen lengkap dalam bahasa Indonesia formal. Gunakan tahun ${new Date().t
           throw new Error("Terjadi kesalahan sistem. Silakan coba lagi nanti.");
         }
 
-        // Bad request errors (400)
+        // Bad request errors (400) - include original error for debugging
         if (message.includes("400")) {
           throw new Error("Terjadi kesalahan saat memproses permintaan. Silakan coba lagi.");
         }
