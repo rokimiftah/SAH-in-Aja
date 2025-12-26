@@ -326,6 +326,318 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     correctAnswer: "b",
     explanation: "Setiap perubahan bahan baku wajib dilaporkan ke BPJPH dan dokumen SJPH harus diperbarui.",
   },
+  // Kriteria Sistem Jaminan Produk Halal (SJPH) Tambahan
+  {
+    id: "q26",
+    question: "Berapa batas maksimal kandungan etanol dalam produk makanan (bukan minuman) agar tetap bisa disertifikasi halal?",
+    options: [
+      { value: "a", label: "0%" },
+      { value: "b", label: "0.5%" },
+      { value: "c", label: "1%" },
+      { value: "d", label: "5%" },
+    ],
+    correctAnswer: "b",
+    explanation:
+      "Menurut Fatwa MUI, kandungan etanol pada produk akhir makanan tidak boleh melebihi 0.5% selama tidak membahayakan medis.",
+  },
+  {
+    id: "q27",
+    question: "Apa peran Komisi Fatwa MUI dalam proses sertifikasi halal?",
+    options: [
+      { value: "a", label: "Memeriksa pabrik" },
+      { value: "b", label: "Menerbitkan sertifikat" },
+      { value: "c", label: "Menetapkan kehalalan produk melalui sidang fatwa" },
+      { value: "d", label: "Melatih penyelia halal" },
+    ],
+    correctAnswer: "c",
+    explanation: "Komisi Fatwa MUI berwenang menetapkan status kehalalan produk yang diajukan sertifikasi.",
+  },
+  {
+    id: "q28",
+    question: "Apa itu LPH (Lembaga Pemeriksa Halal)?",
+    options: [
+      { value: "a", label: "Lembaga yang menerbitkan sertifikat" },
+      { value: "b", label: "Lembaga yang melakukan pemeriksaan dan/atau pengujian kehalalan produk" },
+      { value: "c", label: "Lembaga pelatihan halal" },
+      { value: "d", label: "Lembaga konsultasi halal" },
+    ],
+    correctAnswer: "b",
+    explanation: "LPH bertugas melakukan pemeriksaan dokumen dan audit lapangan terhadap kehalalan produk.",
+  },
+  {
+    id: "q29",
+    question: "Kapan Audit Internal halal harus dilakukan oleh perusahaan?",
+    options: [
+      { value: "a", label: "Setiap bulan" },
+      { value: "b", label: "Minimal satu kali dalam satu tahun" },
+      { value: "c", label: "Hanya saat ada audit eksternal" },
+      { value: "d", label: "Setiap 5 tahun sekali" },
+    ],
+    correctAnswer: "b",
+    explanation: "Audit internal wajib dilakukan minimal satu kali setahun untuk memastikan SJPH berjalan efektif.",
+  },
+  {
+    id: "q30",
+    question: "Apa syarat utama air yang digunakan untuk pencucian dalam proses produksi halal?",
+    options: [
+      { value: "a", label: "Air hangat" },
+      { value: "b", label: "Air mutlak (suci dan mensucikan)" },
+      { value: "c", label: "Air yang dicampur sabun" },
+      { value: "d", label: "Air mineral kemasan" },
+    ],
+    correctAnswer: "b",
+    explanation: "Air yang digunakan harus air mutlak (suci mensucikan) dan bebas dari najis.",
+  },
+  // Bahan Kritis dan Titik Kritis
+  {
+    id: "q31",
+    question: "Manakah berikut ini yang merupakan titik kritis pada keju?",
+    options: [
+      { value: "a", label: "Susu murni" },
+      { value: "b", label: "Enzim Rennet/Pepsin" },
+      { value: "c", label: "Garam" },
+      { value: "d", label: "Air" },
+    ],
+    correctAnswer: "b",
+    explanation:
+      "Enzim rennet/pepsin sering berasal dari lambung hewan, sehingga harus dipastikan berasal dari hewan halal yang disembelih syar'i.",
+  },
+  {
+    id: "q32",
+    question: "Apa status hukum bangkai ikan dan belalang?",
+    options: [
+      { value: "a", label: "Haram" },
+      { value: "b", label: "Halal" },
+      { value: "c", label: "Makruh" },
+      { value: "d", label: "Syubhat" },
+    ],
+    correctAnswer: "b",
+    explanation: "Rasulullah SAW bersabda bahwa dua bangkai yang halal dimakan adalah ikan dan belalang.",
+  },
+  {
+    id: "q33",
+    question: "Apakah penggunaan nama 'Rum Cake' diperbolehkan untuk sertifikasi halal?",
+    options: [
+      { value: "a", label: "Boleh asal tidak memabukkan" },
+      { value: "b", label: "Tidak boleh, karena menggunakan nama minuman keras" },
+      { value: "c", label: "Boleh jika alkoholnya < 0.5%" },
+      { value: "d", label: "Boleh jika rasanya enak" },
+    ],
+    correctAnswer: "b",
+    explanation: "Produk tidak boleh menggunakan nama yang mengarah pada produk haram seperti 'Rum', 'Whisky', atau 'Babi'.",
+  },
+  {
+    id: "q34",
+    question: "Bagaimana hukum penggunaan kuas dari bulu babi untuk mengoles roti?",
+    options: [
+      { value: "a", label: "Halal jika dicuci" },
+      { value: "b", label: "Haram dan menajiskan roti" },
+      { value: "c", label: "Makruh" },
+      { value: "d", label: "Boleh darurat" },
+    ],
+    correctAnswer: "b",
+    explanation: "Bulu babi adalah najis mughallazhah. Penggunaannya haram dan membuat produk menjadi najis.",
+  },
+  {
+    id: "q35",
+    question: "Apa yang dimaksud dengan bahan penolong (processing aid)?",
+    options: [
+      { value: "a", label: "Bahan yang dimakan langsung" },
+      { value: "b", label: "Bahan yang digunakan dalam proses tapi tidak ada di produk akhir" },
+      { value: "c", label: "Bahan kemasan" },
+      { value: "d", label: "Bahan pengawet" },
+    ],
+    correctAnswer: "b",
+    explanation:
+      "Bahan penolong digunakan untuk membantu proses produksi tetapi tidak menjadi bagian komposisi produk akhir (namun tetap harus halal).",
+  },
+  // Penyembelihan
+  {
+    id: "q36",
+    question: "Berapa saluran yang wajib terputus saat penyembelihan hewan?",
+    options: [
+      { value: "a", label: "1 saluran (napas)" },
+      { value: "b", label: "2 saluran (makan & napas)" },
+      { value: "c", label: "3 saluran (makan, napas, dua pembuluh darah)" },
+      { value: "d", label: "Kepala harus putus" },
+    ],
+    correctAnswer: "c",
+    explanation: "Wajib terputus saluran napas (hulqum), saluran makan (mari'), dan dua pembuluh darah leher (wadajain).",
+  },
+  {
+    id: "q37",
+    question: "Apa hukum melakukan stunning (pemingsanan) hewan sebelum disembelih?",
+    options: [
+      { value: "a", label: "Haram mutlak" },
+      { value: "b", label: "Diperbolehkan dengan syarat hewan tidak mati sebelum disembelih" },
+      { value: "c", label: "Wajib dilakukan" },
+      { value: "d", label: "Makruh" },
+    ],
+    correctAnswer: "b",
+    explanation:
+      "Stunning diperbolehkan asalkan hanya menyebabkan pingsan sementara (tidak mematikan) untuk memudahkan penyembelihan.",
+  },
+  {
+    id: "q38",
+    question: "Siapa yang boleh menjadi juru sembelih halal (Juleha)?",
+    options: [
+      { value: "a", label: "Siapa saja yang kuat" },
+      { value: "b", label: "Muslim, baligh, berakal, dan memahami tata cara syar'i" },
+      { value: "c", label: "Orang non-muslim ahli jagal" },
+      { value: "d", label: "Anak-anak" },
+    ],
+    correctAnswer: "b",
+    explanation: "Juru sembelih harus beragama Islam, dewasa (baligh), berakal sehat, dan mengerti syariat penyembelihan.",
+  },
+  // Manajemen Halal
+  {
+    id: "q39",
+    question: "Apa yang dimaksud dengan Kaji Ulang Manajemen dalam SJPH?",
+    options: [
+      { value: "a", label: "Menghitung ulang gaji karyawan" },
+      { value: "b", label: "Evaluasi efektivitas penerapan SJPH oleh manajemen puncak" },
+      { value: "c", label: "Pemeriksaan stok gudang" },
+      { value: "d", label: "Rapat bulanan biasa" },
+    ],
+    correctAnswer: "b",
+    explanation:
+      "Kaji ulang manajemen adalah evaluasi berkala oleh pimpinan untuk memastikan SJPH tetap efektif dan sesuai standar.",
+  },
+  {
+    id: "q40",
+    question: "Apa kewajiban pelaku usaha terhadap logo halal?",
+    options: [
+      { value: "a", label: "Disimpan di kantor" },
+      { value: "b", label: "Dicantumkan pada kemasan produk yang telah bersertifikat" },
+      { value: "c", label: "Hanya dipasang di website" },
+      { value: "d", label: "Tidak wajib dicantumkan" },
+    ],
+    correctAnswer: "b",
+    explanation: "Pelaku usaha wajib mencantumkan label Halal Indonesia pada kemasan produk yang telah mendapat sertifikat.",
+  },
+  {
+    id: "q41",
+    question: "Media fermentasi mikroba menjadi haram jika...",
+    options: [
+      { value: "a", label: "Menggunakan gula" },
+      { value: "b", label: "Menggunakan bahan yang berasal dari babi" },
+      { value: "c", label: "Dilakukan di laboratorium" },
+      { value: "d", label: "Menggunakan air" },
+    ],
+    correctAnswer: "b",
+    explanation: "Media pertumbuhan mikroba tidak boleh mengandung bahan najis/haram seperti turunan babi.",
+  },
+  {
+    id: "q42",
+    question: "Apa yang dimaksud dengan produk kosmetik halal?",
+    options: [
+      { value: "a", label: "Kosmetik yang mahal" },
+      { value: "b", label: "Kosmetik yang bebas dari bahan najis dan aman digunakan (thayyib)" },
+      { value: "c", label: "Kosmetik impor" },
+      { value: "d", label: "Kosmetik herbal" },
+    ],
+    correctAnswer: "b",
+    explanation: "Kosmetik halal harus terbuat dari bahan halal, suci, dan tidak membahayakan penggunanya.",
+  },
+  {
+    id: "q43",
+    question: "Bagaimana aturan penggunaan fasilitas produksi untuk produk halal?",
+    options: [
+      { value: "a", label: "Boleh campur dengan produk babi" },
+      { value: "b", label: "Harus bebas dari kontaminasi najis dan tidak bergantian dengan produk babi" },
+      { value: "c", label: "Boleh bergantian asal dicuci air biasa" },
+      { value: "d", label: "Tidak ada aturan khusus" },
+    ],
+    correctAnswer: "b",
+    explanation: "Fasilitas produksi tidak boleh digunakan bergantian dengan produk yang mengandung babi/najis berat.",
+  },
+  {
+    id: "q44",
+    question: "Apa fungsi matriks bahan dalam dokumen SJPH?",
+    options: [
+      { value: "a", label: "Daftar harga bahan" },
+      { value: "b", label: "Memetakan bahan yang digunakan pada setiap produk" },
+      { value: "c", label: "Jadwal kedatangan bahan" },
+      { value: "d", label: "Daftar supplier" },
+    ],
+    correctAnswer: "b",
+    explanation: "Matriks bahan digunakan untuk menunjukkan distribusi penggunaan bahan baku pada setiap jenis produk.",
+  },
+  {
+    id: "q45",
+    question: "Apa yang harus dilakukan jika sertifikat halal akan habis masa berlakunya?",
+    options: [
+      { value: "a", label: "Membiarkannya mati" },
+      { value: "b", label: "Mengajukan perpanjangan minimal 3 bulan sebelum habis" },
+      { value: "c", label: "Membuat sertifikat sendiri" },
+      { value: "d", label: "Tetap jualan tanpa logo halal" },
+    ],
+    correctAnswer: "b",
+    explanation: "Pelaku usaha wajib mengajukan perpanjangan sertifikat halal, idealnya 3 bulan sebelum masa berlaku habis.",
+  },
+  {
+    id: "q46",
+    question: "Apakah kulit bangkai hewan bisa menjadi suci?",
+    options: [
+      { value: "a", label: "Tidak bisa" },
+      { value: "b", label: "Bisa, dengan cara disamak (kecuali anjing & babi)" },
+      { value: "c", label: "Bisa dicuci dengan sabun" },
+      { value: "d", label: "Bisa dijemur saja" },
+    ],
+    correctAnswer: "b",
+    explanation: "Kulit bangkai (selain anjing dan babi) dapat menjadi suci setelah melalui proses penyamakan.",
+  },
+  {
+    id: "q47",
+    question: "Emulsifier (E471) sering menjadi titik kritis karena...",
+    options: [
+      { value: "a", label: "Beracun" },
+      { value: "b", label: "Bisa berasal dari lemak hewani atau nabati" },
+      { value: "c", label: "Terlalu mahal" },
+      { value: "d", label: "Mengandung alkohol" },
+    ],
+    correctAnswer: "b",
+    explanation:
+      "Emulsifier dapat dibuat dari lemak nabati (halal) atau lemak hewani (harus dari hewan halal disembelih), sehingga perlu dipastikan sumbernya.",
+  },
+  {
+    id: "q48",
+    question: "Program sosialisasi kebijakan halal ditujukan kepada...",
+    options: [
+      { value: "a", label: "Hanya direktur" },
+      { value: "b", label: "Seluruh karyawan dan pihak terkait" },
+      { value: "c", label: "Hanya satpam" },
+      { value: "d", label: "Hanya konsumen" },
+    ],
+    correctAnswer: "b",
+    explanation: "Kebijakan halal harus disosialisasikan kepada seluruh pemangku kepentingan internal perusahaan.",
+  },
+  {
+    id: "q49",
+    question: "Apa sanksi bagi pelaku usaha yang tidak menjaga kesinambungan PPH (Proses Produk Halal)?",
+    options: [
+      { value: "a", label: "Diberi hadiah" },
+      { value: "b", label: "Pencabutan sertifikat halal" },
+      { value: "c", label: "Dinaikkan pajaknya" },
+      { value: "d", label: "Tidak ada sanksi" },
+    ],
+    correctAnswer: "b",
+    explanation:
+      "Pelanggaran terhadap konsistensi PPH dapat mengakibatkan sanksi administratif hingga pencabutan sertifikat halal.",
+  },
+  {
+    id: "q50",
+    question: "Salah satu tujuan UU Jaminan Produk Halal adalah...",
+    options: [
+      { value: "a", label: "Meningkatkan harga jual" },
+      { value: "b", label: "Memberikan kenyamanan, keamanan, dan kepastian bagi masyarakat" },
+      { value: "c", label: "Mempersulit pedagang kecil" },
+      { value: "d", label: "Meningkatkan ekspor babi" },
+    ],
+    correctAnswer: "b",
+    explanation:
+      "Tujuan utama UU JPH adalah memberikan jaminan kenyamanan, keamanan, keselamatan, dan kepastian ketersediaan produk halal bagi masyarakat.",
+  },
 ];
 
 /**
@@ -346,7 +658,7 @@ function shuffleArray<T>(array: T[]): T[] {
 export const QUIZ_QUESTION_COUNT = 10;
 
 /**
- * Mendapatkan soal kuis acak (10 soal dari 25 soal)
+ * Mendapatkan soal kuis acak (10 soal dari 50 soal)
  */
 export function getShuffledQuestions(): QuizQuestion[] {
   const shuffledQuestions = shuffleArray(QUIZ_QUESTIONS);
