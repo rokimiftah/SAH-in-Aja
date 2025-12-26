@@ -33,15 +33,13 @@ const TEMPLATE_PROMPTS: Record<string, string> = {
 6. Kode Bahan Internal
 7. Status Halal (Halal/Dalam Proses/Perlu Verifikasi)`,
 
-  traceability: `Buat Form Traceability yang mencakup:
-1. Informasi Produk
-2. Tanggal Produksi
-3. Nomor Batch
-4. Daftar Bahan yang Digunakan
-5. Supplier Setiap Bahan
-6. Nomor Lot Bahan
-7. Tanggal Masuk Bahan
-8. Catatan Proses Produksi`,
+  traceability: `Buat Tabel Matriks Traceability (Ketertelusuran) yang mencakup:
+1. Kolom Vertikal: Daftar seluruh Bahan Baku
+2. Kolom Horizontal: Daftar seluruh Produk (Varian)
+3. Isi Tabel: Tanda centang (v) jika bahan digunakan pada produk tersebut
+4. Informasi Supplier dan Status Halal untuk setiap bahan
+5. Kode Produksi/Batch untuk simulasi tracking
+6. Kesimpulan: Apakah semua produk terjamin kehalalannya berdasarkan matriks bahan?`,
 
   komitmen_halal: `Buat Surat Komitmen Halal yang mencakup:
 1. Identitas Pelaku Usaha
@@ -52,33 +50,22 @@ const TEMPLATE_PROMPTS: Record<string, string> = {
 6. Komitmen Audit Internal
 7. Tanda Tangan dan Materai`,
 
-  sop_pencucian_najis: `Buat SOP Pencucian Najis (Samak) yang mencakup:
-1. Tujuan dan Ruang Lingkup
-   - Tujuan prosedur samak
-   - Peralatan yang tercakup
-2. Definisi Najis
-   - Najis Mughallazhah (berat): babi dan anjing
-   - Najis Mutawassithah (sedang): darah, kotoran
-   - Najis Mukhaffafah (ringan): air kencing bayi
-3. Prosedur Identifikasi Kontaminasi
-   - Checklist inspeksi visual
-   - Dokumentasi penemuan kontaminasi
-4. Prosedur Pencucian (Samak)
-   - Untuk Najis Mughallazhah: 7x pencucian, salah satunya dengan tanah/debu
-   - Untuk Najis Mutawassithah: pencucian hingga hilang warna, bau, rasa
-   - Untuk Najis Mukhaffafah: cukup percikan air
-5. Bahan dan Peralatan Pencucian
-   - Jenis air yang digunakan (air mutlak)
-   - Tanah/debu untuk samak (jika diperlukan)
-   - Alat pembersih yang digunakan
-6. Dokumentasi dan Pencatatan
-   - Form pencatatan kejadian kontaminasi
-   - Form checklist prosedur pencucian
-   - Verifikasi oleh Penyelia Halal
-7. Tindakan Pencegahan
-   - Pemisahan area produksi
-   - Pelatihan karyawan
-   - Inspeksi berkala`,
+  sop_pencucian_najis: `Buat SOP Pencucian Najis (Samak) yang SPESIFIK sesuai kondisi usaha ini, mencakup:
+1. Tujuan: Memastikan semua fasilitas bebas dari najis sebelum digunakan produksi halal.
+2. Identifikasi Sumber Air:
+   - Wajib menggunakan AIR MENGALIR (kran/selang) untuk pembilasan akhir.
+   - Dilarang hanya menggunakan metode celup (ember statis) untuk penyucian najis.
+3. Prosedur Teknis (Wajib Detil):
+   - Langkah 1: Buang kotoran/sisa makanan (Solid Waste).
+   - Langkah 2: Gosok dengan sabun/deterjen.
+   - Langkah 3: Bilas dengan AIR MENGALIR sampai hilang 3 sifat (bau, rasa, warna).
+   - Langkah 4: Keringkan dan simpan di rak tertutup.
+4. Penanganan Khusus (Jika ada kontaminasi Najis Berat/Mughallazhah):
+   - Wajib sertu (7x cuci, 1x dengan tanah) jika terkena babi/anjing.
+5. Verifikasi:
+   - Cara mengecek kebersihan (visual & organoleptik).
+6. Dokumentasi:
+   - Log harian pembersihan.`,
 
   pernyataan_bebas_babi: `Buat Surat Pernyataan Bebas Babi yang mencakup:
 1. Kop Surat
@@ -120,17 +107,34 @@ export const generateHalalDocument = action({
       address: v.string(),
       owner: v.string(),
       productType: v.string(),
+      washingMethod: v.optional(v.string()),
     }),
+    products: v.array(
+      v.object({
+        id: v.string(),
+        name: v.string(),
+      }),
+    ),
     ingredients: v.array(
       v.object({
         name: v.string(),
         supplier: v.string(),
         halalStatus: v.string(),
+        productsUsedIn: v.optional(v.array(v.string())), // Changed to array of IDs
       }),
     ),
   },
   handler: async (_ctx, args) => {
     const templatePrompt = TEMPLATE_PROMPTS[args.templateType] || TEMPLATE_PROMPTS.sop_produksi;
+
+    // Helper to resolve product names from IDs
+    const getProductNames = (productIds?: string[]) => {
+      if (!productIds || productIds.length === 0) return "";
+      return productIds
+        .map((id) => args.products.find((p) => p.id === id)?.name)
+        .filter(Boolean)
+        .join(", ");
+    };
 
     const userContent = `${templatePrompt}
 
@@ -139,9 +143,22 @@ DATA USAHA:
 - Alamat: ${args.businessInfo.address}
 - Pemilik: ${args.businessInfo.owner}
 - Jenis Produk: ${args.businessInfo.productType}
+- Metode Pencucian: ${args.businessInfo.washingMethod || "Belum ditentukan"}
 
-DAFTAR BAHAN:
-${args.ingredients.map((i) => `- ${i.name} (Supplier: ${i.supplier}, Status: ${i.halalStatus})`).join("\n")}
+DAFTAR PRODUK (VARIAN):
+${args.products.map((p, i) => `${i + 1}. ${p.name}`).join("\n")}
+
+DAFTAR BAHAN & MATRIKS PENGGUNAAN:
+${args.ingredients
+  .map(
+    (i) =>
+      `- ${i.name} (Supplier: ${i.supplier}, Status: ${i.halalStatus}) ${
+        i.productsUsedIn && i.productsUsedIn.length > 0
+          ? `[Digunakan di: ${getProductNames(i.productsUsedIn)}]`
+          : "[Digunakan di: Semua Produk/Umum]"
+      }`,
+  )
+  .join("\n")}
 
 TANGGAL HARI INI: ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Jakarta" })}
 

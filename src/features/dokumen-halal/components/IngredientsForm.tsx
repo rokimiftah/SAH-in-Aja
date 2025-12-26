@@ -1,4 +1,4 @@
-import type { Ingredient } from "../types";
+import type { Ingredient, Product } from "../types";
 
 import { Plus, Trash2 } from "lucide-react";
 
@@ -6,6 +6,7 @@ import { Select } from "@shared/components/ui";
 
 interface IngredientsFormProps {
   data: Ingredient[];
+  products: Product[];
   onChange: (data: Ingredient[]) => void;
 }
 
@@ -16,26 +17,45 @@ const HALAL_STATUS_OPTIONS = [
   { value: "alami", label: "Bahan Alami (Tanpa Proses)", color: "bg-blue-500" },
 ];
 
-export function IngredientsForm({ data, onChange }: IngredientsFormProps) {
+export function IngredientsForm({ data, products, onChange }: IngredientsFormProps) {
   const addIngredient = () => {
-    onChange([...data, { name: "", supplier: "", halalStatus: "perlu_verifikasi" }]);
+    onChange([...data, { name: "", supplier: "", halalStatus: "perlu_verifikasi", productsUsedIn: [] }]);
   };
 
   const removeIngredient = (index: number) => {
     onChange(data.filter((_, i) => i !== index));
   };
 
-  const updateIngredient = (index: number, field: keyof Ingredient, value: string) => {
+  const updateIngredient = (index: number, field: keyof Ingredient, value: string | string[]) => {
     const updated = [...data];
     updated[index] = { ...updated[index], [field]: value };
     onChange(updated);
+  };
+
+  const toggleProduct = (index: number, productId: string) => {
+    const ingredient = data[index];
+    const currentProducts = ingredient.productsUsedIn || [];
+    const newProducts = currentProducts.includes(productId)
+      ? currentProducts.filter((id) => id !== productId)
+      : [...currentProducts, productId];
+    updateIngredient(index, "productsUsedIn", newProducts);
+  };
+
+  const toggleSelectAll = (index: number) => {
+    const ingredient = data[index];
+    const currentProducts = ingredient.productsUsedIn || [];
+    const allProductIds = products.map((p) => p.id);
+
+    // If all are selected, deselect all. Otherwise, select all.
+    const newProducts = currentProducts.length === products.length ? [] : allProductIds;
+    updateIngredient(index, "productsUsedIn", newProducts);
   };
 
   return (
     <div className="space-y-4">
       <div className="text-center">
         <h2 className="text-text-dark text-xl font-bold">Daftar Bahan Baku</h2>
-        <p className="mt-1 text-sm text-gray-600">Tambahkan bahan-bahan yang digunakan dalam produksi</p>
+        <p className="mt-1 text-sm text-gray-600">Tambahkan bahan dan pilih produk mana saja yang menggunakan bahan tersebut.</p>
       </div>
 
       <div className="space-y-3">
@@ -77,6 +97,50 @@ export function IngredientsForm({ data, onChange }: IngredientsFormProps) {
                 options={HALAL_STATUS_OPTIONS}
                 placeholder="Pilih status halal"
               />
+
+              <div className="pt-2">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="block text-xs font-medium text-gray-500">Digunakan pada Produk:</span>
+                  <button
+                    type="button"
+                    onClick={() => toggleSelectAll(index)}
+                    className="text-primary-blue text-xs font-medium hover:underline"
+                  >
+                    {ingredient.productsUsedIn?.length === products.length ? "Hapus Semua" : "Pilih Semua"}
+                  </button>
+                </div>
+
+                {products.length === 0 ? (
+                  <p className="text-xs text-gray-400 italic">Belum ada produk yang didaftarkan.</p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {products.map((product) => {
+                      const isSelected = ingredient.productsUsedIn?.includes(product.id);
+                      return (
+                        <button
+                          key={product.id}
+                          type="button"
+                          onClick={() => toggleProduct(index, product.id)}
+                          className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-xs transition-colors ${
+                            isSelected
+                              ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                              : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                          }`}
+                        >
+                          <div
+                            className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                              isSelected ? "border-emerald-500 bg-emerald-500" : "border-gray-300 bg-white"
+                            }`}
+                          >
+                            {isSelected && <Plus className="h-3 w-3 text-white" />}
+                          </div>
+                          <span className="truncate">{product.name || "(Tanpa Nama)"}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ))}

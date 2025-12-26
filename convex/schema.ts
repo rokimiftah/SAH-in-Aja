@@ -127,12 +127,14 @@ export default defineSchema({
       address: v.string(),
       owner: v.string(),
       productType: v.string(),
+      washingMethod: v.optional(v.string()), // Added washingMethod
     }),
     ingredients: v.array(
       v.object({
         name: v.string(),
         supplier: v.string(),
         halalStatus: v.string(),
+        productsUsedIn: v.optional(v.string()), // Added productsUsedIn for traceability
       }),
     ),
     generatedContent: v.string(), // AI-generated document content

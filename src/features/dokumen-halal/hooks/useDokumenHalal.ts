@@ -1,5 +1,5 @@
 import type { Id } from "../../../../convex/_generated/dataModel";
-import type { BusinessInfo, GenerationStage, Ingredient, TemplateType } from "../types";
+import type { BusinessInfo, GenerationStage, Ingredient, Product, TemplateType } from "../types";
 
 import { useState } from "react";
 
@@ -17,7 +17,12 @@ interface UseDokumenHalalReturn {
   result: GenerationResult | null;
   error: string | null;
   credits: { remaining: number; limit: number } | null;
-  generateDocument: (templateType: TemplateType, businessInfo: BusinessInfo, ingredients: Ingredient[]) => Promise<void>;
+  generateDocument: (
+    templateType: TemplateType,
+    businessInfo: BusinessInfo,
+    products: Product[],
+    ingredients: Ingredient[],
+  ) => Promise<void>;
   reset: () => void;
 }
 
@@ -32,7 +37,12 @@ export function useDokumenHalal(): UseDokumenHalalReturn {
   const generateHalalDocument = useAction(api.generateDocument.generateHalalDocument);
   const saveDocument = useMutation(api.halalDocuments.create);
 
-  const generateDocument = async (templateType: TemplateType, businessInfo: BusinessInfo, ingredients: Ingredient[]) => {
+  const generateDocument = async (
+    templateType: TemplateType,
+    businessInfo: BusinessInfo,
+    products: Product[],
+    ingredients: Ingredient[],
+  ) => {
     setStage("generating");
     setError(null);
     setResult(null);
@@ -44,6 +54,7 @@ export function useDokumenHalal(): UseDokumenHalalReturn {
       const generationResult = await generateHalalDocument({
         templateType,
         businessInfo,
+        products,
         ingredients,
       });
 
@@ -51,11 +62,24 @@ export function useDokumenHalal(): UseDokumenHalalReturn {
 
       if (user?._id) {
         try {
+          // Format ingredients to string for backend backward compatibility or update backend
+          // Currently backend expects productsUsedIn as string in saveDocument
+          const formattedIngredients = ingredients.map((i) => ({
+            ...i,
+            productsUsedIn: i.productsUsedIn
+              ?.map((pid) => {
+                const p = products.find((p) => p.id === pid);
+                return p ? p.name : "";
+              })
+              .filter(Boolean)
+              .join(", "),
+          }));
+
           documentId = await saveDocument({
             userId: user._id,
             templateType,
             businessInfo,
-            ingredients,
+            ingredients: formattedIngredients,
             generatedContent: generationResult.content,
             creditsUsed: 1,
           });

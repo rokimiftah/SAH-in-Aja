@@ -12,17 +12,25 @@ export interface BusinessInfo {
   address: string;
   owner: string;
   productType: string;
+  washingMethod?: "air_mengalir" | "rendam_bilas" | "usap_basah" | "lainnya";
+}
+
+export interface Product {
+  id: string;
+  name: string;
 }
 
 export interface Ingredient {
   name: string;
   supplier: string;
   halalStatus: string;
+  productsUsedIn?: string[]; // Array of product names/IDs
 }
 
 export interface DocumentData {
   templateType: TemplateType;
   businessInfo: BusinessInfo;
+  products: Product[];
   ingredients: Ingredient[];
 }
 
