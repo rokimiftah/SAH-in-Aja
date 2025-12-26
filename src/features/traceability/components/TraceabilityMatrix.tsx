@@ -37,21 +37,24 @@ export function TraceabilityMatrix({ products, ingredients, mappings, onToggleMa
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-gray-900">Matriks Produk-Bahan</h3>
-        <p className="text-sm text-gray-500">Klik sel untuk menambah/hapus mapping</p>
+        <p className="hidden text-sm text-gray-500 sm:block">Klik sel untuk menambah/hapus mapping</p>
       </div>
+
+      {/* Mobile hint */}
+      <p className="text-xs text-gray-500 sm:hidden">Geser untuk melihat semua data. Tap sel untuk toggle.</p>
 
       <div className="overflow-x-auto rounded-xl border border-gray-200">
         <table className="w-full min-w-max">
           <thead>
             <tr className="bg-gray-50">
-              <th className="sticky left-0 z-10 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-700">
-                Bahan \ Produk
-              </th>
+              <th className="bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-700">Bahan \ Produk</th>
               {products.map((product) => (
                 <th key={product._id} className="px-4 py-3 text-center text-sm font-medium text-gray-700">
-                  <div className="max-w-28">
-                    <p className="truncate">{product.name}</p>
-                    {product.productCode && <p className="truncate text-xs font-normal text-gray-500">{product.productCode}</p>}
+                  <div>
+                    <p className="whitespace-nowrap">{product.name}</p>
+                    {product.productCode && (
+                      <p className="text-xs font-normal whitespace-nowrap text-gray-500">{product.productCode}</p>
+                    )}
                   </div>
                 </th>
               ))}
@@ -60,14 +63,14 @@ export function TraceabilityMatrix({ products, ingredients, mappings, onToggleMa
           <tbody className="divide-y divide-gray-100">
             {ingredients.map((ingredient) => (
               <tr key={ingredient._id} className="hover:bg-gray-50">
-                <td className="sticky left-0 z-10 bg-white px-4 py-3">
+                <td className="bg-white px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <div className="max-w-48 min-w-0">
-                      <p className="truncate font-medium text-gray-900">{ingredient.name}</p>
-                      <p className="truncate text-xs text-gray-500">{ingredient.supplier}</p>
+                    <div className="min-w-0">
+                      <p className="font-medium whitespace-nowrap text-gray-900">{ingredient.name}</p>
+                      <p className="text-xs whitespace-nowrap text-gray-500">{ingredient.supplier}</p>
                     </div>
                     <span
-                      className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium ${HALAL_STATUS_COLORS[ingredient.halalStatus as HalalStatus]}`}
+                      className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium whitespace-nowrap ${HALAL_STATUS_COLORS[ingredient.halalStatus as HalalStatus]}`}
                     >
                       {HALAL_STATUS_LABELS[ingredient.halalStatus as HalalStatus]}
                     </span>

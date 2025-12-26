@@ -48,7 +48,7 @@ const PHOTO_GUIDES: {
   },
   {
     id: 3,
-    area: "Kulkas/Penyimpanan",
+    area: "Penyimpanan",
     short: "Kulkas",
     hint: "Buka kulkas, tampilkan isi penyimpanan bahan",
     icon: Snowflake,
@@ -110,14 +110,25 @@ export function PhotoCapture({ onPhotosComplete }: PhotoCaptureProps) {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [capturedPhotos.length, isComplete]);
 
-  // Cleanup object URLs on unmount
+  // Sync currentStep with sliderIndex on mobile when slider changes
+  useEffect(() => {
+    // Only update if the slide doesn't have a photo yet
+    const guide = PHOTO_GUIDES[sliderIndex];
+    if (guide && !capturedPhotos.find((p) => p.id === guide.id)) {
+      setCurrentStep(sliderIndex);
+    }
+  }, [sliderIndex, capturedPhotos]);
+  const capturedPhotosRef = useRef<CapturedPhoto[]>([]);
+  capturedPhotosRef.current = capturedPhotos;
+
+  // Cleanup object URLs on unmount only
   useEffect(() => {
     return () => {
-      for (const photo of capturedPhotos) {
+      for (const photo of capturedPhotosRef.current) {
         URL.revokeObjectURL(photo.preview);
       }
     };
-  }, [capturedPhotos]);
+  }, []);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -262,6 +273,7 @@ export function PhotoCapture({ onPhotosComplete }: PhotoCaptureProps) {
           <div className="overflow-hidden rounded-xl">
             {(() => {
               const guide = PHOTO_GUIDES[sliderIndex];
+              if (!guide) return null;
               const photo = getPhotoForStep(guide.id);
               const isActive = sliderIndex === currentStep && !isComplete;
               return (
@@ -382,7 +394,7 @@ export function PhotoCapture({ onPhotosComplete }: PhotoCaptureProps) {
               <label
                 htmlFor="photo-input"
                 className={cn(
-                  "group relative inline-flex cursor-pointer flex-col items-center gap-3 rounded-2xl border-2 border-dashed px-12 py-8 transition-all",
+                  "group relative inline-flex h-35 w-45 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed transition-all sm:h-40 sm:w-55 sm:gap-3 sm:rounded-2xl",
                   isCompressing
                     ? "border-gray-200 bg-gray-50"
                     : "border-primary-blue/30 bg-primary-blue/5 hover:border-primary-blue hover:bg-primary-blue/10",
@@ -390,17 +402,21 @@ export function PhotoCapture({ onPhotosComplete }: PhotoCaptureProps) {
               >
                 {isCompressing ? (
                   <>
-                    <div className="border-t-primary-blue h-12 w-12 animate-spin rounded-full border-4 border-gray-300" />
-                    <span className="text-sm font-medium text-gray-600">Mengompresi foto...</span>
+                    <div className="flex h-12 w-12 items-center justify-center sm:h-16 sm:w-16">
+                      <div className="border-t-primary-blue h-10 w-10 animate-spin rounded-full border-4 border-gray-300 sm:h-12 sm:w-12" />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-gray-600">Mengompresi...</p>
+                    </div>
                   </>
                 ) : (
                   <>
-                    <div className="bg-primary-blue rounded-full p-4 shadow-md transition-shadow group-hover:shadow-xl">
-                      <Camera className="h-8 w-8 text-white" />
+                    <div className="bg-primary-blue flex h-12 w-12 items-center justify-center rounded-full shadow-md transition-shadow group-hover:shadow-xl sm:h-16 sm:w-16">
+                      <Camera className="h-6 w-6 text-white sm:h-8 sm:w-8" />
                     </div>
-                    <div>
-                      <span className="text-primary-blue text-lg font-semibold">Pilih Foto</span>
-                      <p className="mt-1 text-xs text-gray-500">Ketuk untuk membuka galeri</p>
+                    <div className="text-center">
+                      <p className="text-primary-blue text-sm font-semibold sm:text-base">Pilih Foto</p>
+                      <p className="text-[10px] text-gray-500 sm:text-xs">Ketuk untuk membuka galeri</p>
                     </div>
                   </>
                 )}
@@ -453,6 +469,7 @@ export function PhotoCapture({ onPhotosComplete }: PhotoCaptureProps) {
                 }
                 setCapturedPhotos([]);
                 setCurrentStep(0);
+                setSliderIndex(0);
               }}
               className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 sm:rounded-xl sm:px-4 sm:py-3 sm:text-base"
             >

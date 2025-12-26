@@ -20,6 +20,7 @@ import {
   XCircle,
 } from "lucide-react";
 
+import { useToast } from "@shared/components/ui";
 import { cn } from "@shared/lib";
 
 import { AddIngredientModal } from "./AddIngredientModal";
@@ -279,7 +280,7 @@ export function ScanResult({ result, onNewScan, onGoToDokumen, onGoToAsisten }: 
     name: string;
     status: "aman" | "meragukan" | "tidak_halal";
   } | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const toast = useToast();
 
   const amanItems = result.analysis.filter((a) => a.status === "aman");
   const meragukanItems = result.analysis.filter((a) => a.status === "meragukan");
@@ -295,8 +296,7 @@ export function ScanResult({ result, onNewScan, onGoToDokumen, onGoToAsisten }: 
 
   const handleModalSuccess = () => {
     setModalIngredient(null);
-    setSuccessMessage(`"${modalIngredient?.name}" berhasil ditambahkan ke Daftar Bahan!`);
-    setTimeout(() => setSuccessMessage(null), 3000);
+    toast.success(`"${modalIngredient?.name}" berhasil ditambahkan ke Daftar Bahan!`);
   };
 
   const handleShare = async () => {
@@ -486,15 +486,6 @@ export function ScanResult({ result, onNewScan, onGoToDokumen, onGoToAsisten }: 
           </button>
         )}
       </div>
-
-      {successMessage && (
-        <div className="animate-in fade-in slide-in-from-bottom-4 fixed bottom-4 left-1/2 z-50 -translate-x-1/2">
-          <div className="flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-medium text-white shadow-lg">
-            <CheckCircle className="h-4 w-4" />
-            <span>{successMessage}</span>
-          </div>
-        </div>
-      )}
 
       {modalIngredient && (
         <AddIngredientModal
