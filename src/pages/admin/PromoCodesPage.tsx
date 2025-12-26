@@ -5,6 +5,8 @@ import { format } from "date-fns";
 import { ArrowLeft, Calendar, Check, Coins, Copy, Plus, Power, Search, Tag, User } from "lucide-react";
 import { Link } from "wouter";
 
+import { DatePicker } from "@shared/components/ui";
+
 import { api } from "../../../convex/_generated/api";
 
 export function PromoCodesPage() {
@@ -256,12 +258,10 @@ export function PromoCodesPage() {
                     <label htmlFor="promo-expiration" className="mb-1.5 block text-sm font-medium text-gray-700">
                       Expiration
                     </label>
-                    <input
-                      id="promo-expiration"
-                      type="date"
+                    <DatePicker
                       value={formData.expiresAt}
-                      onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
-                      className="w-full rounded-xl border border-gray-200 px-4 py-2.5 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none"
+                      onChange={(value) => setFormData({ ...formData, expiresAt: value })}
+                      placeholder="Pilih tanggal..."
                     />
                   </div>
                 </div>

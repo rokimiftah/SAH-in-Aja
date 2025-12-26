@@ -104,7 +104,7 @@ export function IngredientsForm({ data, products, onChange }: IngredientsFormPro
                   <button
                     type="button"
                     onClick={() => toggleSelectAll(index)}
-                    className="text-primary-blue text-xs font-medium hover:underline"
+                    className="text-primary-blue cursor-pointer text-xs font-medium hover:underline"
                   >
                     {ingredient.productsUsedIn?.length === products.length ? "Hapus Semua" : "Pilih Semua"}
                   </button>

@@ -180,7 +180,7 @@ Buat dokumen lengkap dalam bahasa Indonesia formal. Gunakan tahun ${new Date().t
           },
         ],
         temperature: 0.7,
-        max_tokens: 4096,
+        max_tokens: 16384,
       });
 
       const message = response.choices[0]?.message;

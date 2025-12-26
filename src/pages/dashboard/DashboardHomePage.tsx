@@ -61,8 +61,8 @@ export function DashboardHomePage() {
 
         {/* Stats */}
         <div className="mb-4 flex flex-col gap-3 sm:grid sm:grid-cols-3 lg:grid-cols-5">
-          <StatsCard label="Cek Dapur" value={scans?.length ?? 0} icon={Camera} variant="emerald" />
           <StatsCard label="Cek Bahan" value={materialScans?.length ?? 0} icon={Package} variant="cyan" />
+          <StatsCard label="Cek Dapur" value={scans?.length ?? 0} icon={Camera} variant="emerald" />
           <StatsCard label="Dokumen" value={documents?.length ?? 0} icon={FileText} variant="blue" />
           <StatsCard label="Konsultasi" value={consultations?.length ?? 0} icon={MessageCircle} variant="orange" />
           <StatsCard label="Voice Audit" value={voiceAuditHistory?.length ?? 0} icon={Mic} variant="rose" />
@@ -78,16 +78,6 @@ export function DashboardHomePage() {
           <h2 className="mb-4 text-lg font-semibold text-gray-800">Fitur Utama</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:flex-1 lg:grid-cols-3 xl:grid-cols-5">
             <FeatureCard
-              icon={<Camera className="h-6 w-6 text-white" />}
-              name={FEATURES.cekDapur.name}
-              tagline={FEATURES.cekDapur.tagline}
-              description="Foto area produksi, AI analisis kesiapan sertifikasi halal."
-              ctaText={FEATURES.cekDapur.cta.primary}
-              href="/dashboard/cek-dapur"
-              gradient="bg-gradient-to-br from-emerald-500 to-teal-600"
-              available={true}
-            />
-            <FeatureCard
               icon={<Package className="h-6 w-6 text-white" />}
               name={FEATURES.cekBahan.name}
               tagline={FEATURES.cekBahan.tagline}
@@ -95,6 +85,16 @@ export function DashboardHomePage() {
               ctaText={FEATURES.cekBahan.cta.primary}
               href="/dashboard/cek-bahan"
               gradient="bg-gradient-to-br from-cyan-500 to-teal-600"
+              available={true}
+            />
+            <FeatureCard
+              icon={<Camera className="h-6 w-6 text-white" />}
+              name={FEATURES.cekDapur.name}
+              tagline={FEATURES.cekDapur.tagline}
+              description="Foto area produksi, AI analisis kesiapan sertifikasi halal."
+              ctaText={FEATURES.cekDapur.cta.primary}
+              href="/dashboard/cek-dapur"
+              gradient="bg-gradient-to-br from-emerald-500 to-teal-600"
               available={true}
             />
             <FeatureCard

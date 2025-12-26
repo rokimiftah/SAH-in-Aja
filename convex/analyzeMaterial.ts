@@ -176,9 +176,7 @@ export const analyzeMaterial = action({
     } catch (parseError) {
       console.error("JSON Parse Error:", parseError);
       console.error("Failed to parse content:", jsonContent);
-      throw new ConvexError(
-        "Gagal memproses hasil analisis AI. Silakan coba lagi dengan foto yang lebih jelas."
-      );
+      throw new ConvexError("Gagal memproses hasil analisis AI. Silakan coba lagi dengan foto yang lebih jelas.");
     }
   },
 });

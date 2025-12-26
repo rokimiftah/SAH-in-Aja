@@ -144,6 +144,7 @@ export function PhotoCapture({ onPhotosComplete }: PhotoCaptureProps) {
 
       if (currentStep < PHOTO_GUIDES.length - 1) {
         setCurrentStep((prev) => prev + 1);
+        setSliderIndex((prev) => prev + 1);
       }
     } catch (error) {
       console.error("Compression error:", error);
@@ -164,6 +165,7 @@ export function PhotoCapture({ onPhotosComplete }: PhotoCaptureProps) {
     setCapturedPhotos((prev) => prev.filter((p) => p.id !== photoId));
     const stepIndex = PHOTO_GUIDES.findIndex((g) => g.id === photoId);
     setCurrentStep(stepIndex);
+    setSliderIndex(stepIndex);
   };
 
   const handleSubmit = () => {

@@ -61,31 +61,27 @@ export function useDokumenHalal(): UseDokumenHalalReturn {
       let documentId: Id<"halal_documents"> | undefined;
 
       if (user?._id) {
-        try {
-          // Format ingredients to string for backend backward compatibility or update backend
-          // Currently backend expects productsUsedIn as string in saveDocument
-          const formattedIngredients = ingredients.map((i) => ({
-            ...i,
-            productsUsedIn: i.productsUsedIn
-              ?.map((pid) => {
-                const p = products.find((p) => p.id === pid);
-                return p ? p.name : "";
-              })
-              .filter(Boolean)
-              .join(", "),
-          }));
+        // Format ingredients to string for backend backward compatibility or update backend
+        // Currently backend expects productsUsedIn as string in saveDocument
+        const formattedIngredients = ingredients.map((i) => ({
+          ...i,
+          productsUsedIn: i.productsUsedIn
+            ?.map((pid) => {
+              const p = products.find((p) => p.id === pid);
+              return p ? p.name : "";
+            })
+            .filter(Boolean)
+            .join(", "),
+        }));
 
-          documentId = await saveDocument({
-            userId: user._id,
-            templateType,
-            businessInfo,
-            ingredients: formattedIngredients,
-            generatedContent: generationResult.content,
-            creditsUsed: 1,
-          });
-        } catch (saveError) {
-          console.error("Failed to save document:", saveError);
-        }
+        documentId = await saveDocument({
+          userId: user._id,
+          templateType,
+          businessInfo,
+          ingredients: formattedIngredients,
+          generatedContent: generationResult.content,
+          creditsUsed: 1,
+        });
       }
 
       setResult({

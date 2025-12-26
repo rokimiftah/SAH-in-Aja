@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import { AlertCircle, AlertTriangle, Calendar, Edit2, Plus, Trash2, X } from "lucide-react";
 
-import { Select } from "@shared/components/ui";
+import { ConfirmDialog, DatePicker, Select } from "@shared/components/ui";
 
 import { HALAL_STATUS_COLORS, HALAL_STATUS_LABELS, HALAL_STATUS_OPTIONS } from "../types";
 
@@ -42,6 +42,11 @@ export function IngredientManager({ ingredients, onCreate, onUpdate, onDelete }:
   const [editingId, setEditingId] = useState<Id<"ingredients"> | null>(null);
   const [formData, setFormData] = useState(INITIAL_FORM);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; ingredientId: Id<"ingredients"> | null }>({
+    isOpen: false,
+    ingredientId: null,
+  });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const resetForm = () => {
     setFormData(INITIAL_FORM);
@@ -85,8 +90,18 @@ export function IngredientManager({ ingredients, onCreate, onUpdate, onDelete }:
   };
 
   const handleDelete = async (ingredientId: Id<"ingredients">) => {
-    if (!confirm("Hapus bahan ini? Semua mapping produk akan ikut terhapus.")) return;
-    await onDelete({ ingredientId });
+    setDeleteConfirm({ isOpen: true, ingredientId });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirm.ingredientId) return;
+    setIsDeleting(true);
+    try {
+      await onDelete({ ingredientId: deleteConfirm.ingredientId });
+      setDeleteConfirm({ isOpen: false, ingredientId: null });
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const startEdit = (ingredient: Ingredient) => {
@@ -191,11 +206,10 @@ export function IngredientManager({ ingredients, onCreate, onUpdate, onDelete }:
                 placeholder="Nomor Sertifikat Halal"
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 focus:outline-none"
               />
-              <input
-                type="date"
+              <DatePicker
                 value={formData.certExpiryDate}
-                onChange={(e) => setFormData((p) => ({ ...p, certExpiryDate: e.target.value }))}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 focus:outline-none"
+                onChange={(value) => setFormData((p) => ({ ...p, certExpiryDate: value }))}
+                placeholder="Tanggal Kadaluarsa"
               />
             </div>
 
@@ -260,22 +274,22 @@ export function IngredientManager({ ingredients, onCreate, onUpdate, onDelete }:
         <div className="space-y-2">
           {ingredients.map((ingredient) => (
             <div key={ingredient._id} className="rounded-lg border border-gray-200 bg-white p-3">
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <p className="font-medium text-gray-900">{ingredient.name}</p>
                     <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${HALAL_STATUS_COLORS[ingredient.halalStatus as HalalStatus]}`}
+                      className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${HALAL_STATUS_COLORS[ingredient.halalStatus as HalalStatus]}`}
                     >
                       {HALAL_STATUS_LABELS[ingredient.halalStatus as HalalStatus]}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600">Supplier: {ingredient.supplier}</p>
+                  <p className="mt-1 text-sm text-gray-600">Supplier: {ingredient.supplier}</p>
                   {ingredient.halalCertNumber && (
                     <p className="text-xs text-gray-500">No. Sertifikat: {ingredient.halalCertNumber}</p>
                   )}
                   {ingredient.certExpiryDate && (
-                    <div className="flex items-center gap-1">
+                    <div className="mt-1 flex flex-wrap items-center gap-1">
                       <p
                         className={`flex items-center gap-1 text-xs ${
                           isExpired(ingredient.certExpiryDate)
@@ -285,21 +299,23 @@ export function IngredientManager({ ingredients, onCreate, onUpdate, onDelete }:
                               : "text-gray-500"
                         }`}
                       >
-                        <Calendar className="h-3 w-3" />
+                        <Calendar className="h-3 w-3 shrink-0" />
                         {isExpired(ingredient.certExpiryDate) ? (
                           <>
-                            KADALUARSA: {new Date(ingredient.certExpiryDate).toLocaleDateString("id-ID")}
-                            <span className="ml-1 flex items-center gap-0.5">
-                              <AlertTriangle className="h-3 w-3" />
-                            </span>
+                            <span className="hidden sm:inline">KADALUARSA:</span>
+                            <span className="sm:hidden">Exp:</span>
+                            {new Date(ingredient.certExpiryDate).toLocaleDateString("id-ID")}
+                            <AlertTriangle className="ml-1 h-3 w-3 shrink-0" />
                           </>
                         ) : (
                           <>
-                            Berlaku s.d. {new Date(ingredient.certExpiryDate).toLocaleDateString("id-ID")}
+                            <span className="hidden sm:inline">Berlaku s.d.</span>
+                            <span className="sm:hidden">s.d.</span>
+                            {new Date(ingredient.certExpiryDate).toLocaleDateString("id-ID")}
                             {isExpiringSoon(ingredient.certExpiryDate) && (
                               <span className="ml-1 flex items-center gap-0.5 text-amber-600">
-                                <AlertTriangle className="h-3 w-3" />
-                                Segera berakhir
+                                <AlertTriangle className="h-3 w-3 shrink-0" />
+                                <span className="hidden sm:inline">Segera berakhir</span>
                               </span>
                             )}
                           </>
@@ -308,7 +324,7 @@ export function IngredientManager({ ingredients, onCreate, onUpdate, onDelete }:
                     </div>
                   )}
                 </div>
-                <div className="ml-3 flex shrink-0 gap-1">
+                <div className="flex shrink-0 gap-1">
                   <button
                     type="button"
                     onClick={() => startEdit(ingredient)}
@@ -329,6 +345,18 @@ export function IngredientManager({ ingredients, onCreate, onUpdate, onDelete }:
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, ingredientId: null })}
+        onConfirm={confirmDelete}
+        title="Hapus Bahan?"
+        message="Bahan ini akan dihapus beserta semua mapping produk yang terkait. Tindakan ini tidak dapat dibatalkan."
+        confirmText="Hapus"
+        cancelText="Batal"
+        variant="danger"
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

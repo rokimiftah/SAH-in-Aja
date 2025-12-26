@@ -85,12 +85,16 @@ export const create = mutation({
       address: v.string(),
       owner: v.string(),
       productType: v.string(),
+      washingMethod: v.optional(
+        v.union(v.literal("air_mengalir"), v.literal("rendam_bilas"), v.literal("usap_basah"), v.literal("lainnya")),
+      ),
     }),
     ingredients: v.array(
       v.object({
         name: v.string(),
         supplier: v.string(),
         halalStatus: v.string(),
+        productsUsedIn: v.optional(v.string()),
       }),
     ),
     generatedContent: v.string(),

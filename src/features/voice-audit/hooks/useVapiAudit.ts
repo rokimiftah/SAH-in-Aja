@@ -370,7 +370,7 @@ export function useVapiAudit() {
                 content: buildSystemPrompt(config),
               },
             ],
-            maxTokens: 4096,
+            maxTokens: 10000,
           },
           voice: {
             provider: "minimax",

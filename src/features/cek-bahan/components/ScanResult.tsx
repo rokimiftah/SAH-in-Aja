@@ -14,12 +14,15 @@ import {
   Info,
   MessageCircle,
   Package,
+  Plus,
   Share2,
   Shield,
   XCircle,
 } from "lucide-react";
 
 import { cn } from "@shared/lib";
+
+import { AddIngredientModal } from "./AddIngredientModal";
 
 interface ScanResultProps {
   result: MaterialScanResult;
@@ -205,7 +208,13 @@ function StatsSummary({ analysis }: { analysis: MaterialScanResult["analysis"] }
   );
 }
 
-function IngredientCard({ item }: { item: MaterialScanResult["analysis"][0] }) {
+function IngredientCard({
+  item,
+  onAddToList,
+}: {
+  item: MaterialScanResult["analysis"][0];
+  onAddToList: (ingredientName: string, status: "aman" | "meragukan" | "tidak_halal") => void;
+}) {
   const config = {
     aman: {
       icon: CheckCircle,
@@ -237,9 +246,19 @@ function IngredientCard({ item }: { item: MaterialScanResult["analysis"][0] }) {
 
   return (
     <div className={cn("overflow-hidden rounded-2xl border shadow-sm transition-all hover:shadow-md", config.border, config.bg)}>
-      <div className={cn("flex items-center gap-2 px-4 py-2.5", config.badgeBg)}>
-        <Icon className={cn("h-4 w-4", config.iconColor)} />
-        <span className={cn("text-xs font-bold tracking-wide uppercase", config.iconColor)}>{config.label}</span>
+      <div className={cn("flex items-center justify-between gap-2 px-4 py-2.5", config.badgeBg)}>
+        <div className="flex items-center gap-2">
+          <Icon className={cn("h-4 w-4", config.iconColor)} />
+          <span className={cn("text-xs font-bold tracking-wide uppercase", config.iconColor)}>{config.label}</span>
+        </div>
+        <button
+          type="button"
+          onClick={() => onAddToList(item.ingredient, item.status)}
+          className="flex items-center gap-1 rounded-full bg-white/80 px-2.5 py-1 text-xs font-medium text-gray-700 transition-all hover:bg-white hover:shadow-sm"
+        >
+          <Plus className="h-3 w-3" />
+          <span className="hidden sm:inline">Tambah</span>
+        </button>
       </div>
       <div className="p-4">
         <p className="text-text-dark mb-2 font-semibold">{item.ingredient}</p>
@@ -256,9 +275,29 @@ function IngredientCard({ item }: { item: MaterialScanResult["analysis"][0] }) {
 }
 
 export function ScanResult({ result, onNewScan, onGoToDokumen, onGoToAsisten }: ScanResultProps) {
+  const [modalIngredient, setModalIngredient] = useState<{
+    name: string;
+    status: "aman" | "meragukan" | "tidak_halal";
+  } | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
   const amanItems = result.analysis.filter((a) => a.status === "aman");
   const meragukanItems = result.analysis.filter((a) => a.status === "meragukan");
   const tidakHalalItems = result.analysis.filter((a) => a.status === "tidak_halal");
+
+  const handleAddToList = (ingredientName: string, status: "aman" | "meragukan" | "tidak_halal") => {
+    setModalIngredient({ name: ingredientName, status });
+  };
+
+  const handleModalClose = () => {
+    setModalIngredient(null);
+  };
+
+  const handleModalSuccess = () => {
+    setModalIngredient(null);
+    setSuccessMessage(`"${modalIngredient?.name}" berhasil ditambahkan ke Daftar Bahan!`);
+    setTimeout(() => setSuccessMessage(null), 3000);
+  };
 
   const handleShare = async () => {
     const statusText = {
@@ -287,17 +326,26 @@ export function ScanResult({ result, onNewScan, onGoToDokumen, onGoToAsisten }: 
 
       <StatusBadge status={result.overallStatus} />
 
-      <StatsSummary analysis={result.analysis} />
+      {!result.halalCertificate?.detected && <StatsSummary analysis={result.analysis} />}
 
       {result.halalCertificate?.detected && (
         <div className="mb-6 rounded-xl border border-green-200 bg-green-50 p-4">
           <div className="flex items-start gap-3">
             <Shield className="mt-0.5 h-5 w-5 shrink-0 text-green-600" />
-            <div>
+            <div className="flex-1">
               <h4 className="font-semibold text-green-800">Logo Halal Terdeteksi</h4>
-              <p className="text-sm text-green-700">
-                Produk ini memiliki logo halal resmi di kemasan.
+              <p className="mb-3 text-sm text-green-700">
+                Produk ini memiliki logo halal resmi. Anda cukup menambahkan produk ini sebagai 1 bahan baku tanpa perlu breakdown
+                komposisi.
               </p>
+              <button
+                type="button"
+                onClick={() => handleAddToList("", "aman")}
+                className="flex cursor-pointer items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700"
+              >
+                <Plus className="h-4 w-4" />
+                Tambah Produk ke Daftar Bahan
+              </button>
             </div>
           </div>
         </div>
@@ -321,7 +369,7 @@ export function ScanResult({ result, onNewScan, onGoToDokumen, onGoToAsisten }: 
         <p className="text-text-dark text-center text-base leading-relaxed font-medium">{result.summary}</p>
       </div>
 
-      {result.extractedIngredients.length > 0 && (
+      {!result.halalCertificate?.detected && result.extractedIngredients.length > 0 && (
         <div className="mb-6 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
           <div className="mb-3 flex items-center gap-2">
             <Award className="text-primary-blue h-5 w-5" />
@@ -337,7 +385,7 @@ export function ScanResult({ result, onNewScan, onGoToDokumen, onGoToAsisten }: 
         </div>
       )}
 
-      {tidakHalalItems.length > 0 && (
+      {!result.halalCertificate?.detected && tidakHalalItems.length > 0 && (
         <div className="mb-6">
           <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-red-600">
             <XCircle className="h-5 w-5" />
@@ -346,13 +394,13 @@ export function ScanResult({ result, onNewScan, onGoToDokumen, onGoToAsisten }: 
           </h3>
           <div className="space-y-3">
             {tidakHalalItems.map((item, idx) => (
-              <IngredientCard key={idx} item={item} />
+              <IngredientCard key={idx} item={item} onAddToList={handleAddToList} />
             ))}
           </div>
         </div>
       )}
 
-      {meragukanItems.length > 0 && (
+      {!result.halalCertificate?.detected && meragukanItems.length > 0 && (
         <div className="mb-6">
           <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-yellow-600">
             <AlertTriangle className="h-5 w-5" />
@@ -361,13 +409,13 @@ export function ScanResult({ result, onNewScan, onGoToDokumen, onGoToAsisten }: 
           </h3>
           <div className="space-y-3">
             {meragukanItems.map((item, idx) => (
-              <IngredientCard key={idx} item={item} />
+              <IngredientCard key={idx} item={item} onAddToList={handleAddToList} />
             ))}
           </div>
         </div>
       )}
 
-      {amanItems.length > 0 && (
+      {!result.halalCertificate?.detected && amanItems.length > 0 && (
         <div className="mb-6">
           <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-green-600">
             <CheckCircle className="h-5 w-5" />
@@ -376,7 +424,7 @@ export function ScanResult({ result, onNewScan, onGoToDokumen, onGoToAsisten }: 
           </h3>
           <div className="space-y-3">
             {amanItems.map((item, idx) => (
-              <IngredientCard key={idx} item={item} />
+              <IngredientCard key={idx} item={item} onAddToList={handleAddToList} />
             ))}
           </div>
         </div>
@@ -438,6 +486,24 @@ export function ScanResult({ result, onNewScan, onGoToDokumen, onGoToAsisten }: 
           </button>
         )}
       </div>
+
+      {successMessage && (
+        <div className="animate-in fade-in slide-in-from-bottom-4 fixed bottom-4 left-1/2 z-50 -translate-x-1/2">
+          <div className="flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-medium text-white shadow-lg">
+            <CheckCircle className="h-4 w-4" />
+            <span>{successMessage}</span>
+          </div>
+        </div>
+      )}
+
+      {modalIngredient && (
+        <AddIngredientModal
+          ingredientName={modalIngredient.name}
+          suggestedStatus={modalIngredient.status}
+          onClose={handleModalClose}
+          onSuccess={handleModalSuccess}
+        />
+      )}
     </div>
   );
 }
