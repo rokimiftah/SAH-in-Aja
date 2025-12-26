@@ -592,7 +592,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div ref={userMenuRef} className="relative p-4">
           <div
             className={cn(
-              "absolute right-4 bottom-full left-4 mb-2 origin-bottom overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-gray-200 transition-all duration-200",
+              "absolute right-4 bottom-full left-4 mb-0.5 origin-bottom overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-gray-200 transition-all duration-200",
               userMenuOpen ? "translate-y-0 scale-100 opacity-100" : "pointer-events-none translate-y-2 scale-95 opacity-0",
             )}
           >

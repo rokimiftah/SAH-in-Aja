@@ -8,7 +8,7 @@ export default defineConfig({
   html: {
     meta: {
       description:
-        "SAH-in Aja! Platform persiapan sertifikasi halal berbasis AI untuk UMKM Indonesia. Foto area produksi, dapat laporan kesiapan halal, lengkap dengan dokumen wajib dan panduan step-by-step ke BPJPH/MUI.",
+        "SAH-in Aja! Platform persiapan sertifikasi halal berbasis AI untuk UMKM Indonesia. Cek jalur sertifikasi, pelatihan kesadaran halal, analisis kesiapan dapur & bahan, buat dokumen wajib, konsultasi asisten halal, dan simulasi audit.",
       viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
     },
     favicon: "public/favicon.avif",

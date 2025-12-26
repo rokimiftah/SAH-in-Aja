@@ -20,8 +20,8 @@ export const HeroSection = () => {
             Persiapan Sertifikasi Halal Lebih Mudah
           </h1>
           <p className="mx-auto mb-6 max-w-2xl text-base text-gray-500 sm:mb-8 sm:text-lg">
-            Platform AI lengkap untuk persiapan sertifikasi halal UMKM. Cek kesiapan, analisis bahan, buat dokumen, konsultasi,
-            dan latihan audit.
+            Platform AI untuk persiapan sertifikasi halal UMKM. Cek jalur, pelatihan halal, analisis bahan & dapur, buat dokumen,
+            konsultasi AI, simulasi audit.
           </p>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link

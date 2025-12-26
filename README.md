@@ -94,7 +94,7 @@ Waktu proses sertifikasi yang **lama**
 <table>
 <tr>
 
-<td width="25%" valign="top">
+<td width="33%" valign="top">
 
 ### 1. Cek Jalur Sertifikasi
 
@@ -110,7 +110,7 @@ Tentukan jalur sertifikasi yang tepat
 
 </td>
 
-<td width="25%" valign="top">
+<td width="33%" valign="top">
 
 ### 2. Data Produk & Bahan
 
@@ -127,7 +127,7 @@ Kelola produk, bahan, dan matriks
 
 </td>
 
-<td width="25%" valign="top">
+<td width="33%" valign="top">
 
 ### 3. Cek Bahan Halal
 
@@ -146,7 +146,11 @@ Foto label produk, AI baca komposisi + validasi halal
 
 </td>
 
-<td width="25%" valign="top">
+</tr>
+
+<tr>
+
+<td width="33%" valign="top">
 
 ### 4. Cek Dapur Halal
 
@@ -164,10 +168,8 @@ Foto area produksi, AI analisis, Skor kesiapan + Action plan
 **Model:** Claude Sonnet 4.5 (Vision)
 
 </td>
-</tr>
 
-<tr>
-<td width="25%" valign="top">
+<td width="33%" valign="top">
 
 ### 5. Dokumen Halal
 
@@ -188,7 +190,7 @@ Pilih template, Isi data, Generate dokumen
 
 </td>
 
-<td width="25%" valign="top">
+<td width="33%" valign="top">
 
 ### 6. Asisten Halal
 
@@ -207,7 +209,11 @@ Tanya, Jawab instan, Panduan lengkap
 
 </td>
 
-<td width="25%" valign="top">
+</tr>
+
+<tr>
+
+<td width="33%" valign="top">
 
 ### 7. Pelatihan Kesadaran Halal
 
@@ -224,7 +230,7 @@ Uji pengetahuan halal dengan sertifikat
 
 </td>
 
-<td width="25%" valign="top">
+<td width="33%" valign="top">
 
 ### 8. Simulasi Audit Halal
 
@@ -240,10 +246,8 @@ Latihan wawancara audit dengan AI auditor
 **Model:** Vapi.ai (Voice AI)
 
 </td>
-</tr>
 
-<tr>
-<td width="25%" valign="top">
+<td width="33%" valign="top">
 
 ### 9. Admin Dashboard
 
@@ -257,59 +261,42 @@ Kelola user, promo, dan analytics
 
 </td>
 
-<td colspan="3" width="75%" valign="top">
-
-### 10. Sistem Riwayat & Profile
-
-**Comprehensive Tracking**
-
-Semua aktivitas tersimpan dan dapat diakses kembali
-
-- Riwayat Cek Dapur Halal (foto & hasil analisis)
-- Riwayat Cek Bahan Halal (scan & validasi)
-- Riwayat Dokumen Halal (download ulang)
-- Riwayat Asisten Halal (lanjutkan percakapan)
-- Riwayat Simulasi Audit (transkrip & feedback)
-- Riwayat Pelatihan (sertifikat & score)
-- Edit Profile (data bisnis, preferensi)
-
-</td>
 </tr>
 </table>
 
 ---
 
-## 🎯 Alur Persiapan Sertifikasi Halal yang Benar
+## Alur Persiapan Sertifikasi Halal yang Benar
 
 Untuk mempersiapkan sertifikasi halal dengan optimal, **ikuti urutan fitur ini secara berurutan**:
 
 ```
-📚 FASE 1: EDUKASI & PEMAHAMAN
+FASE 1: EDUKASI & PEMAHAMAN
 1. Pelatihan Kesadaran Halal → Dapatkan sertifikat pelatihan internal
 2. Asisten Halal → Konsultasi awal tentang proses dan persyaratan
 
-🔍 FASE 2: ASSESSMENT & IDENTIFIKASI
+FASE 2: ASSESSMENT & IDENTIFIKASI
 3. Cek Jalur Sertifikasi → Tentukan jalur Self-Declare atau Reguler
 4. Cek Bahan Halal → Validasi status halal semua bahan baku
 5. Cek Dapur Halal → Assessment kesiapan area produksi
 
-🛠️ FASE 3: PERBAIKAN
+FASE 3: PERBAIKAN
 6. Lakukan Perbaikan → Ganti bahan & perbaiki dapur berdasarkan hasil assessment
 
-📊 FASE 4: DATA MASTER
+FASE 4: DATA MASTER
 7. Data Produk & Bahan → Input master data untuk matriks traceability
 
-📄 FASE 5: DOKUMENTASI
+FASE 5: DOKUMENTASI
 8. Dokumen Halal → Generate 7 dokumen SJPH wajib
 
-🎤 FASE 6: LATIHAN AUDIT
+FASE 6: LATIHAN AUDIT
 9. Simulasi Audit Halal → Latihan wawancara dengan AI auditor
 
-📝 FASE 7: PENGAJUAN
+FASE 7: PENGAJUAN
 10. Daftar ke BPJPH → Upload dokumen ke halal.go.id
 ```
 
-**⚠️ PENTING:** Jangan skip atau acak urutan! Kesalahan urutan bisa menyebabkan penolakan saat audit.
+**PENTING:** Jangan skip atau acak urutan! Kesalahan urutan bisa menyebabkan penolakan saat audit.
 
 ---
 
@@ -326,7 +313,7 @@ Untuk mempersiapkan sertifikasi halal dengan optimal, **ikuti urutan fitur ini s
 
 ---
 
-### 📚 FASE 1: EDUKASI & PEMAHAMAN DASAR
+### FASE 1: EDUKASI & PEMAHAMAN DASAR
 
 #### 2. Pelatihan Kesadaran Halal (WAJIB PERTAMA!)
 
@@ -394,7 +381,7 @@ Untuk mempersiapkan sertifikasi halal dengan optimal, **ikuti urutan fitur ini s
 
 #### 4. Cek Jalur Sertifikasi (CRITICAL!)
 
-**Mengapa penting?** ⚠️ **Kesalahan jalur = Penolakan 100%!** Produk berisiko (daging, high-tech) yang masuk jalur Self-Declare akan otomatis ditolak di sidang fatwa.
+**Mengapa penting?** **Kesalahan jalur = Penolakan 100%!** Produk berisiko (daging, high-tech) yang masuk jalur Self-Declare akan otomatis ditolak di sidang fatwa.
 
 **Tujuan:** Menentukan jalur yang tepat untuk usaha Anda.
 
@@ -415,8 +402,8 @@ Untuk mempersiapkan sertifikasi halal dengan optimal, **ikuti urutan fitur ini s
 
 **Contoh:**
 
-- ✅ **Self-Declare**: Kue kering, sambal botol (tanpa daging), keripik singkong
-- ❌ **Reguler**: Bakso daging, rendang, nugget ayam, olahan susu
+- **Self-Declare**: Kue kering, sambal botol (tanpa daging), keripik singkong
+- **Reguler**: Bakso daging, rendang, nugget ayam, olahan susu
 
 ---
 
@@ -503,7 +490,7 @@ Fitur ini menganalisis foto area produksi/dapur Anda untuk menilai kesiapan sert
 
 ---
 
-### 🛠️ FASE 3: PERBAIKAN BERDASARKAN ASSESSMENT
+### FASE 3: PERBAIKAN BERDASARKAN ASSESSMENT
 
 #### 7. Lakukan Perbaikan Fisik
 
@@ -529,7 +516,7 @@ Fitur ini menganalisis foto area produksi/dapur Anda untuk menilai kesiapan sert
 
 ---
 
-### 📊 FASE 4: DATA MASTER & TRACEABILITY
+### FASE 4: DATA MASTER & TRACEABILITY
 
 #### 8. Data Produk & Bahan
 
@@ -551,7 +538,7 @@ Fitur ini menganalisis foto area produksi/dapur Anda untuk menilai kesiapan sert
 5. Di tab Matriks, hubungkan produk dengan bahan yang digunakan
 6. Data ini akan otomatis digunakan untuk generate dokumen SJPH
 
-**⚠️ PENTING:**
+**PENTING:**
 
 - Input **nomor sertifikat halal** untuk semua bahan (jika ada)
 - Input **tanggal kadaluarsa** sertifikat halal (wajib!)
@@ -562,7 +549,7 @@ Fitur ini menganalisis foto area produksi/dapur Anda untuk menilai kesiapan sert
 
 ---
 
-### 📄 FASE 5: PEMBUATAN DOKUMEN SJPH
+### FASE 5: PEMBUATAN DOKUMEN SJPH
 
 #### 9. Dokumen Halal (Auto Generator)
 
@@ -647,7 +634,7 @@ Fitur ini menganalisis foto area produksi/dapur Anda untuk menilai kesiapan sert
 
 ---
 
-### 🎤 FASE 6: LATIHAN PERSIAPAN AUDIT
+### FASE 6: LATIHAN PERSIAPAN AUDIT
 
 #### 10. Simulasi Audit Halal (Voice AI Simulator)
 
@@ -688,7 +675,7 @@ Fitur ini menganalisis foto area produksi/dapur Anda untuk menilai kesiapan sert
 
 ---
 
-### 📝 FASE 7: PENGAJUAN RESMI KE BPJPH
+### FASE 7: PENGAJUAN RESMI KE BPJPH
 
 #### 11. Daftar ke BPJPH via halal.go.id
 
@@ -703,14 +690,14 @@ Fitur ini menganalisis foto area produksi/dapur Anda untuk menilai kesiapan sert
    - **Self-Declare** via SEHATI (gratis untuk 1 juta UMKM pertama)
    - **Reguler** (berbayar Rp 2-10 juta)
 5. Upload semua dokumen yang sudah di-generate dari SAH-in Aja!:
-   - ✅ SOP Produksi Halal
-   - ✅ Perjanjian Supplier Halal
-   - ✅ Daftar Bahan Baku
-   - ✅ Form Traceability
-   - ✅ Surat Komitmen Halal
-   - ✅ SOP Pencucian Najis
-   - ✅ Pernyataan Bebas Babi
-   - ✅ Sertifikat Pelatihan Internal (dari Pelatihan Kesadaran Halal)
+   - SOP Produksi Halal
+   - Perjanjian Supplier Halal
+   - Daftar Bahan Baku
+   - Form Traceability
+   - Surat Komitmen Halal
+   - SOP Pencucian Najis
+   - Pernyataan Bebas Babi
+   - Sertifikat Pelatihan Internal (dari Pelatihan Kesadaran Halal)
 6. Bayar biaya (jika jalur Reguler)
 7. Tunggu jadwal:
    - **Self-Declare:** Verifikasi oleh Pendamping PPH
