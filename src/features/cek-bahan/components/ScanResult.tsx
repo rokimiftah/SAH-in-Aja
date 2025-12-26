@@ -295,12 +295,9 @@ export function ScanResult({ result, onNewScan, onGoToDokumen, onGoToAsisten }: 
             <Shield className="mt-0.5 h-5 w-5 shrink-0 text-green-600" />
             <div>
               <h4 className="font-semibold text-green-800">Logo Halal Terdeteksi</h4>
-              {result.halalCertificate.issuer && (
-                <p className="text-sm text-green-700">Penerbit: {result.halalCertificate.issuer}</p>
-              )}
-              {result.halalCertificate.number && (
-                <p className="text-sm text-green-700">Nomor Sertifikat: {result.halalCertificate.number}</p>
-              )}
+              <p className="text-sm text-green-700">
+                Produk ini memiliki logo halal resmi di kemasan.
+              </p>
             </div>
           </div>
         </div>

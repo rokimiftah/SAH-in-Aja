@@ -1,0 +1,149 @@
+Berikut adalah analisis mendalam mengenai proyek SAH-in Aja! (Siap Audit Halal).
+
+1. Overview Proyek
+
+SAH-in Aja! adalah platform web berbasis AI yang dirancang untuk membantu UMKM Indonesia mempersiapkan sertifikasi halal. Platform ini mendigitalisasi proses konsultasi, audit mandiri, pengecekan bahan, dan pembuatan dokumen yang biasanya rumit menjadi workflow otomatis yang mudah.
+
+2. Arsitektur Teknis & Tech Stack
+
+Proyek ini menggunakan arsitektur Modern Fullstack Serverless yang sangat efisien:
+
+Frontend:
+   - React 19: Versi terbaru React.
+   - Rsbuild: Build tool berbasis Rust (Rspack), sangat cepat untuk dev & build.
+   - Tailwind CSS v4: Styling framework terbaru.
+   - Wouter: Routing library yang minimalis.
+   - Framer Motion: Untuk animasi antarmuka yang halus.
+Backend & Database:
+   - Convex: Backend-as-a-Service (BaaS) yang menangani database real-time, fungsi server (API), penjadwalan (cron), dan penyimpanan file (storage).
+   - Schema Validation: Menggunakan zod dan validator bawaan Convex.
+Integrasi AI & External Services:
+   - OpenAI: Untuk analisis teks dan visi (kemungkinan besar digunakan di fitur Chat & Analisis Foto).
+   - Vapi: Platform Voice AI untuk fitur simulasi audit suara.
+   - Resend: Layanan pengiriman email (Magic Link login).
+
+3. Bedah Database (Convex Schema)
+
+Data model didesain terpusat di convex/schema.ts. Berikut entitas utamanya:
+
+   - `users`: Profil pengguna, termasuk role (user/admin), tier (free, eceran, juragan), dan saldo kredit utama.
+   - `user_daily_credits`: Mekanisme pembatasan penggunaan fitur harian (kuota reset tiap hari UTC+7). Membatasi eksploitasi API AI yang mahal.
+   - Log Aktivitas & Riwayat:
+      - material_scans: Menyimpan hasil OCR dan analisis kehalalan bahan makanan.
+      - halal_scans: Menyimpan foto area produksi dan hasil audit visual AI.
+      - halal_documents: Menyimpan data isian user dan link PDF dokumen yang digenerate.
+      - halal_consultations: Riwayat chat dengan bot Asisten Halal.
+      - voice_audit_sessions: Transkrip dan skor dari simulasi audit suara.
+   - `promo_codes`: Sistem manajemen kode promo untuk menambah kredit user di luar kuota harian.
+
+4. Detail Workflow & Fungsionalitas
+
+   A. Sistem Autentikasi & Role
+      - Auth: Menggunakan "Magic Link" via email. Tidak ada password.
+      - Role: User biasa masuk ke Dashboard, Admin memiliki akses khusus ke /admin untuk manajemen user dan kode promo.
+
+   B. Fitur Utama (The Core Features)
+
+      1. Cek Bahan (Smart Material Scanner)
+         - Workflow: User upload foto kemasan (depan/belakang) -> OCR ekstrak teks -> AI mencocokkan dengan database bahan -> Klasifikasi status (Aman, Meragukan, Tidak Halal).
+         - Output: Daftar bahan dengan status warna-warni dan kesimpulan akhir.
+
+      2. Siap Halal (Visual Audit)
+         - Workflow: User memfoto area produksi (dapur/gudang) -> AI Vision menganalisis potensi kontaminasi atau ketidaksesuaian standar SJPH (Sistem Jaminan Produk Halal).
+         - Output: Skor kepatuhan, daftar temuan (critical/warning/pass), dan saran perbaikan.
+
+      3. Dokumen Halal (Auto Generator)
+         - Workflow: User memilih template (misal: SOP Produksi) -> Mengisi form wizard -> Sistem me-render dokumen.
+         - Output: File PDF/Docx siap cetak yang sesuai format standar BPJPH.
+
+      4. Asisten Halal (AI Consultant)
+         - Workflow: Chat interface mirip ChatGPT tetapi konteksnya dibatasi pada regulasi halal, BPJPH, dan MUI.
+         - Data: Didukung oleh halal_knowledge_base untuk jawaban yang akurat (RAG - Retrieval Augmented Generation).
+
+      5. Voice Audit (Simulasi Audit Suara)
+         - Workflow: Integrasi dengan Vapi. User berbicara dengan AI Auditor (bisa pilih mode "Galak" atau "Ramah") untuk simulasi tanya jawab saat audit lapangan nanti.
+         - Output: Transkrip percakapan, skor performa menjawab, dan feedback.
+
+      5. Struktur Kode (Project Structure)
+
+      Kode diorganisir dengan pola Feature-based Architecture yang rapi di src/:
+
+         - `src/app`: Setup global, entry point, providers (Convex, Auth), dan global styles.
+         - `src/features`: Logika bisnis utama dipisah per fitur (asisten-halal, cek-bahan, dll). Setiap folder fitur mandiri memiliki:
+         - components/: UI spesifik fitur.
+         - hooks/: Custom hooks untuk komunikasi ke Convex (useQuery, useMutation).
+         - lib/ atau utils/: Helper function spesifik fitur.
+         - `src/pages`: Komposisi halaman yang menggabungkan komponen fitur. Terbagi menjadi dashboard (app utama), landing (marketing), auth, dan admin.
+         - `src/shared`: Komponen UI reusable (Button, Input, Layout), types global, dan utilitas umum.
+
+Kesimpulan:
+Proyek ini sudah sangat matang secara struktur. Penggunaan Convex sangat tepat untuk mempercepat pengembangan fitur real-time tanpa pusing memikirkan infrastruktur backend, sementara pembagian folder features membuat kode mudah di-maintain dan dikembangkan lebih lanjut.
+
+Berikut analisis dan evaluasi SAH-in Aja! berdasarkan research sertifikasi halal, dengan fokus pada kesenjangan (gap analysis), kesimpulan, dan rekomendasi improvement yang konkrit.
+
+1. Kesimpulan Umum: Potensi vs Realita
+
+Secara arsitektur teknis dan konsep, SAH-in Aja! sudah sangat maju ("state-of-the-art") dengan penggunaan AI (OCR, Vision, Chatbot). Namun, secara substansi kepatuhan regulasi (Syariah Compliance & BPJPH Standard), aplikasi ini belum sepenuhnya mengakomodir kompleksitas administrasi halal, terutama untuk dokumen inti SJPH (Sistem Jaminan Produk Halal).
+
+Fitur AI yang ada cenderung bersifat "suplemen canggih" (nice-to-have), namun fitur "wajib" (mandatory) untuk lolos audit administratif masih ada yang bolong atau terlalu disederhanakan.
+
+2. Evaluasi Alur & Fitur (Gap Analysis)
+
+   A. Alur yang Sudah Sesuai (Good)
+      1. Konsultasi Awal (Asisten Halal):
+         - Penggunaan RAG (Retrieval Augmented Generation) dengan basis data regulasi sudah tepat untuk menjawab kebingungan user tentang alur, biaya, dan syarat. Ini mengatasi masalah kurangnya edukasi.
+      2. Audit Visual (Siap Halal):
+         - Sangat membantu untuk pre-screening kondisi fisik (kebersihan, potensi najis) sebelum auditor datang. Ini sesuai dengan kebutuhan persiapan "Site Visit".
+      3. Cek Bahan (Smart Material Scanner):
+         - Fitur OCR sangat berguna untuk input data awal. Klasifikasi "Aman/Meragukan/Tidak Halal" sudah sejalan dengan prinsip kehati-hatian (precautionary principle).
+
+   B. Alur yang Perlu Diubah/Diperbaiki (Critical Changes Needed)
+
+      1. Validasi Jalur Sertifikasi (Self-Declare vs Reguler) - SANGAT KRUSIAL
+         - Masalah: Saat ini belum terlihat logika penapisan (screening) yang ketat di awal.
+         - Risiko: User penjual bakso daging sapi pasar (risiko tinggi) masuk ke jalur Self-Declare karena merasa "UMK". Ini pasti ditolak di sidang fatwa.
+         - Perubahan: Tambahkan "Smart Eligibility Check" di awal onboarding. Tanyakan: "Apakah bahan Anda mengandung daging sembelihan?", "Apakah proses teknologi tinggi?". Jika YA -> Paksa/arahkan ke jalur Reguler. Jangan beri harapan palsu di jalur Self-Declare.
+
+      2. Mekanisme Matriks Bahan (Traceability)
+         - Masalah: Schema database saat ini (ingredients di halal_documents) terlihat flat (hanya list bahan).
+         - Risiko: Regulasi mewajibkan Matriks Bahan vs Produk. Contoh: "Tepung A dipakai di Roti Coklat, tapi tidak di Roti Keju". Jika hanya list bahan gelondongan dokumen SJPH cacat.
+         - Perubahan: Ubah struktur data menjadi relasional Many-to-Many antara Products dan Ingredients. User harus memetakan bahan mana untuk produk mana.
+
+      3. Data Bahan Baku & Integrasi BPJPH
+         - Masalah: OCR Cek Bahan hanya membaca label.
+         - Risiko: Auditor butuh Nomor Sertifikat Halal yang valid dan masa berlakunya. Sekedar nama bahan tidak cukup.
+         - Perubahan: Tambahkan field manual/validasi untuk input Nomor SH. Idealnya, AI tidak hanya membaca nama, tapi mencoba mengekstrak/mencari Nomor SH di kemasan.
+
+   C. Fitur yang "Hilang" & Harus Ditambah (Missing Features)
+
+      1. Generator SJPH yang "Syariah-Compliant" (Bukan Sekedar Template)
+         - Kekurangan: Fitur generateDocument saat ini sepertinya hanya mengisi placeholder nama usaha.
+         - Wajib Tambah:
+            - Form Prosedur Pencucian Najis: User harus ditanya "Bagaimana cara mencuci peralatan?". Jawaban harus divalidasi (harus air mengalir, bukan dicelup kobokan Ini syarat mutlak sahnya thaharah.
+            - SK Tim Manajemen Halal: Otomatis generate surat penunjukan penyelia halal (bisa pemilik sendiri).
+
+      2. Bukti Pelatihan Internal (E-Learning Mini)
+         - Kekurangan: Syarat SJPH mewajibkan bukti sosialisasi/pelatihan.
+         - Wajib Tambah: Fitur "Kuis Halal Singkat" untuk karyawan/pemilik. Setelah lulus kuis (misal: tentang najis & bahan), generate sertifikat pelatihan internal PDF otomatis. Tanpa ini, audit dokumen gagal.
+
+      3. Surat Pernyataan Bebas Babi (Pork-Free Declaration)
+         - Wajib Tambah: Untuk jalur Self-Declare, user wajib menandatangani akad/ikrar halal. Tambahkan fitur tanda tangan digital/centang persetujuan legal yang kuat di akhir proses.
+
+3. Rangkuman Action Plan (Prioritas)
+
+Prioritas  │ Fitur / Perubahan               │ Alasan Regulasi
+:----------+-:-------------------------------+-:------------------------------
+**High**   │ **Screening Jalur (Self-Declare │ Mencegah penolakan fatal karena
+           │ vs Reguler)**                   │ salah jalur sejak awal.
+**High**   │ **Matriks Bahan                 │ Syarat mutlak dokumen SJPH
+           │ (Product-Ingredient Mapping)**  │ (Traceability).
+**Medium** │ **Form SOP Pencucian Najis**    │ Syarat sah kesucian alat
+           │                                 │ produksi (Thaharah).
+**Medium** │ **Kuis & Sertifikat Pelatihan   │ Bukti kompetensi penyelia halal
+           │ Internal**                      │ (Wajib di Manual SJPH).
+**Low**    │ **Integrasi API BPJPH           │ Mengurangi *double entry*, tapi
+           │ (Simulasi)**                    │ bergantung pada ketersediaan
+           │                                 │ API pemerintah.
+
+Kesimpulan Akhir:
+SAH-in Aja! memiliki fondasi teknologi yang hebat. Untuk menjadi solusi yang benar-benar "selesai", fokus pengembangan berikutnya harus digeser dari "kecanggihan AI" ke "kedalaman kepatuhan administrasi SJPH". AI harus dilatih untuk menjadi "Auditor Galak" yang rewel soal dokumen, bukan sekedar asisten yang ramah.

@@ -39,9 +39,6 @@ interface IngredientAnalysis {
 interface MaterialAnalysisResult {
   halalCertificate?: {
     detected: boolean;
-    number?: string;
-    issuer?: string;
-    expiryDate?: string; // ISO date string
   };
   positiveListDetected?: boolean;
   extractedIngredients: string[];
@@ -131,17 +128,20 @@ export const analyzeMaterial = action({
 
     let jsonContent = content.trim();
 
-    const codeBlockMatch = jsonContent.match(/^```(?:json|JSON)?\s*([\s\S]*?)\s*```$/);
+    // Remove code block markers (```json ... ```)
+    const codeBlockMatch = jsonContent.match(/```(?:json|JSON)?\s*([\s\S]*?)\s*```/);
     if (codeBlockMatch) {
       jsonContent = codeBlockMatch[1].trim();
-    } else if (jsonContent.startsWith("```")) {
-      jsonContent = jsonContent.replace(/^```(?:json|JSON)?\s*/, "").replace(/\s*```$/, "");
     }
 
+    // Extract JSON object from the content
     const jsonObjectMatch = jsonContent.match(/\{[\s\S]*\}/);
     if (jsonObjectMatch) {
       jsonContent = jsonObjectMatch[0];
     }
+
+    // Sanitize: replace JavaScript undefined with JSON null
+    jsonContent = jsonContent.replace(/:\s*undefined\b/g, ": null");
 
     try {
       const result = JSON.parse(jsonContent);
@@ -157,9 +157,6 @@ export const analyzeMaterial = action({
         halalCertificate: result.halalCertificate
           ? {
               detected: Boolean(result.halalCertificate.detected),
-              number: result.halalCertificate.number || undefined,
-              issuer: result.halalCertificate.issuer || undefined,
-              expiryDate: result.halalCertificate.expiryDate || undefined,
             }
           : undefined,
         positiveListDetected: result.positiveListDetected ?? undefined,
@@ -176,14 +173,12 @@ export const analyzeMaterial = action({
         summary: String(result.summary || "Tidak dapat menganalisis gambar"),
         photoUrls,
       };
-    } catch {
-      return {
-        extractedIngredients: [],
-        analysis: [],
-        overallStatus: "meragukan",
-        summary: "Gagal memproses hasil analisis AI. Silakan coba lagi dengan foto yang lebih jelas.",
-        photoUrls,
-      };
+    } catch (parseError) {
+      console.error("JSON Parse Error:", parseError);
+      console.error("Failed to parse content:", jsonContent);
+      throw new ConvexError(
+        "Gagal memproses hasil analisis AI. Silakan coba lagi dengan foto yang lebih jelas."
+      );
     }
   },
 });

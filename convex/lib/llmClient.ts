@@ -189,13 +189,10 @@ JENIS DOKUMEN:
 
 TUGAS ANDA (BERTINGKAT):
 
-STEP 1 - DETEKSI LOGO & NOMOR SERTIFIKAT HALAL:
+STEP 1 - DETEKSI LOGO HALAL:
 Periksa apakah ada logo halal resmi di kemasan (MUI, BPJPH, atau lembaga halal internasional yang diakui).
-- Jika ADA logo halal → Auto-pass, **EKSTRAK NOMOR SERTIFIKAT HALAL** jika terlihat.
-  - Cari pola nomor seperti: "LPPOM-MUI-12345678", "00010...", "ID-xxxxx", atau kombinasi huruf-angka.
-  - Cari juga **TANGGAL KADALUARSA SERTIFIKAT** (format DD/MM/YYYY, MM/YYYY, atau keterangan "Berlaku hingga...")
-  - Identifikasi **PENERBIT** (MUI, BPJPH, JAKIM, IFANCA, MUI Provinsi, dll)
-- Jika TIDAK ADA logo → Lanjut ke Step 2.
+- Jika ADA logo halal → set detected: true, produk dianggap AMAN
+- Jika TIDAK ADA logo → Lanjut ke Step 2
 
 STEP 2 - CEK POSITIVE LIST (KMA No. 335/2022):
 Periksa apakah bahan termasuk Positive List (bahan alam yang tidak perlu sertifikat halal):
@@ -232,10 +229,7 @@ BAHAN JELAS TIDAK HALAL (langsung tolak):
 OUTPUT FORMAT (WAJIB JSON VALID):
 {
   "halalCertificate": {
-    "detected": true/false,
-    "number": "nomor sertifikat jika terlihat (contoh: LPPOM-MUI-12345678, 00010012345678, ID-xxxx)",
-    "issuer": "MUI/BPJPH/JAKIM/IFANCA/lainnya",
-    "expiryDate": "YYYY-MM-DD jika terlihat (convert dari DD/MM/YYYY atau MM/YYYY)"
+    "detected": true/false
   },
   "positiveListDetected": true/false,
   "extractedIngredients": ["bahan 1", "bahan 2", ...],
@@ -251,13 +245,6 @@ OUTPUT FORMAT (WAJIB JSON VALID):
   "summary": "kesimpulan dalam 1-2 kalimat bahasa Indonesia sederhana"
 }
 
-CATATAN PENTING EKSTRAKSI NOMOR SERTIFIKAT:
-- Nomor sertifikat halal biasanya terlihat di dekat logo halal
-- Format bervariasi: "LPPOM-MUI-xxxxx", "00010xxxxx", "MUI/xxxx/yyyy", "IDxxxx"
-- Cari teks yang mengandung kata kunci: "No. Sertifikat", "No. Reg", "Sertifikat Halal", atau angka panjang di sekitar logo
-- Tanggal kadaluarsa biasanya tertulis: "Berlaku hingga", "Valid until", atau format tanggal DD/MM/YYYY
-- Jika tidak jelas terlihat, set ke undefined (jangan mengarang!)
-
 PANDUAN BAHASA:
 - Gunakan bahasa Indonesia SEDERHANA seperti berbicara dengan ibu-ibu UMKM
 - Hindari istilah teknis berlebihan
@@ -265,9 +252,9 @@ PANDUAN BAHASA:
 - Prioritaskan keamanan: lebih baik "meragukan" daripada meloloskan yang bermasalah
 
 PENTING:
-- Selalu output JSON yang valid
+- Selalu output JSON yang valid (gunakan null, BUKAN undefined)
 - Jika tidak bisa membaca teks sama sekali, set overallStatus ke "meragukan" dan minta foto ulang di summary
-- Jangan mengarang bahan yang tidak terlihat di foto`,
+- JANGAN MENGARANG data yang tidak terlihat di foto`,
 
   HALAL_ASSISTANT: `Anda adalah Asisten Halal dari SAH-in Aja!, chatbot khusus untuk panduan proses sertifikasi halal BPJPH/MUI.
 
