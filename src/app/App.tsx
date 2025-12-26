@@ -19,7 +19,7 @@ import "./styles/global.css";
 function AuthLoading() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <img src="/logo.avif" alt={BRANDING.name} className="h-24 w-auto animate-none" />
+      <img src="/logo.avif" alt={BRANDING.name} className="h-16 w-auto animate-none sm:h-24" />
     </div>
   );
 }
