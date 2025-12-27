@@ -246,6 +246,10 @@ export function useVapiAudit() {
   const [sessionId, setSessionId] = useState<Id<"voice_audit_sessions"> | null>(null);
   const [callEnded, setCallEnded] = useState(false);
 
+  // Refs for volume-based detection with debounce
+  const volumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastVolumeRef = useRef<number>(0);
+
   const toast = useToast();
 
   const startSessionMutation = useMutation(api.voiceAudit.startSession);
@@ -278,22 +282,41 @@ export function useVapiAudit() {
       });
 
       vapi.on("call-end", () => {
+        if (volumeTimeoutRef.current) {
+          clearTimeout(volumeTimeoutRef.current);
+          volumeTimeoutRef.current = null;
+        }
         setIsActive(false);
         setStatus("idle");
         setIsSpeaking(false);
         setCallEnded(true);
       });
 
-      // speech-start: User started speaking (detected by VAD)
-      // This means it's the user's turn now
-      vapi.on("speech-start", () => {
-        setIsSpeaking(false); // User's turn
-      });
-
-      // speech-end: User stopped speaking (detected by VAD after 1s silence)
-      // After user stops, assistant will respond
-      vapi.on("speech-end", () => {
-        setIsSpeaking(true); // Assistant's turn
+      // volume-level: Detects ASSISTANT audio output (remote participant)
+      // This is the most reliable way to know if assistant is speaking
+      // Volume > 0.01 means assistant is speaking
+      vapi.on("volume-level", (volume: number) => {
+        lastVolumeRef.current = volume;
+        
+        if (volume > 0.01) {
+          // Assistant is speaking - clear any pending timeout
+          if (volumeTimeoutRef.current) {
+            clearTimeout(volumeTimeoutRef.current);
+            volumeTimeoutRef.current = null;
+          }
+          setIsSpeaking(true);
+        } else {
+          // Volume is low - wait 500ms before switching to user's turn
+          // This prevents flickering during brief pauses
+          if (!volumeTimeoutRef.current) {
+            volumeTimeoutRef.current = setTimeout(() => {
+              if (lastVolumeRef.current <= 0.01) {
+                setIsSpeaking(false);
+              }
+              volumeTimeoutRef.current = null;
+            }, 500);
+          }
+        }
       });
 
       // Handle transcript for saving to database
