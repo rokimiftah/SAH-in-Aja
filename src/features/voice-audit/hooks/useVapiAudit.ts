@@ -384,6 +384,21 @@ export function useVapiAudit() {
             language: "id",
           },
           endCallPhrases: ["sesi selesai", "terima kasih atas waktunya", "semoga sukses", "sampai jumpa"],
+          // Voice pipeline configuration for Indonesian language
+          // Prevents premature turn switching by using longer timeouts
+          startSpeakingPlan: {
+            waitSeconds: 0.6,
+            transcriptionEndpointingPlan: {
+              onPunctuationSeconds: 0.3,
+              onNoPunctuationSeconds: 2.0,
+              onNumberSeconds: 0.8,
+            },
+          },
+          stopSpeakingPlan: {
+            numWords: 2,
+            voiceSeconds: 0.4,
+            backoffSeconds: 1.5,
+          },
         });
 
         // Update session with Vapi call ID
