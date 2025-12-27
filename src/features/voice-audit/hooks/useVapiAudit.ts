@@ -237,6 +237,9 @@ function buildFirstMessage(config: AuditConfig): string {
   return `${greeting} ${fullName}, saya auditor dari BPJPH. Hari ini kita akan melakukan simulasi wawancara audit halal dengan fokus pada ${topic}. Apakah ${fullName} siap untuk memulai?`;
 }
 
+// Minimum duration (ms) before allowing turn switch to prevent rapid flickering
+const MIN_TURN_DURATION_MS = 1500;
+
 export function useVapiAudit() {
   const vapiRef = useRef<Vapi | null>(null);
   const [status, setStatus] = useState<VapiStatus>("idle");
@@ -245,6 +248,10 @@ export function useVapiAudit() {
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const [sessionId, setSessionId] = useState<Id<"voice_audit_sessions"> | null>(null);
   const [callEnded, setCallEnded] = useState(false);
+
+  // Track last turn switch time to prevent rapid flickering on mobile
+  const lastTurnSwitchRef = useRef<number>(0);
+  const speechDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const toast = useToast();
 
@@ -276,18 +283,54 @@ export function useVapiAudit() {
       });
 
       vapi.on("call-end", () => {
+        // Clear any pending debounce
+        if (speechDebounceRef.current) {
+          clearTimeout(speechDebounceRef.current);
+          speechDebounceRef.current = null;
+        }
         setIsActive(false);
         setStatus("idle");
         setIsSpeaking(false);
         setCallEnded(true);
       });
 
+      // Debounced speech-start to prevent rapid flickering on mobile
       vapi.on("speech-start", () => {
-        setIsSpeaking(true);
+        const now = Date.now();
+        const timeSinceLastSwitch = now - lastTurnSwitchRef.current;
+
+        // Clear any pending speech-end debounce
+        if (speechDebounceRef.current) {
+          clearTimeout(speechDebounceRef.current);
+          speechDebounceRef.current = null;
+        }
+
+        // Only switch if enough time has passed since last switch
+        if (timeSinceLastSwitch >= MIN_TURN_DURATION_MS) {
+          lastTurnSwitchRef.current = now;
+          setIsSpeaking(true);
+        }
       });
 
+      // Debounced speech-end to prevent premature turn switching
       vapi.on("speech-end", () => {
-        setIsSpeaking(false);
+        // Clear any existing debounce
+        if (speechDebounceRef.current) {
+          clearTimeout(speechDebounceRef.current);
+        }
+
+        // Debounce the speech-end event to prevent flickering
+        speechDebounceRef.current = setTimeout(() => {
+          const now = Date.now();
+          const timeSinceLastSwitch = now - lastTurnSwitchRef.current;
+
+          // Only switch if enough time has passed
+          if (timeSinceLastSwitch >= MIN_TURN_DURATION_MS) {
+            lastTurnSwitchRef.current = now;
+            setIsSpeaking(false);
+          }
+          speechDebounceRef.current = null;
+        }, 500); // 500ms debounce delay
       });
 
       vapi.on("message", (message) => {
@@ -385,19 +428,19 @@ export function useVapiAudit() {
           },
           endCallPhrases: ["sesi selesai", "terima kasih atas waktunya", "semoga sukses", "sampai jumpa"],
           // Voice pipeline configuration for Indonesian language
-          // Prevents premature turn switching by using longer timeouts
+          // More conservative settings to handle mobile browser quirks (especially iOS Safari)
           startSpeakingPlan: {
-            waitSeconds: 0.6,
+            waitSeconds: 0.8,
             transcriptionEndpointingPlan: {
-              onPunctuationSeconds: 0.3,
-              onNoPunctuationSeconds: 2.0,
-              onNumberSeconds: 0.8,
+              onPunctuationSeconds: 0.5,
+              onNoPunctuationSeconds: 2.5,
+              onNumberSeconds: 1.0,
             },
           },
           stopSpeakingPlan: {
-            numWords: 2,
-            voiceSeconds: 0.4,
-            backoffSeconds: 1.5,
+            numWords: 3,
+            voiceSeconds: 0.5,
+            backoffSeconds: 2.0,
           },
         });
 
