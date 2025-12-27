@@ -90,13 +90,6 @@ PENTING - INTONASI SUARA:
 - Pastikan kalimat tanya terdengar seperti pertanyaan, bukan pernyataan
 - Gunakan nada yang ekspresif dan natural, tidak monoton
 
-PENTING - MENUNGGU JAWABAN:
-- Setelah mengajukan pertanyaan, TUNGGU jawaban yang jelas dari pengguna
-- Jika pengguna tidak menjawab atau hanya ada noise/keheningan, ulangi pertanyaan dengan kata-kata berbeda
-- Jangan anggap noise, bunyi "um", "ah", atau keheningan sebagai jawaban
-- Jika setelah mengulang 2 kali pengguna masih tidak menjawab, tanyakan apakah mereka masih di sana
-- Contoh: "Maaf ${fullName}, sepertinya saya tidak mendengar jawaban Anda. Bisa diulangi?"
-
 PENTING - MENGAKHIRI SESI:
 - Setelah memberikan kesimpulan dan saran, ucapkan penutup"
 - Contoh penutup: "Terima kasih atas waktunya ${fullName}. Semoga sukses dalam proses sertifikasi halal! ${greeting}"
@@ -253,10 +246,6 @@ export function useVapiAudit() {
   const [sessionId, setSessionId] = useState<Id<"voice_audit_sessions"> | null>(null);
   const [callEnded, setCallEnded] = useState(false);
 
-  // Refs for volume-based detection with debounce
-  const volumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastVolumeRef = useRef<number>(0);
-
   const toast = useToast();
 
   const startSessionMutation = useMutation(api.voiceAudit.startSession);
@@ -284,49 +273,23 @@ export function useVapiAudit() {
       vapi.on("call-start", () => {
         setStatus("connected");
         setIsActive(true);
-        // Assistant speaks first
-        setIsSpeaking(true);
       });
 
       vapi.on("call-end", () => {
-        if (volumeTimeoutRef.current) {
-          clearTimeout(volumeTimeoutRef.current);
-          volumeTimeoutRef.current = null;
-        }
         setIsActive(false);
         setStatus("idle");
         setIsSpeaking(false);
         setCallEnded(true);
       });
 
-      // volume-level: Detects ASSISTANT audio output (remote participant)
-      // This is the most reliable way to know if assistant is speaking
-      // Volume > 0.01 means assistant is speaking
-      vapi.on("volume-level", (volume: number) => {
-        lastVolumeRef.current = volume;
-        
-        if (volume > 0.01) {
-          // Assistant is speaking - clear any pending timeout
-          if (volumeTimeoutRef.current) {
-            clearTimeout(volumeTimeoutRef.current);
-            volumeTimeoutRef.current = null;
-          }
-          setIsSpeaking(true);
-        } else {
-          // Volume is low - wait 500ms before switching to user's turn
-          // This prevents flickering during brief pauses
-          if (!volumeTimeoutRef.current) {
-            volumeTimeoutRef.current = setTimeout(() => {
-              if (lastVolumeRef.current <= 0.01) {
-                setIsSpeaking(false);
-              }
-              volumeTimeoutRef.current = null;
-            }, 500);
-          }
-        }
+      vapi.on("speech-start", () => {
+        setIsSpeaking(true);
       });
 
-      // Handle transcript for saving to database
+      vapi.on("speech-end", () => {
+        setIsSpeaking(false);
+      });
+
       vapi.on("message", (message) => {
         if (message.type === "transcript" && message.transcriptType === "final") {
           const entry: TranscriptEntry = {
@@ -407,7 +370,7 @@ export function useVapiAudit() {
                 content: buildSystemPrompt(config),
               },
             ],
-            maxTokens: 10000,
+            maxTokens: 4096,
           },
           voice: {
             provider: "minimax",
@@ -418,28 +381,9 @@ export function useVapiAudit() {
           firstMessage: buildFirstMessage(config),
           transcriber: {
             provider: "deepgram",
-            model: "nova-2",
             language: "id",
           },
           endCallPhrases: ["sesi selesai", "terima kasih atas waktunya", "semoga sukses", "sampai jumpa"],
-          // Voice pipeline configuration for Indonesian language
-          // Use transcription-based endpointing only
-          startSpeakingPlan: {
-            waitSeconds: 0.6,
-            transcriptionEndpointingPlan: {
-              onPunctuationSeconds: 0.3,
-              onNoPunctuationSeconds: 2.5,
-              onNumberSeconds: 0.8,
-            },
-          },
-          // DISABLE interruption completely - let assistant finish speaking
-          // This prevents audio cutoff on mobile where mic picks up TTS audio
-          stopSpeakingPlan: {
-            // Require 10 words to interrupt (effectively disabling interruption)
-            numWords: 10,
-            voiceSeconds: 0.5,
-            backoffSeconds: 3.0,
-          },
         });
 
         // Update session with Vapi call ID
