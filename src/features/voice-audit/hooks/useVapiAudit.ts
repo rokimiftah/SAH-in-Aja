@@ -246,11 +246,6 @@ export function useVapiAudit() {
   const [sessionId, setSessionId] = useState<Id<"voice_audit_sessions"> | null>(null);
   const [callEnded, setCallEnded] = useState(false);
 
-  // Lock to prevent rapid state changes - stores the last speaker role
-  const lastSpeakerRef = useRef<"assistant" | "user" | null>(null);
-  const stateChangeTimeRef = useRef<number>(0);
-  const MIN_STATE_DURATION_MS = 2000; // Minimum 2 seconds before allowing state change
-
   const toast = useToast();
 
   const startSessionMutation = useMutation(api.voiceAudit.startSession);
@@ -280,8 +275,6 @@ export function useVapiAudit() {
         setIsActive(true);
         // Assistant speaks first
         setIsSpeaking(true);
-        lastSpeakerRef.current = "assistant";
-        stateChangeTimeRef.current = Date.now();
       });
 
       vapi.on("call-end", () => {
@@ -289,32 +282,30 @@ export function useVapiAudit() {
         setStatus("idle");
         setIsSpeaking(false);
         setCallEnded(true);
-        lastSpeakerRef.current = null;
       });
 
-      // ONLY use FINAL transcript for state changes to prevent flickering
-      // Ignore all partial transcripts and speech events - they are unreliable on mobile
-
+      // Use the message event to handle speech-update which is more reliable
+      // speech-update has: { type: "speech-update", status: "started"|"stopped", role: "assistant"|"user" }
       vapi.on("message", (message) => {
-        if (message.type === "transcript" && message.transcriptType === "final") {
-          const role = message.role === "assistant" ? "assistant" : "user";
-          const now = Date.now();
-          const timeSinceLastChange = now - stateChangeTimeRef.current;
-
-          // Only update state if:
-          // 1. Speaker changed from last recorded speaker
-          // 2. Enough time has passed since last state change
-          if (role !== lastSpeakerRef.current && timeSinceLastChange >= MIN_STATE_DURATION_MS) {
-            lastSpeakerRef.current = role;
-            stateChangeTimeRef.current = now;
-            // Assistant speaking = isSpeaking true, User speaking = isSpeaking false
+        // Handle speech-update event for turn detection
+        if (message.type === "speech-update") {
+          const { status: speechStatus, role } = message as { status: "started" | "stopped"; role: "assistant" | "user" };
+          
+          if (speechStatus === "started") {
+            // Someone started speaking
+            // isSpeaking = true means assistant is speaking, false means user's turn
             setIsSpeaking(role === "assistant");
           }
+          // We don't handle "stopped" to avoid flickering - 
+          // the next "started" event will update the state
+        }
 
+        // Handle final transcript for saving to database
+        if (message.type === "transcript" && message.transcriptType === "final") {
           const entry: TranscriptEntry = {
-            role,
+            role: message.role === "assistant" ? "assistant" : "user",
             text: message.transcript,
-            timestamp: now,
+            timestamp: Date.now(),
           };
           setTranscript((prev) => [...prev, entry]);
 
