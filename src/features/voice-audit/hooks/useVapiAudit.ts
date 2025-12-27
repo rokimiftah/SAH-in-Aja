@@ -90,6 +90,13 @@ PENTING - INTONASI SUARA:
 - Pastikan kalimat tanya terdengar seperti pertanyaan, bukan pernyataan
 - Gunakan nada yang ekspresif dan natural, tidak monoton
 
+PENTING - MENUNGGU JAWABAN:
+- Setelah mengajukan pertanyaan, TUNGGU jawaban yang jelas dari pengguna
+- Jika pengguna tidak menjawab atau hanya ada noise/keheningan, ulangi pertanyaan dengan kata-kata berbeda
+- Jangan anggap noise, bunyi "um", "ah", atau keheningan sebagai jawaban
+- Jika setelah mengulang 2 kali pengguna masih tidak menjawab, tanyakan apakah mereka masih di sana
+- Contoh: "Maaf ${fullName}, sepertinya saya tidak mendengar jawaban Anda. Bisa diulangi?"
+
 PENTING - MENGAKHIRI SESI:
 - Setelah memberikan kesimpulan dan saran, ucapkan penutup"
 - Contoh penutup: "Terima kasih atas waktunya ${fullName}. Semoga sukses dalam proses sertifikasi halal! ${greeting}"
@@ -411,6 +418,7 @@ export function useVapiAudit() {
           firstMessage: buildFirstMessage(config),
           transcriber: {
             provider: "deepgram",
+            model: "nova-2",
             language: "id",
           },
           endCallPhrases: ["sesi selesai", "terima kasih atas waktunya", "semoga sukses", "sampai jumpa"],
