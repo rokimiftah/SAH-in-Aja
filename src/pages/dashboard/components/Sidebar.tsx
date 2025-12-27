@@ -278,6 +278,33 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     }
     return initialExpanded;
   });
+
+  const collapseAllMenusSmoothly = useCallback(() => {
+    setExpandedMenus((prev) => {
+      if (prev.size === 0) return prev;
+
+      const menus = Array.from(prev);
+      // Collapse menus one by one with stagger delay
+      menus.forEach((menuId, index) => {
+        setTimeout(() => {
+          setExpandedMenus((current) => {
+            const next = new Set(current);
+            next.delete(menuId);
+            return next;
+          });
+        }, index * 80); // 80ms delay between each collapse
+      });
+
+      return prev; // Return current state, will be updated by timeouts
+    });
+  }, []);
+
+  // Collapse all submenus when navigating to /dashboard
+  useEffect(() => {
+    if (location === "/dashboard") {
+      collapseAllMenusSmoothly();
+    }
+  }, [location, collapseAllMenusSmoothly]);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   const toggleMenu = useCallback((menuId: string) => {
@@ -396,6 +423,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           <button
             type="button"
             onClick={() => {
+              // Collapse all submenus when clicking logo
+              collapseAllMenusSmoothly();
               if (handleNavigation("/dashboard")) {
                 navigate("/dashboard");
                 onClose();
@@ -450,6 +479,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                         <button
                           type="button"
                           onClick={() => {
+                            // Collapse all submenus when clicking dashboard menu
+                            if (item.id === "dashboard") {
+                              collapseAllMenusSmoothly();
+                            }
                             if (handleNavigation(item.href)) {
                               navigate(item.href);
                               onClose();
