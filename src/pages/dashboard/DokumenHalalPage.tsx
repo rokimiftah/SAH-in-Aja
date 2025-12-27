@@ -93,6 +93,7 @@ export function DokumenHalalPage() {
   const creditStatus = useQuery(api.credits.checkCredits, { feature: "dokumenHalal" });
   const eligibility = useQuery(api.eligibility.getMyEligibility);
   const traceabilityData = useQuery(api.traceability.getTraceabilityMatrix);
+  const user = useQuery(api.users.getCurrentUser);
 
   const isLoadingCredits = creditStatus === undefined;
   const hasCredits = creditStatus?.hasCredits ?? false;
@@ -105,6 +106,17 @@ export function DokumenHalalPage() {
     setProcessing(isProcessing, "Pembuatan dokumen sedang berjalan...");
     return () => setProcessing(false);
   }, [flowState, stage, setProcessing]);
+
+  useEffect(() => {
+    if (flowState === "business" && user) {
+      setBusinessInfo((prev) => ({
+        ...prev,
+        name: user.businessName || prev.name,
+        address: user.address || prev.address,
+        owner: user.name || prev.owner,
+      }));
+    }
+  }, [flowState, user]);
 
   // Prevent accidental page close/refresh during form filling
   useEffect(() => {

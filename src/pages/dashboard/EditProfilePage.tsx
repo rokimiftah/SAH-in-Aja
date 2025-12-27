@@ -51,6 +51,8 @@ export function EditProfilePage() {
   const generateUploadUrl = useMutation(api.users.generateUploadUrl);
 
   const [name, setName] = useState<string | null>(null);
+  const [businessName, setBusinessName] = useState<string | null>(null);
+  const [address, setAddress] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [compressedBlob, setCompressedBlob] = useState<Blob | null>(null);
   const [saving, setSaving] = useState(false);
@@ -66,6 +68,8 @@ export function EditProfilePage() {
   }, [previewUrl]);
 
   const currentName = name ?? user?.name ?? "";
+  const currentBusinessName = businessName ?? user?.businessName ?? "";
+  const currentAddress = address ?? user?.address ?? "";
   const currentImage = previewUrl ?? user?.image;
   const linkedProviders = user?.linkedProviders ?? [];
 
@@ -85,7 +89,7 @@ export function EditProfilePage() {
   const avatarUrl =
     currentImage || `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(initials)}&backgroundColor=10b981`;
 
-  const hasChanges = name !== null || compressedBlob !== null;
+  const hasChanges = name !== null || businessName !== null || address !== null || compressedBlob !== null;
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -137,11 +141,15 @@ export function EditProfilePage() {
 
       await updateProfile({
         ...(name !== null && { name }),
+        ...(businessName !== null && { businessName }),
+        ...(address !== null && { address }),
         ...(storageId && { storageId }),
       });
 
       setSaved(true);
       setName(null);
+      setBusinessName(null);
+      setAddress(null);
       setCompressedBlob(null);
       setPreviewUrl(null);
       toast.success("Profil berhasil disimpan");
@@ -166,18 +174,18 @@ export function EditProfilePage() {
   return (
     <PageContainer backButton={{ onClick: () => navigate("/dashboard") }} centered maxWidth="xl">
       {/* Header */}
-      <div className="mb-5 text-center">
-        <h1 className="text-xl font-bold text-gray-800">Edit Profil</h1>
-        <p className="mt-1.5 text-sm text-gray-600">Perbarui foto dan nama Anda</p>
+      <div className="mb-6 text-center">
+        <h1 className="text-2xl font-bold text-gray-800">Edit Profil</h1>
+        <p className="mt-2 text-sm text-gray-600">Perbarui foto dan informasi Anda</p>
       </div>
 
       {/* Avatar Section */}
-      <div className="mb-5 flex flex-col items-center">
-        <div className="mb-2">
+      <div className="mb-6 flex flex-col items-center rounded-2xl border border-gray-100 bg-gray-50 p-6">
+        <div className="relative mb-3">
           <img
             src={avatarUrl}
             alt="Avatar"
-            className="h-20 w-20 rounded-full border-4 border-white object-cover shadow-lg ring-2 ring-gray-200"
+            className="h-24 w-24 rounded-full border-4 border-white object-cover shadow-lg"
             referrerPolicy="no-referrer"
           />
           <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
@@ -185,54 +193,93 @@ export function EditProfilePage() {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="flex cursor-pointer items-center gap-2 text-sm font-medium text-emerald-600 transition-colors hover:text-emerald-700"
+          className="flex cursor-pointer items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-medium text-emerald-600 shadow-sm transition-all hover:text-emerald-700 hover:shadow-md"
         >
           <Upload className="h-4 w-4" />
           Ganti Foto
         </button>
       </div>
 
-      {/* Name Input */}
-      <div className="mb-5">
-        <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-gray-700">
-          Nama
-        </label>
-        <input
-          id="name"
-          type="text"
-          value={currentName}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Masukkan nama Anda"
-          className="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-gray-800 transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
-        />
-      </div>
+      {/* Form Fields - Simple 2 Column */}
+      <div className="mb-6 space-y-5">
+        {/* Row 1: Nama & Nama Usaha */}
+        <div className="grid gap-5 lg:grid-cols-2">
+          <div>
+            <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-gray-700">
+              Nama
+            </label>
+            <input
+              id="name"
+              type="text"
+              value={currentName}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Masukkan nama Anda"
+              className="h-10.5 w-full rounded-xl border border-gray-300 px-3 py-2.5 text-gray-800 transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
+            />
+          </div>
 
-      {/* Email (Read-only) */}
-      <div className="mb-5">
-        <span className="mb-1.5 block text-sm font-medium text-gray-700">Email</span>
-        <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-600">{user.email || "-"}</div>
-      </div>
+          <div>
+            <label htmlFor="businessName" className="mb-1.5 block text-sm font-medium text-gray-700">
+              Nama Usaha
+            </label>
+            <input
+              id="businessName"
+              type="text"
+              value={currentBusinessName}
+              onChange={(e) => setBusinessName(e.target.value)}
+              placeholder="Masukkan nama usaha Anda"
+              className="h-10.5 w-full rounded-xl border border-gray-300 px-3 py-2.5 text-gray-800 transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
+            />
+          </div>
+        </div>
 
-      {/* Linked Providers */}
-      <div className="mb-6">
-        <span className="mb-1.5 block text-sm font-medium text-gray-700">Metode Login Terhubung</span>
-        <div className="flex gap-2">
-          {linkedProviders.length > 0 ? (
-            linkedProviders.map((provider) => (
-              <div
-                key={provider}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-2 py-2 sm:gap-2"
-              >
-                <span className="text-gray-600">{PROVIDER_ICONS[provider] || <Mail className="h-4 w-4" />}</span>
-                <span className="hidden text-sm font-medium text-gray-700 sm:inline">{PROVIDER_NAMES[provider] || provider}</span>
-                <Check className="h-3.5 w-3.5 text-emerald-500" />
-              </div>
-            ))
-          ) : (
-            <div className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-center text-sm text-gray-500">
-              Tidak ada provider terhubung
+        {/* Row 2: Email & Alamat Usaha */}
+        <div className="grid gap-5 lg:grid-cols-2">
+          <div>
+            <span className="mb-1.5 block text-sm font-medium text-gray-700">Email</span>
+            <div className="flex h-10.5 items-center rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm text-gray-600">
+              {user.email || "-"}
             </div>
-          )}
+          </div>
+
+          <div>
+            <label htmlFor="address" className="mb-1.5 block text-sm font-medium text-gray-700">
+              Alamat Usaha
+            </label>
+            <input
+              id="address"
+              type="text"
+              value={currentAddress}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Masukkan alamat usaha Anda"
+              className="h-10.5 w-full rounded-xl border border-gray-300 px-3 py-2.5 text-gray-800 transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Row 3: Metode Login (Full Width) */}
+        <div>
+          <span className="mb-1.5 block text-sm font-medium text-gray-700">Metode Login Terhubung</span>
+          <div className="flex h-10.5 gap-2">
+            {linkedProviders.length > 0 ? (
+              linkedProviders.map((provider) => (
+                <div
+                  key={provider}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-2 sm:gap-2"
+                >
+                  <span className="text-gray-600">{PROVIDER_ICONS[provider] || <Mail className="h-4 w-4" />}</span>
+                  <span className="hidden text-sm font-medium text-gray-700 sm:inline">
+                    {PROVIDER_NAMES[provider] || provider}
+                  </span>
+                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+                </div>
+              ))
+            ) : (
+              <div className="flex w-full items-center justify-center rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm text-gray-500">
+                Tidak ada provider terhubung
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -242,9 +289,9 @@ export function EditProfilePage() {
         onClick={handleSave}
         disabled={!hasChanges || saving}
         className={cn(
-          "flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 font-semibold transition-all",
+          "flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 font-semibold shadow-md transition-all",
           hasChanges && !saving
-            ? "cursor-pointer bg-emerald-500 text-white shadow-md hover:bg-emerald-600 hover:shadow-lg"
+            ? "cursor-pointer bg-emerald-500 text-white hover:bg-emerald-600 hover:shadow-lg"
             : "cursor-not-allowed bg-gray-100 text-gray-400",
         )}
       >
