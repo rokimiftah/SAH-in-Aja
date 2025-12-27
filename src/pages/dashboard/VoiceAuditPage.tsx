@@ -49,7 +49,7 @@ export function VoiceAuditPage() {
     preferredTitle: "bapak",
   });
 
-  const { status, isSpeaking, isSupported, callEnded, startSession, endSession, resetCallEnded } = useVapiAudit();
+  const { status, isSupported, callEnded, startSession, endSession, resetCallEnded } = useVapiAudit();
 
   const user = useQuery(api.users.getCurrentUser);
   const creditStatus = useQuery(api.credits.checkCredits, { feature: "voiceAudit" });
@@ -273,10 +273,11 @@ export function VoiceAuditPage() {
           {/* Status Text - Above Mic */}
           {!isEnding && (
             <div className="text-center">
-              <p
-                className={`text-lg font-semibold transition-colors sm:text-xl ${isSpeaking ? "text-rose-600" : "text-gray-800"}`}
-              >
-                {isSpeaking ? "Auditor berbicara..." : "Giliran Anda..."}
+              <p className="text-lg font-semibold text-rose-600 sm:text-xl">
+                Sesi Audit Aktif
+              </p>
+              <p className="mt-1 text-sm text-gray-500">
+                Dengarkan dan jawab pertanyaan auditor
               </p>
             </div>
           )}
@@ -292,16 +293,8 @@ export function VoiceAuditPage() {
             />
 
             {/* Mic Circle */}
-            <div
-              className={`relative flex h-32 w-32 items-center justify-center rounded-full shadow-2xl transition-all duration-300 sm:h-36 sm:w-36 md:h-40 md:w-40 ${
-                isSpeaking ? "scale-105 bg-linear-to-br from-rose-500 to-pink-600" : "bg-linear-to-br from-rose-400 to-pink-500"
-              }`}
-            >
-              {isSpeaking ? (
-                <Volume2 className="h-14 w-14 animate-pulse text-white sm:h-16 sm:w-16 md:h-18 md:w-18" />
-              ) : (
-                <Mic className="h-14 w-14 text-white sm:h-16 sm:w-16 md:h-18 md:w-18" />
-              )}
+            <div className="relative flex h-32 w-32 items-center justify-center rounded-full bg-linear-to-br from-rose-500 to-pink-600 shadow-2xl sm:h-36 sm:w-36 md:h-40 md:w-40">
+              <Mic className="h-14 w-14 text-white sm:h-16 sm:w-16 md:h-18 md:w-18" />
             </div>
           </div>
 
