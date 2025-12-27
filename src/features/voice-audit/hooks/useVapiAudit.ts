@@ -415,21 +415,23 @@ export function useVapiAudit() {
           },
           endCallPhrases: ["sesi selesai", "terima kasih atas waktunya", "semoga sukses", "sampai jumpa"],
           // Voice pipeline configuration for Indonesian language
-          // Conservative settings to prevent premature interruption on mobile
+          // Use transcription-based interruption (numWords > 0) instead of VAD-based
+          // VAD is too sensitive on mobile and picks up TTS audio from speaker
           startSpeakingPlan: {
-            waitSeconds: 1.2,
+            waitSeconds: 0.6,
             transcriptionEndpointingPlan: {
-              onPunctuationSeconds: 0.8,
-              onNoPunctuationSeconds: 3.0,
-              onNumberSeconds: 1.5,
+              onPunctuationSeconds: 0.3,
+              onNoPunctuationSeconds: 2.0,
+              onNumberSeconds: 0.8,
             },
           },
           stopSpeakingPlan: {
-            // numWords > 0 means use transcription-based interruption (more accurate)
-            // instead of VAD-based (voiceSeconds) which is too sensitive on mobile
-            numWords: 5,
-            voiceSeconds: 1.0,
-            backoffSeconds: 3.0,
+            // numWords > 0 = transcription-based interruption (more accurate, less sensitive)
+            // User must say at least 3 words to interrupt assistant
+            numWords: 3,
+            // voiceSeconds only used when numWords = 0, but set to max anyway
+            voiceSeconds: 0.5,
+            backoffSeconds: 2.0,
           },
         });
 
