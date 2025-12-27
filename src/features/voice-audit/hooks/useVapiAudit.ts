@@ -284,23 +284,20 @@ export function useVapiAudit() {
         setCallEnded(true);
       });
 
-      // Use the message event to handle speech-update which is more reliable
-      // speech-update has: { type: "speech-update", status: "started"|"stopped", role: "assistant"|"user" }
-      vapi.on("message", (message) => {
-        // Handle speech-update event for turn detection
-        if (message.type === "speech-update") {
-          const { status: speechStatus, role } = message as { status: "started" | "stopped"; role: "assistant" | "user" };
-          
-          if (speechStatus === "started") {
-            // Someone started speaking
-            // isSpeaking = true means assistant is speaking, false means user's turn
-            setIsSpeaking(role === "assistant");
-          }
-          // We don't handle "stopped" to avoid flickering - 
-          // the next "started" event will update the state
-        }
+      // speech-start: User started speaking (detected by VAD)
+      // This means it's the user's turn now
+      vapi.on("speech-start", () => {
+        setIsSpeaking(false); // User's turn
+      });
 
-        // Handle final transcript for saving to database
+      // speech-end: User stopped speaking (detected by VAD after 1s silence)
+      // After user stops, assistant will respond
+      vapi.on("speech-end", () => {
+        setIsSpeaking(true); // Assistant's turn
+      });
+
+      // Handle transcript for saving to database
+      vapi.on("message", (message) => {
         if (message.type === "transcript" && message.transcriptType === "final") {
           const entry: TranscriptEntry = {
             role: message.role === "assistant" ? "assistant" : "user",
