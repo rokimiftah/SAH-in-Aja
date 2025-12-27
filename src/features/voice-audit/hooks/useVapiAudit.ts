@@ -415,19 +415,21 @@ export function useVapiAudit() {
           },
           endCallPhrases: ["sesi selesai", "terima kasih atas waktunya", "semoga sukses", "sampai jumpa"],
           // Voice pipeline configuration for Indonesian language
-          // More conservative settings to handle mobile browser quirks (especially iOS Safari)
+          // Conservative settings to prevent premature interruption on mobile
           startSpeakingPlan: {
-            waitSeconds: 0.8,
+            waitSeconds: 1.2,
             transcriptionEndpointingPlan: {
-              onPunctuationSeconds: 0.5,
-              onNoPunctuationSeconds: 2.5,
-              onNumberSeconds: 1.0,
+              onPunctuationSeconds: 0.8,
+              onNoPunctuationSeconds: 3.0,
+              onNumberSeconds: 1.5,
             },
           },
           stopSpeakingPlan: {
-            numWords: 3,
-            voiceSeconds: 0.5,
-            backoffSeconds: 2.0,
+            // numWords > 0 means use transcription-based interruption (more accurate)
+            // instead of VAD-based (voiceSeconds) which is too sensitive on mobile
+            numWords: 5,
+            voiceSeconds: 1.0,
+            backoffSeconds: 3.0,
           },
         });
 
