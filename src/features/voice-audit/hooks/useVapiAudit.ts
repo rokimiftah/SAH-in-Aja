@@ -237,9 +237,6 @@ function buildFirstMessage(config: AuditConfig): string {
   return `${greeting} ${fullName}, saya auditor dari BPJPH. Hari ini kita akan melakukan simulasi wawancara audit halal dengan fokus pada ${topic}. Apakah ${fullName} siap untuk memulai?`;
 }
 
-// Minimum duration (ms) before allowing turn switch to prevent rapid flickering
-const MIN_TURN_DURATION_MS = 1500;
-
 export function useVapiAudit() {
   const vapiRef = useRef<Vapi | null>(null);
   const [status, setStatus] = useState<VapiStatus>("idle");
@@ -248,10 +245,6 @@ export function useVapiAudit() {
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const [sessionId, setSessionId] = useState<Id<"voice_audit_sessions"> | null>(null);
   const [callEnded, setCallEnded] = useState(false);
-
-  // Track last turn switch time to prevent rapid flickering on mobile
-  const lastTurnSwitchRef = useRef<number>(0);
-  const speechDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const toast = useToast();
 
@@ -280,58 +273,19 @@ export function useVapiAudit() {
       vapi.on("call-start", () => {
         setStatus("connected");
         setIsActive(true);
+        // Assistant speaks first
+        setIsSpeaking(true);
       });
 
       vapi.on("call-end", () => {
-        // Clear any pending debounce
-        if (speechDebounceRef.current) {
-          clearTimeout(speechDebounceRef.current);
-          speechDebounceRef.current = null;
-        }
         setIsActive(false);
         setStatus("idle");
         setIsSpeaking(false);
         setCallEnded(true);
       });
 
-      // Debounced speech-start to prevent rapid flickering on mobile
-      vapi.on("speech-start", () => {
-        const now = Date.now();
-        const timeSinceLastSwitch = now - lastTurnSwitchRef.current;
-
-        // Clear any pending speech-end debounce
-        if (speechDebounceRef.current) {
-          clearTimeout(speechDebounceRef.current);
-          speechDebounceRef.current = null;
-        }
-
-        // Only switch if enough time has passed since last switch
-        if (timeSinceLastSwitch >= MIN_TURN_DURATION_MS) {
-          lastTurnSwitchRef.current = now;
-          setIsSpeaking(true);
-        }
-      });
-
-      // Debounced speech-end to prevent premature turn switching
-      vapi.on("speech-end", () => {
-        // Clear any existing debounce
-        if (speechDebounceRef.current) {
-          clearTimeout(speechDebounceRef.current);
-        }
-
-        // Debounce the speech-end event to prevent flickering
-        speechDebounceRef.current = setTimeout(() => {
-          const now = Date.now();
-          const timeSinceLastSwitch = now - lastTurnSwitchRef.current;
-
-          // Only switch if enough time has passed
-          if (timeSinceLastSwitch >= MIN_TURN_DURATION_MS) {
-            lastTurnSwitchRef.current = now;
-            setIsSpeaking(false);
-          }
-          speechDebounceRef.current = null;
-        }, 500); // 500ms debounce delay
-      });
+      // IGNORE speech-start and speech-end events - they are unreliable on mobile
+      // Instead, use transcript messages to determine who is speaking
 
       vapi.on("message", (message) => {
         if (message.type === "transcript" && message.transcriptType === "final") {
@@ -341,6 +295,11 @@ export function useVapiAudit() {
             timestamp: Date.now(),
           };
           setTranscript((prev) => [...prev, entry]);
+
+          // Update speaking state based on who just finished speaking
+          // If assistant finished, it's user's turn (isSpeaking = false)
+          // If user finished, assistant will respond (isSpeaking = true)
+          setIsSpeaking(message.role === "user");
 
           addTranscriptMutation({
             sessionId: currentSessionId,
