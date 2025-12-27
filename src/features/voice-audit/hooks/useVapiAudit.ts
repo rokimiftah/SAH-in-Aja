@@ -288,24 +288,29 @@ export function useVapiAudit() {
       // Instead, use transcript messages to determine who is speaking
 
       vapi.on("message", (message) => {
-        if (message.type === "transcript" && message.transcriptType === "final") {
-          const entry: TranscriptEntry = {
-            role: message.role === "assistant" ? "assistant" : "user",
-            text: message.transcript,
-            timestamp: Date.now(),
-          };
-          setTranscript((prev) => [...prev, entry]);
+        if (message.type === "transcript") {
+          // Use PARTIAL transcript to detect who is CURRENTLY speaking
+          // This updates the UI in real-time as someone speaks
+          if (message.transcriptType === "partial") {
+            // Assistant speaking = isSpeaking true, User speaking = isSpeaking false
+            setIsSpeaking(message.role === "assistant");
+          }
 
-          // Update speaking state based on who just finished speaking
-          // If assistant finished, it's user's turn (isSpeaking = false)
-          // If user finished, assistant will respond (isSpeaking = true)
-          setIsSpeaking(message.role === "user");
+          // Use FINAL transcript to save to database
+          if (message.transcriptType === "final") {
+            const entry: TranscriptEntry = {
+              role: message.role === "assistant" ? "assistant" : "user",
+              text: message.transcript,
+              timestamp: Date.now(),
+            };
+            setTranscript((prev) => [...prev, entry]);
 
-          addTranscriptMutation({
-            sessionId: currentSessionId,
-            role: entry.role,
-            text: entry.text,
-          }).catch(console.error);
+            addTranscriptMutation({
+              sessionId: currentSessionId,
+              role: entry.role,
+              text: entry.text,
+            }).catch(console.error);
+          }
         }
       });
 
