@@ -239,6 +239,7 @@ function buildFirstMessage(config: AuditConfig): string {
 
 export function useVapiAudit() {
   const vapiRef = useRef<Vapi | null>(null);
+  const sessionStartTimeRef = useRef<number>(0);
   const [status, setStatus] = useState<VapiStatus>("idle");
   const [isActive, setIsActive] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -273,6 +274,7 @@ export function useVapiAudit() {
       vapi.on("call-start", () => {
         setStatus("connected");
         setIsActive(true);
+        sessionStartTimeRef.current = Date.now();
       });
 
       vapi.on("call-end", () => {
@@ -280,6 +282,13 @@ export function useVapiAudit() {
         setStatus("idle");
         setIsSpeaking(false);
         setCallEnded(true);
+
+        // Complete session in database when call ends naturally (auditor finishes)
+        const durationSeconds = Math.floor((Date.now() - sessionStartTimeRef.current) / 1000);
+        completeSessionMutation({
+          sessionId: currentSessionId,
+          durationSeconds,
+        }).catch((err) => console.error("Failed to complete session:", err));
       });
 
       vapi.on("speech-start", () => {
@@ -318,6 +327,13 @@ export function useVapiAudit() {
           setStatus("idle");
           setIsSpeaking(false);
           setCallEnded(true);
+
+          // Complete session in database
+          const durationSeconds = Math.floor((Date.now() - sessionStartTimeRef.current) / 1000);
+          completeSessionMutation({
+            sessionId: currentSessionId,
+            durationSeconds,
+          }).catch((err) => console.error("Failed to complete session:", err));
           return;
         }
 
@@ -328,7 +344,7 @@ export function useVapiAudit() {
         setCallEnded(true);
       });
     },
-    [addTranscriptMutation, toast],
+    [addTranscriptMutation, completeSessionMutation, toast],
   );
 
   const startSession = useCallback(
@@ -405,30 +421,15 @@ export function useVapiAudit() {
     [startSessionMutation, updateVapiCallId, consumeCredit, setupEventListeners, toast],
   );
 
-  const endSession = useCallback(
-    async (score?: number, feedback?: string) => {
-      if (vapiRef.current) {
-        vapiRef.current.stop();
-      }
+  const endSession = useCallback(async (_score?: number, _feedback?: string) => {
+    // Just stop Vapi - the call-end event handler will complete the session in database
+    if (vapiRef.current) {
+      vapiRef.current.stop();
+    }
 
-      if (sessionId) {
-        try {
-          await completeSessionMutation({
-            sessionId,
-            score,
-            feedback,
-            durationSeconds: Math.floor((Date.now() - (transcript[0]?.timestamp || Date.now())) / 1000),
-          });
-        } catch (err) {
-          console.error("Failed to complete session:", err);
-        }
-      }
-
-      setIsActive(false);
-      setStatus("idle");
-    },
-    [sessionId, completeSessionMutation, transcript],
-  );
+    setIsActive(false);
+    setStatus("idle");
+  }, []);
 
   const abandonSession = useCallback(async () => {
     if (vapiRef.current) {

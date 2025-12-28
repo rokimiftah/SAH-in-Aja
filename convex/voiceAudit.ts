@@ -66,7 +66,9 @@ export const addTranscript = mutation({
     }
 
     if (session.status !== "active") {
-      throw new ConvexError("Sesi sudah berakhir");
+      // Silently ignore transcripts for completed/abandoned sessions
+      // This can happen due to race conditions with Vapi events
+      return;
     }
 
     await ctx.db.patch(args.sessionId, {
@@ -205,9 +207,11 @@ export const saveSessionFromWebhook = internalMutation({
     durationSeconds: v.number(),
   },
   handler: async (ctx, args) => {
-    // Find session by Vapi call ID
-    const sessions = await ctx.db.query("voice_audit_sessions").collect();
-    const session = sessions.find((s) => s.vapiCallId === args.vapiCallId);
+    // Find session by Vapi call ID using index
+    const session = await ctx.db
+      .query("voice_audit_sessions")
+      .withIndex("by_vapiCallId", (q) => q.eq("vapiCallId", args.vapiCallId))
+      .first();
 
     if (!session) {
       console.error(`Session not found for Vapi call ID: ${args.vapiCallId}`);

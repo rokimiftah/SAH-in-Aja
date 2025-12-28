@@ -190,7 +190,9 @@ export default defineSchema({
     creditsUsed: v.number(),
     createdAt: v.number(),
     completedAt: v.optional(v.number()),
-  }).index("by_user", ["userId"]),
+  })
+    .index("by_user", ["userId"])
+    .index("by_vapiCallId", ["vapiCallId"]),
 
   // Certification Eligibility (Self-Declare vs Reguler pathway screening)
   certification_eligibility: defineTable({

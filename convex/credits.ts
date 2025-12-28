@@ -84,7 +84,7 @@ export const getMyDailyCredits = query({
     const credits = await getDailyCredits(ctx, userId);
 
     // Return defaults if no record exists yet (will be created on first use)
-    // Only cap if value <= daily limit (not boosted by promo code)
+    // Preserve bonus credits above daily limit (from promo codes)
     const cekDapur = credits?.cekDapurCredits ?? DAILY_LIMITS.cekDapur;
     const dokumenHalal = credits?.dokumenHalalCredits ?? DAILY_LIMITS.dokumenHalal;
     const asistenHalal = credits?.asistenHalalChats ?? DAILY_LIMITS.asistenHalal;
@@ -93,14 +93,12 @@ export const getMyDailyCredits = query({
     const training = credits?.trainingCredits ?? DAILY_LIMITS.training;
 
     return {
-      cekDapurCredits: cekDapur > DAILY_LIMITS.cekDapur ? cekDapur : Math.min(cekDapur, DAILY_LIMITS.cekDapur),
-      dokumenHalalCredits:
-        dokumenHalal > DAILY_LIMITS.dokumenHalal ? dokumenHalal : Math.min(dokumenHalal, DAILY_LIMITS.dokumenHalal),
-      asistenHalalChats:
-        asistenHalal > DAILY_LIMITS.asistenHalal ? asistenHalal : Math.min(asistenHalal, DAILY_LIMITS.asistenHalal),
-      cekBahanCredits: cekBahan > DAILY_LIMITS.cekBahan ? cekBahan : Math.min(cekBahan, DAILY_LIMITS.cekBahan),
-      voiceAuditCredits: voiceAudit > DAILY_LIMITS.voiceAudit ? voiceAudit : Math.min(voiceAudit, DAILY_LIMITS.voiceAudit),
-      trainingCredits: training > DAILY_LIMITS.training ? training : Math.min(training, DAILY_LIMITS.training),
+      cekDapurCredits: cekDapur,
+      dokumenHalalCredits: dokumenHalal,
+      asistenHalalChats: asistenHalal,
+      cekBahanCredits: cekBahan,
+      voiceAuditCredits: voiceAudit,
+      trainingCredits: training,
       limits: DAILY_LIMITS,
     };
   },
@@ -131,32 +129,26 @@ export const checkCredits = query({
       case "cekDapur":
         limit = DAILY_LIMITS.cekDapur;
         remaining = credits?.cekDapurCredits ?? limit;
-        if (remaining <= limit) remaining = Math.min(remaining, limit);
         break;
       case "dokumenHalal":
         limit = DAILY_LIMITS.dokumenHalal;
         remaining = credits?.dokumenHalalCredits ?? limit;
-        if (remaining <= limit) remaining = Math.min(remaining, limit);
         break;
       case "asistenHalal":
         limit = DAILY_LIMITS.asistenHalal;
         remaining = credits?.asistenHalalChats ?? limit;
-        if (remaining <= limit) remaining = Math.min(remaining, limit);
         break;
       case "cekBahan":
         limit = DAILY_LIMITS.cekBahan;
         remaining = credits?.cekBahanCredits ?? limit;
-        if (remaining <= limit) remaining = Math.min(remaining, limit);
         break;
       case "voiceAudit":
         limit = DAILY_LIMITS.voiceAudit;
         remaining = credits?.voiceAuditCredits ?? limit;
-        if (remaining <= limit) remaining = Math.min(remaining, limit);
         break;
       case "training":
         limit = DAILY_LIMITS.training;
         remaining = credits?.trainingCredits ?? limit;
-        if (remaining <= limit) remaining = Math.min(remaining, limit);
         break;
     }
 
@@ -239,17 +231,11 @@ export const useAsistenHalalCredit = mutation({
     const freshCredits = await ctx.db.get(credits._id);
     if (!freshCredits) throw new ConvexError("Data kredit tidak ditemukan");
 
-    // Only cap if not boosted (credits <= limit means not boosted)
-    const currentCredits =
-      freshCredits.asistenHalalChats > DAILY_LIMITS.asistenHalal
-        ? freshCredits.asistenHalalChats
-        : Math.min(freshCredits.asistenHalalChats, DAILY_LIMITS.asistenHalal);
-
-    if (currentCredits <= 0) {
+    if (freshCredits.asistenHalalChats <= 0) {
       throw new ConvexError("Kredit chat Asisten Halal habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
     }
 
-    const newCredits = currentCredits - 1;
+    const newCredits = freshCredits.asistenHalalChats - 1;
     await ctx.db.patch(credits._id, {
       asistenHalalChats: newCredits,
     });
@@ -274,15 +260,11 @@ export const useCekBahanCredit = mutation({
     const freshCredits = await ctx.db.get(credits._id);
     if (!freshCredits) throw new ConvexError("Data kredit tidak ditemukan");
 
-    const currentCredits = freshCredits.cekBahanCredits ?? DAILY_LIMITS.cekBahan;
-    const cappedCredits =
-      currentCredits > DAILY_LIMITS.cekBahan ? currentCredits : Math.min(currentCredits, DAILY_LIMITS.cekBahan);
-
-    if (cappedCredits <= 0) {
+    if (freshCredits.cekBahanCredits <= 0) {
       throw new ConvexError("Kredit Cek Bahan habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
     }
 
-    const newCredits = cappedCredits - 1;
+    const newCredits = freshCredits.cekBahanCredits - 1;
     await ctx.db.patch(credits._id, {
       cekBahanCredits: newCredits,
     });
@@ -307,15 +289,11 @@ export const useVoiceAuditCredit = mutation({
     const freshCredits = await ctx.db.get(credits._id);
     if (!freshCredits) throw new ConvexError("Data kredit tidak ditemukan");
 
-    const currentCredits = freshCredits.voiceAuditCredits ?? DAILY_LIMITS.voiceAudit;
-    const cappedCredits =
-      currentCredits > DAILY_LIMITS.voiceAudit ? currentCredits : Math.min(currentCredits, DAILY_LIMITS.voiceAudit);
-
-    if (cappedCredits <= 0) {
+    if (freshCredits.voiceAuditCredits <= 0) {
       throw new ConvexError("Kredit Simulasi Audit habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
     }
 
-    const newCredits = cappedCredits - 1;
+    const newCredits = freshCredits.voiceAuditCredits - 1;
     await ctx.db.patch(credits._id, {
       voiceAuditCredits: newCredits,
     });
@@ -340,15 +318,11 @@ export const useTrainingCredit = mutation({
     const freshCredits = await ctx.db.get(credits._id);
     if (!freshCredits) throw new ConvexError("Data kredit tidak ditemukan");
 
-    const currentCredits = freshCredits.trainingCredits ?? DAILY_LIMITS.training;
-    const cappedCredits =
-      currentCredits > DAILY_LIMITS.training ? currentCredits : Math.min(currentCredits, DAILY_LIMITS.training);
-
-    if (cappedCredits <= 0) {
+    if (freshCredits.trainingCredits <= 0) {
       throw new ConvexError("Kredit Pelatihan Halal habis untuk hari ini. Kredit akan reset besok pukul 00:00 WIB.");
     }
 
-    const newCredits = cappedCredits - 1;
+    const newCredits = freshCredits.trainingCredits - 1;
     await ctx.db.patch(credits._id, {
       trainingCredits: newCredits,
     });

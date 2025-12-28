@@ -95,20 +95,48 @@ export const analyzeKitchen = action({
     let jsonContent = content.trim();
 
     // Handle various markdown code block formats
-    // Match ```json, ```JSON, ``` followed by optional whitespace/newline
     const codeBlockMatch = jsonContent.match(/^```(?:json|JSON)?\s*([\s\S]*?)\s*```$/);
     if (codeBlockMatch) {
       jsonContent = codeBlockMatch[1].trim();
     } else if (jsonContent.startsWith("```")) {
-      // Fallback: remove opening and closing backticks
       jsonContent = jsonContent.replace(/^```(?:json|JSON)?\s*/, "").replace(/\s*```$/, "");
     }
 
-    // Also try to extract JSON object if there's extra text
-    const jsonObjectMatch = jsonContent.match(/\{[\s\S]*\}/);
-    if (jsonObjectMatch) {
-      jsonContent = jsonObjectMatch[0];
+    // Extract the last complete JSON object from the content (more robust)
+    let lastValidJson = "";
+    let depth = 0;
+    let startIndex = -1;
+
+    for (let i = 0; i < jsonContent.length; i++) {
+      if (jsonContent[i] === "{") {
+        if (depth === 0) startIndex = i;
+        depth++;
+      } else if (jsonContent[i] === "}") {
+        depth--;
+        if (depth === 0 && startIndex !== -1) {
+          const candidate = jsonContent.slice(startIndex, i + 1);
+          try {
+            JSON.parse(candidate);
+            lastValidJson = candidate;
+          } catch {
+            // Not valid JSON, continue searching
+          }
+        }
+      }
     }
+
+    if (lastValidJson) {
+      jsonContent = lastValidJson;
+    } else {
+      // Fallback to regex extraction
+      const jsonObjectMatch = jsonContent.match(/\{[\s\S]*\}/);
+      if (jsonObjectMatch) {
+        jsonContent = jsonObjectMatch[0];
+      }
+    }
+
+    // Sanitize: remove trailing commas before closing brackets
+    jsonContent = jsonContent.replace(/,\s*([\]}])/g, "$1");
 
     try {
       const result = JSON.parse(jsonContent);

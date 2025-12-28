@@ -90,6 +90,9 @@ export function useCekBahan(): UseCekBahanReturn {
     setResult(null);
 
     try {
+      // Deduct credit first (atomic check on backend) - this will throw if no credits
+      await deductCredit();
+
       const progressPerPhoto = 30 / photos.length;
       const storageIds: Id<"_storage">[] = [];
 
@@ -103,10 +106,6 @@ export function useCekBahan(): UseCekBahanReturn {
       setProgress(50);
 
       const analysisResult = await analyzeMaterial({ photoStorageIds: storageIds });
-
-      setProgress(80);
-
-      await deductCredit();
 
       setProgress(90);
 

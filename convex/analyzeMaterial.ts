@@ -128,20 +128,51 @@ export const analyzeMaterial = action({
 
     let jsonContent = content.trim();
 
-    // Remove code block markers (```json ... ```)
+    // Remove code block markers (```json ... ```) - handle multiple occurrences
     const codeBlockMatch = jsonContent.match(/```(?:json|JSON)?\s*([\s\S]*?)\s*```/);
     if (codeBlockMatch) {
       jsonContent = codeBlockMatch[1].trim();
     }
 
-    // Extract JSON object from the content
-    const jsonObjectMatch = jsonContent.match(/\{[\s\S]*\}/);
-    if (jsonObjectMatch) {
-      jsonContent = jsonObjectMatch[0];
+    // Extract the last complete JSON object from the content (more robust)
+    // This handles cases where AI adds text before/after the JSON
+    let jsonObjectMatch: RegExpMatchArray | null = null;
+    let depth = 0;
+    let startIndex = -1;
+    let lastValidJson = "";
+
+    for (let i = 0; i < jsonContent.length; i++) {
+      if (jsonContent[i] === "{") {
+        if (depth === 0) startIndex = i;
+        depth++;
+      } else if (jsonContent[i] === "}") {
+        depth--;
+        if (depth === 0 && startIndex !== -1) {
+          const candidate = jsonContent.slice(startIndex, i + 1);
+          try {
+            JSON.parse(candidate);
+            lastValidJson = candidate;
+          } catch {
+            // Not valid JSON, continue searching
+          }
+        }
+      }
+    }
+
+    if (lastValidJson) {
+      jsonContent = lastValidJson;
+    } else {
+      // Fallback to regex extraction if bracket matching fails
+      jsonObjectMatch = jsonContent.match(/\{[\s\S]*\}/);
+      if (jsonObjectMatch) {
+        jsonContent = jsonObjectMatch[0];
+      }
     }
 
     // Sanitize: replace JavaScript undefined with JSON null
     jsonContent = jsonContent.replace(/:\s*undefined\b/g, ": null");
+    // Sanitize: remove trailing commas before closing brackets
+    jsonContent = jsonContent.replace(/,\s*([\]}])/g, "$1");
 
     try {
       const result = JSON.parse(jsonContent);

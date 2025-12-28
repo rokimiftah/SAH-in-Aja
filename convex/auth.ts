@@ -33,6 +33,11 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   providers: [
     magicLink,
     Google({
+      // SECURITY NOTE: allowDangerousEmailAccountLinking is enabled because:
+      // 1. Currently only Google OAuth and Magic Link are used (both verify email ownership)
+      // 2. This allows users to sign in with either method using the same email
+      // If adding new OAuth providers in the future, ensure they verify email ownership
+      // or consider disabling this option
       allowDangerousEmailAccountLinking: true,
       profile: (params) => {
         const raw = params as unknown as GoogleProfile;

@@ -64,12 +64,13 @@ export function VoiceAuditPage() {
     }
   }, [user?.name]);
 
-  // Protect active call state from navigation
+  // Protect active call state from navigation (including connecting state)
   useEffect(() => {
-    const isCallActive = flowState === "active";
-    setProcessing(isCallActive, "Simulasi audit sedang berlangsung...");
+    // Only block when actually connecting or connected (not when Vapi has ended but flowState hasn't updated yet)
+    const isCallActive = status === "connecting" || status === "connected";
+    setProcessing(isCallActive, status === "connecting" ? "Menghubungkan ke auditor..." : "Simulasi audit sedang berlangsung...");
     return () => setProcessing(false);
-  }, [flowState, setProcessing]);
+  }, [status, setProcessing]);
 
   // Handle call ended from Vapi (e.g., meeting ended by server)
   useEffect(() => {
@@ -79,10 +80,10 @@ export function VoiceAuditPage() {
     }
   }, [callEnded, flowState, resetCallEnded]);
 
-  // Prevent accidental page close/refresh during active call
+  // Prevent accidental page close/refresh during active call or connecting
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (flowState === "active") {
+      if (status === "connecting" || status === "connected") {
         e.preventDefault();
         e.returnValue = "";
       }
@@ -90,7 +91,7 @@ export function VoiceAuditPage() {
 
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [flowState]);
+  }, [status]);
 
   const handleGoToConfig = () => setFlowState("config");
 
