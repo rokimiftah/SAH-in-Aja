@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useQuery } from "convex/react";
-import { ArrowLeft, History, Loader2, Zap } from "lucide-react";
+import { AlertTriangle, ArrowLeft, History, Loader2, Zap } from "lucide-react";
 import { useLocation } from "wouter";
 
 import { useToast } from "@shared/components/ui";
@@ -72,9 +72,16 @@ export function TopUpCreditsPage() {
   } = usePayment();
   const paymentHistory = useQuery(api.mayar.getMyPayments);
   const dailyCredits = useQuery(api.credits.getMyDailyCredits);
+  const currentUser = useQuery(api.users.getCurrentUser);
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const isUserLoading = currentUser === undefined;
+  const hasPhoneForPayment = !isUserLoading && (currentUser?.phone ?? "").replace(/\D/g, "").length >= 10;
+
+  const redirectToEditProfile = () => {
+    setLocation(`/dashboard/profile?returnTo=${encodeURIComponent("/dashboard/top-up")}`);
+  };
 
   // Show error toast when payment fails
   useEffect(() => {
@@ -84,7 +91,13 @@ export function TopUpCreditsPage() {
   }, [paymentError, toast]);
 
   const handleBuyCredits = async () => {
-    if (!selectedPackage) return;
+    if (!selectedPackage || isUserLoading) return;
+
+    if (!hasPhoneForPayment) {
+      toast.info("Lengkapi nomor telepon dulu sebelum pembayaran");
+      redirectToEditProfile();
+      return;
+    }
 
     try {
       await initiatePayment();
@@ -179,10 +192,28 @@ export function TopUpCreditsPage() {
 
       {/* Buy Button */}
       <div className="mb-8">
+        {!isUserLoading && !hasPhoneForPayment && (
+          <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+              <div>
+                <p className="text-sm font-medium text-amber-800">Nomor telepon wajib diisi sebelum melakukan pembayaran.</p>
+                <button
+                  type="button"
+                  onClick={redirectToEditProfile}
+                  className="mt-2 cursor-pointer text-sm font-semibold text-amber-700 underline underline-offset-2 hover:text-amber-800"
+                >
+                  Isi nomor telepon di Edit Profile
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <button
           type="button"
           onClick={handleBuyCredits}
-          disabled={!selectedPackage || isCreatingPayment}
+          disabled={!selectedPackage || isCreatingPayment || isUserLoading}
           className="w-full cursor-pointer rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-4 text-lg font-semibold text-white transition-all hover:from-emerald-600 hover:to-teal-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isCreatingPayment ? (
@@ -190,6 +221,8 @@ export function TopUpCreditsPage() {
               <Loader2 className="h-5 w-5 animate-spin" />
               Memproses...
             </span>
+          ) : selectedPackageData && !isUserLoading && !hasPhoneForPayment ? (
+            "Isi nomor HP dulu untuk melanjutkan"
           ) : selectedPackageData ? (
             `Beli ${selectedPackageData.credits} Kredit - ${formatCurrency(selectedPackageData.amount)}`
           ) : (

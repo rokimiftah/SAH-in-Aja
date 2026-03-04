@@ -1,6 +1,6 @@
 import type { Id } from "../../../convex/_generated/dataModel";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useMutation, useQuery } from "convex/react";
 import { Check, Loader2, Mail, Upload } from "lucide-react";
@@ -41,6 +41,17 @@ const PROVIDER_NAMES: Record<string, string> = {
   "magic-link": "Email",
 };
 
+function getSafeReturnPath(): string {
+  if (typeof window === "undefined") return "/dashboard";
+
+  const rawReturnTo = new URLSearchParams(window.location.search).get("returnTo");
+  if (!rawReturnTo) return "/dashboard";
+
+  if (!rawReturnTo.startsWith("/dashboard")) return "/dashboard";
+
+  return rawReturnTo;
+}
+
 export function EditProfilePage() {
   const [, navigate] = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -58,6 +69,8 @@ export function EditProfilePage() {
   const [compressedBlob, setCompressedBlob] = useState<Blob | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const returnToPath = useMemo(() => getSafeReturnPath(), []);
+  const fromTopUpFlow = returnToPath === "/dashboard/top-up";
 
   // Cleanup preview URL on unmount or when it changes
   useEffect(() => {
@@ -121,6 +134,11 @@ export function EditProfilePage() {
   const handleSave = async () => {
     if (!hasChanges) return;
 
+    if (phone !== null && phone.trim() !== "" && phone.replace(/\D/g, "").length < 10) {
+      toast.error("Nomor telepon minimal 10 digit");
+      return;
+    }
+
     setSaving(true);
     setSaved(false);
 
@@ -149,6 +167,9 @@ export function EditProfilePage() {
         ...(storageId && { storageId }),
       });
 
+      const latestPhone = (phone ?? user?.phone ?? "").replace(/\D/g, "");
+      const shouldRedirectToReturnPath = returnToPath !== "/dashboard" && latestPhone.length >= 10;
+
       setSaved(true);
       setName(null);
       setPhone(null);
@@ -157,6 +178,11 @@ export function EditProfilePage() {
       setCompressedBlob(null);
       setPreviewUrl(null);
       toast.success("Profil berhasil disimpan");
+
+      if (shouldRedirectToReturnPath) {
+        navigate(returnToPath);
+        return;
+      }
 
       setTimeout(() => setSaved(false), 2000);
     } catch (error) {
@@ -176,7 +202,11 @@ export function EditProfilePage() {
   }
 
   return (
-    <PageContainer backButton={{ onClick: () => navigate("/dashboard") }} centered maxWidth="xl">
+    <PageContainer
+      backButton={{ label: fromTopUpFlow ? "Top-Up Kredit" : "Dashboard", onClick: () => navigate(returnToPath) }}
+      centered
+      maxWidth="xl"
+    >
       {/* Header */}
       <div className="mb-6 text-center">
         <h1 className="text-2xl font-bold text-gray-800">Edit Profil</h1>
@@ -235,6 +265,9 @@ export function EditProfilePage() {
               placeholder="08xxxxxxxxxx"
               className="h-10.5 w-full rounded-xl border border-gray-300 px-3 py-2.5 text-gray-800 transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
             />
+            {fromTopUpFlow && (
+              <p className="mt-1.5 text-xs text-amber-700">Setelah simpan, Anda akan kembali ke halaman top-up.</p>
+            )}
           </div>
         </div>
 
