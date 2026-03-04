@@ -18,7 +18,9 @@ export default defineSchema({
     address: v.optional(v.string()),
     credits: v.optional(v.number()), // Koin SAH
     tier: v.optional(v.union(v.literal("free"), v.literal("eceran"), v.literal("juragan"))),
-    role: v.optional(v.union(v.literal("user"), v.literal("admin"))),
+    role: v.optional(v.union(v.literal("user"), v.literal("admin"), v.literal("owner"))),
+    status: v.optional(v.union(v.literal("active"), v.literal("inactive"), v.literal("suspended"))),
+    lastLoginAt: v.optional(v.number()),
     createdAt: v.optional(v.number()),
     storageId: v.optional(v.string()),
     preferredTitle: v.optional(v.union(v.literal("bapak"), v.literal("ibu"), v.literal("mas"), v.literal("mbak"))),
@@ -257,4 +259,23 @@ export default defineSchema({
     certificatePdfUrl: v.optional(v.string()),
     createdAt: v.number(),
   }).index("by_user", ["userId"]),
+
+  // Mayar payments table (Top-Up Kredit AI)
+  mayar_payments: defineTable({
+    userId: v.id("users"),
+    mayarTransactionId: v.string(), // Mayar's transaction ID
+    mayarPaymentId: v.optional(v.string()), // Mayar's payment ID
+    paymentLink: v.string(), // Mayar payment link URL
+    packageId: v.string(), // e.g., "credits_50", "credits_100", "credits_250"
+    credits: v.number(), // Number of credits purchased
+    amount: v.number(), // Amount in IDR
+    status: v.union(v.literal("pending"), v.literal("paid"), v.literal("expired"), v.literal("cancelled")),
+    paidAt: v.optional(v.number()),
+    expiredAt: v.optional(v.number()),
+    mayarWebhookData: v.optional(v.any()), // Store raw webhook data for debugging
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_mayarTransactionId", ["mayarTransactionId"])
+    .index("by_status", ["status"]),
 });

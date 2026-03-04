@@ -32,6 +32,7 @@ export const updateUserProfile = mutation({
     businessName: v.optional(v.string()),
     businessType: v.optional(v.string()),
     address: v.optional(v.string()),
+    phone: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);

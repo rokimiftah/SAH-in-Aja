@@ -51,6 +51,7 @@ export function EditProfilePage() {
   const generateUploadUrl = useMutation(api.users.generateUploadUrl);
 
   const [name, setName] = useState<string | null>(null);
+  const [phone, setPhone] = useState<string | null>(null);
   const [businessName, setBusinessName] = useState<string | null>(null);
   const [address, setAddress] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -68,6 +69,7 @@ export function EditProfilePage() {
   }, [previewUrl]);
 
   const currentName = name ?? user?.name ?? "";
+  const currentPhone = phone ?? user?.phone ?? "";
   const currentBusinessName = businessName ?? user?.businessName ?? "";
   const currentAddress = address ?? user?.address ?? "";
   const currentImage = previewUrl ?? user?.image;
@@ -89,7 +91,7 @@ export function EditProfilePage() {
   const avatarUrl =
     currentImage || `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(initials)}&backgroundColor=10b981`;
 
-  const hasChanges = name !== null || businessName !== null || address !== null || compressedBlob !== null;
+  const hasChanges = name !== null || phone !== null || businessName !== null || address !== null || compressedBlob !== null;
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -141,6 +143,7 @@ export function EditProfilePage() {
 
       await updateProfile({
         ...(name !== null && { name }),
+        ...(phone !== null && { phone }),
         ...(businessName !== null && { businessName }),
         ...(address !== null && { address }),
         ...(storageId && { storageId }),
@@ -148,6 +151,7 @@ export function EditProfilePage() {
 
       setSaved(true);
       setName(null);
+      setPhone(null);
       setBusinessName(null);
       setAddress(null);
       setCompressedBlob(null);
@@ -202,7 +206,7 @@ export function EditProfilePage() {
 
       {/* Form Fields - Simple 2 Column */}
       <div className="mb-6 space-y-5">
-        {/* Row 1: Nama & Nama Usaha */}
+        {/* Row 1: Nama & Nomor Telepon */}
         <div className="grid gap-5 lg:grid-cols-2">
           <div>
             <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-gray-700">
@@ -219,6 +223,24 @@ export function EditProfilePage() {
           </div>
 
           <div>
+            <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-gray-700">
+              Nomor Telepon
+              <span className="ml-1 text-xs text-amber-600">(wajib untuk pembayaran)</span>
+            </label>
+            <input
+              id="phone"
+              type="tel"
+              value={currentPhone}
+              onChange={(e) => setPhone(e.target.value.replace(/[^\d+]/g, ""))}
+              placeholder="08xxxxxxxxxx"
+              className="h-10.5 w-full rounded-xl border border-gray-300 px-3 py-2.5 text-gray-800 transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Row 2: Nama Usaha & Alamat */}
+        <div className="grid gap-5 lg:grid-cols-2">
+          <div>
             <label htmlFor="businessName" className="mb-1.5 block text-sm font-medium text-gray-700">
               Nama Usaha
             </label>
@@ -230,16 +252,6 @@ export function EditProfilePage() {
               placeholder="Masukkan nama usaha Anda"
               className="h-10.5 w-full rounded-xl border border-gray-300 px-3 py-2.5 text-gray-800 transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
             />
-          </div>
-        </div>
-
-        {/* Row 2: Email & Alamat Usaha */}
-        <div className="grid gap-5 lg:grid-cols-2">
-          <div>
-            <span className="mb-1.5 block text-sm font-medium text-gray-700">Email</span>
-            <div className="flex h-10.5 items-center rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm text-gray-600">
-              {user.email || "-"}
-            </div>
           </div>
 
           <div>
@@ -257,28 +269,37 @@ export function EditProfilePage() {
           </div>
         </div>
 
-        {/* Row 3: Metode Login (Full Width) */}
-        <div>
-          <span className="mb-1.5 block text-sm font-medium text-gray-700">Metode Login Terhubung</span>
-          <div className="flex h-10.5 gap-2">
-            {linkedProviders.length > 0 ? (
-              linkedProviders.map((provider) => (
-                <div
-                  key={provider}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-2 sm:gap-2"
-                >
-                  <span className="text-gray-600">{PROVIDER_ICONS[provider] || <Mail className="h-4 w-4" />}</span>
-                  <span className="hidden text-sm font-medium text-gray-700 sm:inline">
-                    {PROVIDER_NAMES[provider] || provider}
-                  </span>
-                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+        {/* Row 3: Email (read-only) & Metode Login */}
+        <div className="grid gap-5 lg:grid-cols-2">
+          <div>
+            <span className="mb-1.5 block text-sm font-medium text-gray-700">Email</span>
+            <div className="flex h-10.5 items-center rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm text-gray-600">
+              {user.email || "-"}
+            </div>
+          </div>
+
+          <div>
+            <span className="mb-1.5 block text-sm font-medium text-gray-700">Metode Login Terhubung</span>
+            <div className="flex h-10.5 gap-2">
+              {linkedProviders.length > 0 ? (
+                linkedProviders.map((provider) => (
+                  <div
+                    key={provider}
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-2 sm:gap-2"
+                  >
+                    <span className="text-gray-600">{PROVIDER_ICONS[provider] || <Mail className="h-4 w-4" />}</span>
+                    <span className="hidden text-sm font-medium text-gray-700 sm:inline">
+                      {PROVIDER_NAMES[provider] || provider}
+                    </span>
+                    <Check className="h-3.5 w-3.5 text-emerald-500" />
+                  </div>
+                ))
+              ) : (
+                <div className="flex w-full items-center justify-center rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm text-gray-500">
+                  Tidak ada provider terhubung
                 </div>
-              ))
-            ) : (
-              <div className="flex w-full items-center justify-center rounded-xl border border-gray-200 bg-gray-50 px-3 text-sm text-gray-500">
-                Tidak ada provider terhubung
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -18,6 +18,7 @@ import { DokumenHalalHistoryPage } from "./DokumenHalalHistoryPage";
 import { DokumenHalalPage } from "./DokumenHalalPage";
 import { EditProfilePage } from "./EditProfilePage";
 import { EligibilityCheckPage } from "./EligibilityCheckPage";
+import { TopUpCreditsPage } from "./TopUpCreditsPage";
 import { TraceabilityPage } from "./TraceabilityPage";
 import { TrainingHistoryPage } from "./TrainingHistoryPage";
 import { TrainingPage } from "./TrainingPage";
@@ -100,6 +101,7 @@ function DashboardContent() {
               <Route path="/dashboard/traceability" component={TraceabilityPage} />
               <Route path="/dashboard/pelatihan/history" component={TrainingHistoryPage} />
               <Route path="/dashboard/pelatihan" component={TrainingPage} />
+              <Route path="/dashboard/top-up" component={TopUpCreditsPage} />
               <Route path="/dashboard/profile" component={EditProfilePage} />
               <Route>
                 <div className="flex h-full flex-col items-center justify-center gap-4 rounded-2xl border border-gray-200 bg-white">

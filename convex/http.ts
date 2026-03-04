@@ -10,6 +10,65 @@ const http = httpRouter();
 
 auth.addHttpRoutes(http);
 
+// Mayar.id webhook endpoint
+http.route({
+  path: "/mayar-webhook",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    try {
+      // Extract token from query parameter for verification
+      const url = new URL(request.url);
+      const token = url.searchParams.get("token");
+
+      const body = await request.json();
+      const eventType = body?.event;
+
+      console.log("Mayar webhook received:", eventType);
+
+      // Verify webhook request
+      const { verifyWebhookRequest } = await import("./mayar");
+      const verification = verifyWebhookRequest(token, body);
+      if (!verification.valid) {
+        console.error("Webhook verification failed:", verification.error);
+        return new Response(JSON.stringify({ error: verification.error }), {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      switch (eventType) {
+        case "payment.received": {
+          const result = await ctx.runMutation(internal.mayar.handlePaymentReceived, {
+            webhookData: body,
+          });
+          console.log("Payment received processed:", result);
+          break;
+        }
+        case "payment.reminder": {
+          const result = await ctx.runMutation(internal.mayar.handlePaymentReminder, {
+            webhookData: body,
+          });
+          console.log("Payment reminder processed:", result);
+          break;
+        }
+        default:
+          console.log("Unknown Mayar webhook event:", eventType);
+      }
+
+      return new Response(JSON.stringify({ received: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error) {
+      console.error("Mayar webhook error:", error);
+      return new Response(JSON.stringify({ error: "Internal server error" }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }),
+});
+
 // Vapi.ai webhook endpoint
 http.route({
   path: "/vapi-webhook",

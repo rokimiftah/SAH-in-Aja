@@ -22,6 +22,7 @@ import {
   Table,
   UserPen,
   X,
+  Zap,
 } from "lucide-react";
 import { useLocation } from "wouter";
 
@@ -687,6 +688,21 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </button>
               </>
             )}
+            <div className="border-t border-gray-100" />
+            <button
+              type="button"
+              onClick={() => {
+                if (handleNavigation("/dashboard/top-up")) {
+                  navigate("/dashboard/top-up");
+                  setUserMenuOpen(false);
+                  onClose();
+                }
+              }}
+              className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-sm font-medium text-emerald-600 transition-colors hover:bg-emerald-50"
+            >
+              <Zap className="h-4 w-4" />
+              Top-Up Kredit
+            </button>
             <div className="border-t border-gray-100" />
             <button
               type="button"

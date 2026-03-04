@@ -26,6 +26,7 @@ import type * as lib_llmClient from "../lib/llmClient.js";
 import type * as lib_magicLink from "../lib/magicLink.js";
 import type * as maintenance from "../maintenance.js";
 import type * as materialScans from "../materialScans.js";
+import type * as mayar from "../mayar.js";
 import type * as products from "../products.js";
 import type * as storage from "../storage.js";
 import type * as traceability from "../traceability.js";
@@ -58,6 +59,7 @@ declare const fullApi: ApiFromModules<{
   "lib/magicLink": typeof lib_magicLink;
   maintenance: typeof maintenance;
   materialScans: typeof materialScans;
+  mayar: typeof mayar;
   products: typeof products;
   storage: typeof storage;
   traceability: typeof traceability;

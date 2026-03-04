@@ -14,3 +14,4 @@ export { EligibilityCheckPage } from "./EligibilityCheckPage";
 export { TraceabilityPage } from "./TraceabilityPage";
 export { TrainingPage } from "./TrainingPage";
 export { TrainingHistoryPage } from "./TrainingHistoryPage";
+export { TopUpCreditsPage } from "./TopUpCreditsPage";
