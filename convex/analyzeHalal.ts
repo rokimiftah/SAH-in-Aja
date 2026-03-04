@@ -83,12 +83,29 @@ export const analyzeKitchen = action({
       });
     } catch (apiError) {
       console.error("LLM API Error:", apiError);
-      throw new Error(`AI API Error: ${apiError instanceof Error ? apiError.message : "Unknown error"}`);
+      const errorMessage = apiError instanceof Error ? apiError.message : "Unknown error";
+
+      // Check for specific error types
+      if (errorMessage.includes("401") || errorMessage.includes("authentication")) {
+        throw new Error("Terjadi kesalahan konfigurasi API. Silakan hubungi administrator.");
+      }
+      if (errorMessage.includes("429") || errorMessage.includes("rate limit")) {
+        throw new Error("Layanan sedang sibuk. Silakan coba lagi dalam beberapa menit.");
+      }
+      if (errorMessage.includes("model") || errorMessage.includes("not found")) {
+        throw new Error("Model AI tidak tersedia. Silakan hubungi administrator.");
+      }
+
+      throw new Error(`AI API Error: ${errorMessage}`);
     }
 
-    const content = response.choices[0]?.message?.content;
+    const message = response.choices?.[0]?.message;
+    // Extract content - some models use reasoning_content instead of content
+    const content = (message?.content as string) || (message as any)?.reasoning_content;
+
     if (!content) {
-      throw new Error("No response from AI");
+      console.error("No response from AI. Full response:", JSON.stringify(response, null, 2));
+      throw new Error("AI tidak memberikan respons yang valid. Silakan coba lagi.");
     }
 
     // Strip markdown code blocks if present (```json ... ``` or ``` ... ```)

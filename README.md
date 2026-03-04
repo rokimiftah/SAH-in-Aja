@@ -11,7 +11,7 @@
 [![React 19](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Convex](https://img.shields.io/badge/Convex-Backend-FF6B6B?style=for-the-badge)](https://convex.dev/)
-[![Kolosal AI](https://img.shields.io/badge/Kolosal-AI-76B900?style=for-the-badge)](https://kolosal.ai/)
+[![CanopyWave](https://img.shields.io/badge/CanopyWave-AI-4F46E5?style=for-the-badge)](https://canopywave.io/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-06B6D4?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
 
 </div>
@@ -754,11 +754,11 @@ Setiap fitur menyimpan riwayat penggunaan:
 
 ### AI/ML
 
-| Provider                          | Model             | Purpose               |
-| --------------------------------- | ----------------- | --------------------- |
-| [Kolosal AI](https://kolosal.ai/) | Claude Sonnet 4.5 | Vision AI             |
-| [Kolosal AI](https://kolosal.ai/) | Claude Sonnet 4.5 | Text AI               |
-| [Vapi.ai](https://vapi.ai/)       | Realtime Voice AI | Voice Audit Simulator |
+| Provider                             | Model                    | Purpose               |
+| ------------------------------------ | ------------------------ | --------------------- |
+| [CanopyWave](https://canopywave.io/) | moonshotai/kimi-k2.5     | Vision AI             |
+| [CanopyWave](https://canopywave.io/) | xiaomimimo/mimo-v2-flash | Text AI               |
+| [Vapi.ai](https://vapi.ai/)          | Realtime Voice AI        | Voice Audit Simulator |
 
 ### Infrastructure & Tools
 
@@ -773,15 +773,15 @@ Setiap fitur menyimpan riwayat penggunaan:
 
 ## AI Models
 
-Platform ini menggunakan **Kolosal AI** (Claude Sonnet 4.5) dan **Vapi.ai** sebagai provider AI utama:
+Platform ini menggunakan **CanopyWave** dan **Vapi.ai** sebagai provider AI utama:
 
 ### Vision AI - Cek Dapur & Cek Bahan
 
 ```
-Model: global.anthropic.claude-sonnet-4-5-20250929-v1:0
-Provider: Kolosal AI (OpenAI-compatible API)
-Context: 200K tokens
-Pricing: $3.0/1M input, $15.0/1M output
+Model: moonshotai/kimi-k2.5
+Provider: CanopyWave (OpenAI-compatible API)
+Context: Large context window
+Capabilities: Advanced vision understanding, OCR, multimodal reasoning
 ```
 
 **Kemampuan:**
@@ -795,10 +795,9 @@ Pricing: $3.0/1M input, $15.0/1M output
 ### Text AI - Dokumen & Asisten Halal
 
 ```
-Model: global.anthropic.claude-sonnet-4-5-20250929-v1:0
-Provider: Kolosal AI (OpenAI-compatible API)
-Context: 200K tokens
-Pricing: $3.0/1M input, $15.0/1M output
+Model: xiaomimimo/mimo-v2-flash
+Provider: CanopyWave (OpenAI-compatible API)
+Capabilities: Fast text generation, instruction following
 ```
 
 **Kemampuan:**
@@ -867,8 +866,8 @@ Features: Speech-to-Text, Text-to-Speech, Conversational AI
 ┌─────────────────────────────────────────────────────────────┐
 │                    EXTERNAL SERVICES                        │
 │  ┌───────────────┬──────────────┬──────────────────────┐    │
-│  │ Kolosal AI    │ Vapi.ai      │ Convex Storage       │    │
-│  │ (Claude 4.5)  │ (Voice AI)   │ (File Upload)        │    │
+│  │ CanopyWave    │ Vapi.ai      │ Convex Storage       │    │
+│  │ (Mimo/Kimi)   │ (Voice AI)   │ (File Upload)        │    │
 │  └───────────────┴──────────────┴──────────────────────┘    │
 │  ┌──────────────────────────────────────────────────────┐   │
 │  │ Resend (Email for Magic Link)                        │   │

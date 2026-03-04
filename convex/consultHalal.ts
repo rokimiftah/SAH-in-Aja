@@ -115,14 +115,22 @@ Jawab dengan format JSON (tanpa markdown):
       max_tokens: 100,
     });
 
-    const content = response.choices[0]?.message?.content?.trim();
+    // Extract content - some models use reasoning_content instead of content
+    const message = response.choices?.[0]?.message;
+    // Type cast to handle non-standard fields from certain models
+    const content = (message?.content as string) || (message as any)?.reasoning_content;
+
     if (!content) {
+      console.warn("Empty classification response, allowing message");
       return { isHalalRelated: true, reason: "fallback" };
     }
 
     // Parse JSON response with safe error handling
     try {
-      const cleanedContent = content.replace(/```json\n?|\n?```/g, "").trim();
+      const cleanedContent = content
+        .trim()
+        .replace(/```json\n?|\n?```/g, "")
+        .trim();
       const result = JSON.parse(cleanedContent);
       return {
         isHalalRelated: result.isHalalRelated === true,
@@ -130,10 +138,12 @@ Jawab dengan format JSON (tanpa markdown):
       };
     } catch {
       // JSON parsing failed, fallback to allow the message
+      console.warn("JSON parse error in classification, allowing message");
       return { isHalalRelated: true, reason: "json_parse_error" };
     }
-  } catch {
+  } catch (error) {
     // Fallback: jika gagal classify, allow the message (lebih baik false positive)
+    console.warn("Classification error, allowing message:", error instanceof Error ? error.message : error);
     return { isHalalRelated: true, reason: "classification_error" };
   }
 }
@@ -217,17 +227,73 @@ export const chat = action({
       content: args.message,
     });
 
-    const response = await llmClient.chat.completions.create({
+    // Debug: Log request details (will show in Convex logs)
+    console.log("Sending chat request:", {
       model: getLLMModel("text"),
-      messages,
-      temperature: 0.7,
-      max_tokens: 4096,
+      messageLength: args.message.length,
+      historyLength: args.conversationHistory?.length || 0,
     });
 
-    const content = response.choices[0]?.message?.content;
-    if (!content) {
+    let response: Awaited<ReturnType<typeof llmClient.chat.completions.create>>;
+    try {
+      response = await llmClient.chat.completions.create({
+        model: getLLMModel("text"),
+        messages,
+        temperature: 0.7,
+        max_tokens: 4096,
+      });
+    } catch (apiError) {
+      console.error("LLM API Error:", apiError);
+      const errorMessage = apiError instanceof Error ? apiError.message : "Unknown error";
+
+      // Check for specific error types
+      if (errorMessage.includes("401") || errorMessage.includes("authentication")) {
+        return {
+          response: "Maaf, terjadi kesalahan konfigurasi API. Silakan hubungi administrator.",
+          source: "error",
+          confidence: 0,
+        };
+      }
+      if (errorMessage.includes("429") || errorMessage.includes("rate limit")) {
+        return {
+          response: "Maaf, layanan sedang sibuk. Silakan coba lagi dalam beberapa menit.",
+          source: "error",
+          confidence: 0,
+        };
+      }
+      if (errorMessage.includes("model") || errorMessage.includes("not found")) {
+        return {
+          response: "Maaf, model AI tidak tersedia. Silakan hubungi administrator.",
+          source: "error",
+          confidence: 0,
+        };
+      }
+
       return {
-        response: "Maaf, tidak dapat memproses pertanyaan Anda. Silakan coba lagi.",
+        response: `Maaf, terjadi kesalahan koneksi ke layanan AI: ${errorMessage}. Silakan coba lagi.`,
+        source: "error",
+        confidence: 0,
+      };
+    }
+
+    // Debug logging
+    console.log("API Response:", {
+      model: response.model,
+      choices: response.choices?.length,
+      usage: response.usage,
+      hasContent: !!response.choices?.[0]?.message?.content,
+      hasReasoningContent: !!(response.choices?.[0]?.message as any)?.reasoning_content,
+    });
+
+    // Extract content - some models use reasoning_content instead of content
+    const message = response.choices?.[0]?.message;
+    // Type cast to handle non-standard fields from certain models
+    const content = (message?.content as string) || (message as any)?.reasoning_content;
+
+    if (!content || content.trim() === "") {
+      console.error("Empty response from LLM. Full response:", JSON.stringify(response, null, 2));
+      return {
+        response: "Maaf, AI tidak memberikan respons yang valid. Silakan coba lagi.",
         source: "error",
         confidence: 0,
       };

@@ -118,12 +118,29 @@ export const analyzeMaterial = action({
       });
     } catch (apiError) {
       console.error("LLM API Error:", apiError);
-      throw new ConvexError(`Gagal menganalisis foto. Silakan coba lagi.`);
+      const errorMessage = apiError instanceof Error ? apiError.message : "Unknown error";
+
+      // Check for specific error types
+      if (errorMessage.includes("401") || errorMessage.includes("authentication")) {
+        throw new ConvexError("Terjadi kesalahan konfigurasi API. Silakan hubungi administrator.");
+      }
+      if (errorMessage.includes("429") || errorMessage.includes("rate limit")) {
+        throw new ConvexError("Layanan sedang sibuk. Silakan coba lagi dalam beberapa menit.");
+      }
+      if (errorMessage.includes("model") || errorMessage.includes("not found")) {
+        throw new ConvexError("Model AI tidak tersedia. Silakan hubungi administrator.");
+      }
+
+      throw new ConvexError(`Gagal menganalisis foto: ${errorMessage}. Silakan coba lagi.`);
     }
 
-    const content = response.choices[0]?.message?.content;
+    const message = response.choices?.[0]?.message;
+    // Extract content - some models use reasoning_content instead of content
+    const content = (message?.content as string) || (message as any)?.reasoning_content;
+
     if (!content) {
-      throw new ConvexError("Tidak ada respons dari AI. Silakan coba lagi.");
+      console.error("No response from AI. Full response:", JSON.stringify(response, null, 2));
+      throw new ConvexError("AI tidak memberikan respons yang valid. Silakan coba lagi.");
     }
 
     let jsonContent = content.trim();

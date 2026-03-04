@@ -29,6 +29,7 @@ import type * as materialScans from "../materialScans.js";
 import type * as mayar from "../mayar.js";
 import type * as products from "../products.js";
 import type * as storage from "../storage.js";
+import type * as testCanopyWave from "../testCanopyWave.js";
 import type * as traceability from "../traceability.js";
 import type * as training from "../training.js";
 import type * as users from "../users.js";
@@ -62,6 +63,7 @@ declare const fullApi: ApiFromModules<{
   mayar: typeof mayar;
   products: typeof products;
   storage: typeof storage;
+  testCanopyWave: typeof testCanopyWave;
   traceability: typeof traceability;
   training: typeof training;
   users: typeof users;

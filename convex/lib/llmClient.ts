@@ -1,13 +1,15 @@
 import OpenAI from "openai";
 
 /**
- * LLM API Integration (Claude Sonnet 4.5 via OpenAI-compatible API)
+ * LLM API Integration via CanopyWave (OpenAI-compatible API)
  *
- * Provider: LLM API endpoint (OpenAI-compatible)
- * Model: global.anthropic.claude-sonnet-4-5-20250929-v1:0
+ * Provider: CanopyWave
+ * Models:
+ *   - Text: xiaomimimo/mimo-v2-flash
+ *   - Vision: moonshotai/kimi-k2.5
  *
  * CATATAN: Menggunakan API endpoint yang kompatibel dengan OpenAI
- * untuk integrasi Claude Sonnet 4.5 sebagai model LLM utama.
+ * untuk integrasi model LLM terbaik melalui CanopyWave.
  */
 
 /**

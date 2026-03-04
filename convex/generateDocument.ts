@@ -164,10 +164,10 @@ TANGGAL HARI INI: ${new Date().toLocaleDateString("id-ID", { day: "numeric", mon
 
 Buat dokumen lengkap dalam bahasa Indonesia formal. Gunakan tahun ${new Date().toLocaleDateString("id-ID", { year: "numeric", timeZone: "Asia/Jakarta" })} untuk nomor dokumen.`;
 
+    const llmClient = createLLMClient();
+    let response: Awaited<ReturnType<typeof llmClient.chat.completions.create>>;
     try {
-      const llmClient = createLLMClient();
-
-      const response = await llmClient.chat.completions.create({
+      response = await llmClient.chat.completions.create({
         model: getLLMModel("text"),
         messages: [
           {
@@ -182,45 +182,37 @@ Buat dokumen lengkap dalam bahasa Indonesia formal. Gunakan tahun ${new Date().t
         temperature: 0.7,
         max_tokens: 4096,
       });
+    } catch (apiError) {
+      console.error("LLM API Error:", apiError);
+      const errorMessage = apiError instanceof Error ? apiError.message : "Unknown error";
 
-      const message = response.choices[0]?.message;
-      const content = message?.content;
-
-      if (!content || content.trim() === "") {
-        console.error("Content is empty or missing");
-        throw new Error("No content in API response");
+      // Check for specific error types
+      if (errorMessage.includes("401") || errorMessage.includes("authentication")) {
+        throw new Error("Terjadi kesalahan konfigurasi API. Silakan hubungi administrator.");
+      }
+      if (errorMessage.includes("429") || errorMessage.includes("rate limit")) {
+        throw new Error("Layanan sedang sibuk. Silakan coba lagi dalam beberapa menit.");
+      }
+      if (errorMessage.includes("model") || errorMessage.includes("not found")) {
+        throw new Error("Model AI tidak tersedia. Silakan hubungi administrator.");
+      }
+      if (errorMessage.includes("500") || errorMessage.includes("502") || errorMessage.includes("503")) {
+        throw new Error("Layanan sedang tidak tersedia. Silakan coba lagi nanti.");
       }
 
-      return { content };
-    } catch (error) {
-      console.error("Error generating document:", error);
-
-      // Handle specific error types
-      if (error instanceof Error) {
-        const message = error.message;
-
-        // API rate limit or quota errors
-        if (message.includes("429") || message.includes("rate limit")) {
-          throw new Error("Layanan sedang sibuk. Silakan coba lagi dalam beberapa menit.");
-        }
-
-        // API key or authentication errors
-        if (message.includes("401") || message.includes("403") || message.includes("authentication")) {
-          throw new Error("Terjadi kesalahan sistem. Silakan coba lagi nanti.");
-        }
-
-        // Bad request errors (400) - include original error for debugging
-        if (message.includes("400")) {
-          throw new Error("Terjadi kesalahan saat memproses permintaan. Silakan coba lagi.");
-        }
-
-        // Server errors
-        if (message.includes("500") || message.includes("502") || message.includes("503")) {
-          throw new Error("Layanan sedang tidak tersedia. Silakan coba lagi nanti.");
-        }
-      }
-
-      throw new Error("Gagal generate dokumen. Silakan coba lagi.");
+      throw new Error(`Gagal generate dokumen: ${errorMessage}. Silakan coba lagi.`);
     }
+
+    // Extract content - some models use reasoning_content instead of content
+    const message = response.choices?.[0]?.message;
+    // Type cast to handle non-standard fields from certain models
+    const content = (message?.content as string) || (message as any)?.reasoning_content;
+
+    if (!content || content.trim() === "") {
+      console.error("Content is empty or missing. Full response:", JSON.stringify(response, null, 2));
+      throw new Error("AI tidak memberikan respons yang valid. Silakan coba lagi.");
+    }
+
+    return { content };
   },
 });
