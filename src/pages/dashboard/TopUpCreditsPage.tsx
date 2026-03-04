@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useQuery } from "convex/react";
-import { AlertTriangle, ArrowLeft, History, Loader2, Zap } from "lucide-react";
+import { AlertTriangle, ArrowLeft, History, Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
 
 import { useToast } from "@shared/components/ui";
@@ -128,46 +128,38 @@ export function TopUpCreditsPage() {
 
       {/* Current Credits */}
       {dailyCredits && (
-        <div className="mb-8 rounded-2xl border border-gray-200 bg-gradient-to-r from-emerald-50 to-teal-50 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="mb-1 text-sm font-medium text-gray-500">Kredit Saat Ini</p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-emerald-600">
-                  {Math.min(
-                    dailyCredits.cekDapurCredits,
-                    dailyCredits.dokumenHalalCredits,
-                    dailyCredits.asistenHalalChats,
-                    dailyCredits.cekBahanCredits,
-                    dailyCredits.voiceAuditCredits,
-                    dailyCredits.trainingCredits,
-                  )}
-                </span>
-                <span className="text-sm text-gray-500">kredit tersedia</span>
-              </div>
+        <div className="mb-6 rounded-xl border border-emerald-100 bg-linear-to-r from-emerald-50 to-teal-50 p-4 shadow-sm">
+          <p className="text-xs font-semibold tracking-wide text-emerald-800 uppercase">Sisa kredit per fitur</p>
+
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+            <div className="rounded-lg border border-emerald-100 bg-white/75 px-2.5 py-2">
+              <p className="text-[11px] text-gray-500">Cek Dapur</p>
+              <p className="text-base leading-none font-semibold text-gray-900">{dailyCredits.cekDapurCredits}</p>
             </div>
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 shadow-lg">
-              <Zap className="h-7 w-7 text-white" />
+
+            <div className="rounded-lg border border-teal-100 bg-white/75 px-2.5 py-2">
+              <p className="text-[11px] text-gray-500">Dokumen</p>
+              <p className="text-base leading-none font-semibold text-gray-900">{dailyCredits.dokumenHalalCredits}</p>
             </div>
-          </div>
-          <div className="mt-4 grid grid-cols-3 gap-4 text-xs text-gray-600 sm:grid-cols-6">
-            <div>
-              <span className="font-medium">Cek Dapur:</span> {dailyCredits.cekDapurCredits}
+
+            <div className="rounded-lg border border-cyan-100 bg-white/75 px-2.5 py-2">
+              <p className="text-[11px] text-gray-500">Asisten</p>
+              <p className="text-base leading-none font-semibold text-gray-900">{dailyCredits.asistenHalalChats}</p>
             </div>
-            <div>
-              <span className="font-medium">Dokumen:</span> {dailyCredits.dokumenHalalCredits}
+
+            <div className="rounded-lg border border-emerald-100 bg-white/75 px-2.5 py-2">
+              <p className="text-[11px] text-gray-500">Cek Bahan</p>
+              <p className="text-base leading-none font-semibold text-gray-900">{dailyCredits.cekBahanCredits}</p>
             </div>
-            <div>
-              <span className="font-medium">Asisten:</span> {dailyCredits.asistenHalalChats}
+
+            <div className="rounded-lg border border-teal-100 bg-white/75 px-2.5 py-2">
+              <p className="text-[11px] text-gray-500">Voice</p>
+              <p className="text-base leading-none font-semibold text-gray-900">{dailyCredits.voiceAuditCredits}</p>
             </div>
-            <div>
-              <span className="font-medium">Cek Bahan:</span> {dailyCredits.cekBahanCredits}
-            </div>
-            <div>
-              <span className="font-medium">Voice:</span> {dailyCredits.voiceAuditCredits}
-            </div>
-            <div>
-              <span className="font-medium">Training:</span> {dailyCredits.trainingCredits}
+
+            <div className="rounded-lg border border-cyan-100 bg-white/75 px-2.5 py-2">
+              <p className="text-[11px] text-gray-500">Training</p>
+              <p className="text-base leading-none font-semibold text-gray-900">{dailyCredits.trainingCredits}</p>
             </div>
           </div>
         </div>
@@ -214,7 +206,7 @@ export function TopUpCreditsPage() {
           type="button"
           onClick={handleBuyCredits}
           disabled={!selectedPackage || isCreatingPayment || isUserLoading}
-          className="w-full cursor-pointer rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-4 text-lg font-semibold text-white transition-all hover:from-emerald-600 hover:to-teal-600 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full cursor-pointer rounded-xl bg-linear-to-r from-emerald-500 to-teal-500 px-6 py-4 text-lg font-semibold text-white transition-all hover:from-emerald-600 hover:to-teal-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isCreatingPayment ? (
             <span className="flex items-center justify-center gap-2">

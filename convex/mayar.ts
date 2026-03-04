@@ -101,9 +101,9 @@ export const getMyPayments = query({
       .query("mayar_payments")
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .order("desc")
-      .take(20);
+      .collect();
 
-    return payments;
+    return payments.filter((payment) => payment.status === "paid").slice(0, 20);
   },
 });
 

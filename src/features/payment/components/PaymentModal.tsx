@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import { ExternalLink, Loader2, X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { motion } from "motion/react";
 
 import { cn } from "@shared/lib";
@@ -71,7 +71,7 @@ export function PaymentModal({ isOpen, onClose, paymentLink, packageName, credit
 
         <div className="text-center">
           {/* Icon */}
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-teal-500">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-emerald-400 to-teal-500">
             {isLoading ? (
               <Loader2 className="h-8 w-8 animate-spin text-white" />
             ) : (
@@ -135,15 +135,12 @@ export function PaymentModal({ isOpen, onClose, paymentLink, packageName, credit
               <>
                 <a
                   href={paymentLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className={cn(
-                    "flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3",
+                    "flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-linear-to-r from-emerald-500 to-teal-500 px-4 py-3",
                     "text-sm font-semibold text-white transition-all hover:from-emerald-600 hover:to-teal-600 hover:shadow-lg",
                   )}
                 >
                   <span>Bayar Sekarang</span>
-                  <ExternalLink className="h-4 w-4" />
                 </a>
                 <button
                   type="button"
