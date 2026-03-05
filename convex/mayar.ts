@@ -83,6 +83,30 @@ function parseMayarMessage(payload: unknown): string | null {
   return parseString(data.messages) || parseString(data.message);
 }
 
+function mapMayarPaymentStatus(status: string | null): "pending" | "paid" | "expired" | "cancelled" | null {
+  if (!status) return null;
+
+  const normalized = status.toLowerCase();
+
+  if (["paid", "settled", "success"].includes(normalized)) {
+    return "paid";
+  }
+
+  if (["unpaid", "pending", "open", "created", "waiting"].includes(normalized)) {
+    return "pending";
+  }
+
+  if (["expired"].includes(normalized)) {
+    return "expired";
+  }
+
+  if (["closed", "cancelled", "canceled", "failed"].includes(normalized)) {
+    return "cancelled";
+  }
+
+  return null;
+}
+
 function isFinalizedMayarPayment(data: Record<string, unknown>): boolean {
   const transactionStatus = parseString(data.transactionStatus)?.toLowerCase();
   const statusString = parseString(data.status)?.toLowerCase();
@@ -208,7 +232,8 @@ async function validateCouponWithMayar(args: {
 
     const couponCode = parseString(coupon.code) || parseString(coupon.couponCode) || args.couponCode;
     const discountType = parseString(coupon.discountType) || parseString(coupon.couponDiscountType);
-    const discountValue = parseNumber(coupon.discountValue) ?? parseNumber(coupon.couponDiscountValue);
+    const discountValue =
+      parseNumber(coupon.discountValue) ?? parseNumber(coupon.couponDiscountValue) ?? parseNumber(coupon.value);
     const minimumPurchase = parseNumber(coupon.minimumPurchase) ?? parseNumber(coupon.couponMinimumPurchase);
 
     if (!discountType || discountValue === null) {
@@ -296,6 +321,21 @@ export const getLatestPaymentByUser = internalQuery({
   },
 });
 
+export const getPendingPaymentsByUser = internalQuery({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const payments = await ctx.db
+      .query("mayar_payments")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .order("desc")
+      .collect();
+
+    return payments.filter((payment) => payment.status === "pending").slice(0, 3);
+  },
+});
+
 export const getPaymentForCancellation = internalQuery({
   args: {
     paymentId: v.id("mayar_payments"),
@@ -331,6 +371,144 @@ export const markPaymentCancelled = internalMutation({
     });
 
     return { success: true };
+  },
+});
+
+export const markPaymentExpired = internalMutation({
+  args: {
+    paymentId: v.id("mayar_payments"),
+    userId: v.id("users"),
+    expiredAt: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const payment = await ctx.db.get(args.paymentId);
+    if (!payment || payment.userId !== args.userId) {
+      throw new ConvexError("Pembayaran tidak ditemukan");
+    }
+
+    if (payment.status !== "pending") {
+      return { success: false, status: payment.status };
+    }
+
+    await ctx.db.patch(payment._id, {
+      status: "expired",
+      expiredAt: args.expiredAt ?? Date.now(),
+    });
+
+    return { success: true };
+  },
+});
+
+export const syncMyPendingPayments = action({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Silakan login terlebih dahulu");
+
+    const mayarApiKey = process.env.MAYAR_API_KEY;
+    if (!mayarApiKey) {
+      return { checked: 0, updated: 0, skipped: true };
+    }
+
+    const pendingPayments = await ctx.runQuery(internal.mayar.getPendingPaymentsByUser, {
+      userId,
+    });
+
+    if (pendingPayments.length === 0) {
+      return { checked: 0, updated: 0, skipped: false };
+    }
+
+    let checked = 0;
+    let updated = 0;
+
+    for (const payment of pendingPayments) {
+      if (!payment.mayarPaymentId) {
+        continue;
+      }
+
+      checked += 1;
+
+      const response = await fetch(`${MAYAR_BASE_URL}/payment/${payment.mayarPaymentId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${mayarApiKey}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        continue;
+      }
+
+      let payload: unknown = null;
+      try {
+        payload = (await response.json()) as unknown;
+      } catch {
+        payload = null;
+      }
+
+      if (!payload || typeof payload !== "object") {
+        continue;
+      }
+
+      const body = payload as Record<string, unknown>;
+      const statusCode = parseNumber(body.statusCode);
+      const data = body.data && typeof body.data === "object" ? (body.data as Record<string, unknown>) : null;
+      if (statusCode !== 200 || !data) {
+        continue;
+      }
+
+      const remoteStatus = mapMayarPaymentStatus(parseString(data.status));
+
+      if (remoteStatus === "paid") {
+        const result = await ctx.runMutation(internal.mayar.handlePaymentReceived, {
+          webhookData: {
+            event: "payment.received",
+            data: {
+              id: payment.mayarPaymentId,
+              transactionId: payment.mayarTransactionId,
+              status: "paid",
+              transactionStatus: "paid",
+              source: "payment_detail_sync",
+            },
+          },
+        });
+
+        if (result.success && !result.alreadyPaid) {
+          updated += 1;
+        }
+        continue;
+      }
+
+      if (remoteStatus === "expired") {
+        const expiredAt = parseNumber(data.expiredAt) ?? Date.now();
+        const result = await ctx.runMutation(internal.mayar.markPaymentExpired, {
+          paymentId: payment._id,
+          userId,
+          expiredAt,
+        });
+        if (result.success) {
+          updated += 1;
+        }
+        continue;
+      }
+
+      if (remoteStatus === "cancelled") {
+        const result = await ctx.runMutation(internal.mayar.markPaymentCancelled, {
+          paymentId: payment._id,
+          userId,
+        });
+        if (result.success) {
+          updated += 1;
+        }
+      }
+    }
+
+    return {
+      checked,
+      updated,
+      skipped: false,
+    };
   },
 });
 

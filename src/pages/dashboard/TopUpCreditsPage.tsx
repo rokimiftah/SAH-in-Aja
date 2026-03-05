@@ -1,6 +1,6 @@
 import type { Id } from "../../../convex/_generated/dataModel";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useAction, useQuery } from "convex/react";
 import { AlertTriangle, ArrowLeft, History, Loader2 } from "lucide-react";
@@ -59,11 +59,14 @@ function getStatusLabel(status: string): string {
 }
 
 const PAYMENT_REQUEST_COOLDOWN_MS = 60_000;
+const PAYMENT_STATUS_SYNC_THROTTLE_MS = 45_000;
+const MAYAR_PENDING_SYNC_SESSION_KEY = "mayar.pending.sync.lastAt";
 
 export function TopUpCreditsPage() {
   const [, setLocation] = useLocation();
   const toast = useToast();
   const cancelPendingPayment = useAction(api.mayar.cancelMyPendingPayment);
+  const syncPendingPayments = useAction(api.mayar.syncMyPendingPayments);
   const {
     packages,
     selectedPackage,
@@ -85,6 +88,8 @@ export function TopUpCreditsPage() {
   const [showHistory, setShowHistory] = useState(false);
   const [cancellingPaymentId, setCancellingPaymentId] = useState<Id<"mayar_payments"> | null>(null);
   const [nowTimestamp, setNowTimestamp] = useState(Date.now());
+  const [isSyncingPaymentStatus, setIsSyncingPaymentStatus] = useState(false);
+  const isSyncingPendingPaymentsRef = useRef(false);
   const [modalSummary, setModalSummary] = useState({
     packageName: "",
     credits: 0,
@@ -97,12 +102,42 @@ export function TopUpCreditsPage() {
   const latestPaymentId = latestPayment?._id ?? null;
   const latestPaymentCreatedAt = latestPayment?.createdAt ?? null;
   const latestPendingPayment = paymentHistory?.find((payment) => payment.status === "pending") ?? null;
+  const shouldShowSyncIndicator = isSyncingPaymentStatus && !!latestPendingPayment;
   const cooldownRemainingMs = latestPaymentCreatedAt
     ? Math.max(0, PAYMENT_REQUEST_COOLDOWN_MS - (nowTimestamp - latestPaymentCreatedAt))
     : 0;
   const cooldownRemainingSeconds = Math.ceil(cooldownRemainingMs / 1000);
   const isRecentPaymentCooldown = cooldownRemainingMs > 0;
   const isPaymentHistoryLoading = paymentHistory === undefined;
+
+  useEffect(() => {
+    if (currentUser === undefined || !currentUser) return;
+    if (isSyncingPendingPaymentsRef.current) return;
+
+    const now = Date.now();
+    try {
+      const lastSyncRaw = window.sessionStorage.getItem(MAYAR_PENDING_SYNC_SESSION_KEY);
+      const lastSyncAt = Number(lastSyncRaw);
+      if (Number.isFinite(lastSyncAt) && now - lastSyncAt < PAYMENT_STATUS_SYNC_THROTTLE_MS) {
+        return;
+      }
+      window.sessionStorage.setItem(MAYAR_PENDING_SYNC_SESSION_KEY, String(now));
+    } catch {
+      // Ignore storage failures and continue with sync.
+    }
+
+    isSyncingPendingPaymentsRef.current = true;
+    setIsSyncingPaymentStatus(true);
+
+    void syncPendingPayments({})
+      .catch(() => {
+        // Background sync is best-effort.
+      })
+      .finally(() => {
+        isSyncingPendingPaymentsRef.current = false;
+        setIsSyncingPaymentStatus(false);
+      });
+  }, [currentUser, syncPendingPayments]);
 
   useEffect(() => {
     if (!latestPaymentCreatedAt || !latestPaymentId) return;
@@ -345,6 +380,12 @@ export function TopUpCreditsPage() {
           <div className="flex items-center gap-3">
             <History className="h-5 w-5 text-gray-400" />
             <span className="font-medium text-gray-900">Riwayat Pembelian</span>
+            {shouldShowSyncIndicator ? (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-500">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                Menyinkronkan status...
+              </span>
+            ) : null}
           </div>
           <ArrowLeft className={`h-4 w-4 text-gray-400 transition-transform ${showHistory ? "-rotate-90" : "-rotate-180"}`} />
         </button>
