@@ -622,6 +622,23 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </ul>
         </nav>
 
+        {/* Quick action */}
+        <div className="px-4 pb-0.5">
+          <button
+            type="button"
+            onClick={() => {
+              if (handleNavigation("/dashboard/top-up")) {
+                navigate("/dashboard/top-up");
+                onClose();
+              }
+            }}
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-linear-to-r from-emerald-500 to-teal-500 px-4 py-3 text-sm font-semibold text-white transition-all hover:from-emerald-600 hover:to-teal-600 hover:shadow-md"
+          >
+            <Zap className="h-4 w-4" />
+            Top-Up Kredit
+          </button>
+        </div>
+
         {/* Profile */}
         <div ref={userMenuRef} className="relative p-4">
           <div
@@ -688,21 +705,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </button>
               </>
             )}
-            <div className="border-t border-gray-100" />
-            <button
-              type="button"
-              onClick={() => {
-                if (handleNavigation("/dashboard/top-up")) {
-                  navigate("/dashboard/top-up");
-                  setUserMenuOpen(false);
-                  onClose();
-                }
-              }}
-              className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-sm font-medium text-emerald-600 transition-colors hover:bg-emerald-50"
-            >
-              <Zap className="h-4 w-4" />
-              Top-Up Kredit
-            </button>
             <div className="border-t border-gray-100" />
             <button
               type="button"
