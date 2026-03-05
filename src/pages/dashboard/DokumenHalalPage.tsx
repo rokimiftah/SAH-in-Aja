@@ -108,15 +108,25 @@ export function DokumenHalalPage() {
   }, [flowState, stage, setProcessing]);
 
   useEffect(() => {
-    if (flowState === "business" && user) {
-      setBusinessInfo((prev) => ({
+    if (flowState !== "business") return;
+
+    setBusinessInfo((prev) => {
+      const nextName = user?.businessName || prev.name;
+      const nextAddress = user?.address || prev.address;
+      const nextOwner = user?.name || prev.owner;
+
+      if (nextName === prev.name && nextAddress === prev.address && nextOwner === prev.owner) {
+        return prev;
+      }
+
+      return {
         ...prev,
-        name: user.businessName || prev.name,
-        address: user.address || prev.address,
-        owner: user.name || prev.owner,
-      }));
-    }
-  }, [flowState, user]);
+        name: nextName,
+        address: nextAddress,
+        owner: nextOwner,
+      };
+    });
+  }, [flowState, user?.businessName, user?.address, user?.name]);
 
   // Prevent accidental page close/refresh during form filling
   useEffect(() => {

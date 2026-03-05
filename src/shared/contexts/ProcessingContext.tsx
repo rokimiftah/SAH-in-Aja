@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { createContext, useCallback, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
 
 interface ProcessingContextValue {
   isProcessing: boolean;
@@ -19,9 +19,12 @@ export function ProcessingProvider({ children }: { children: ReactNode }) {
     setProcessingMessage(message);
   }, []);
 
-  return (
-    <ProcessingContext.Provider value={{ isProcessing, processingMessage, setProcessing }}>{children}</ProcessingContext.Provider>
+  const value = useMemo<ProcessingContextValue>(
+    () => ({ isProcessing, processingMessage, setProcessing }),
+    [isProcessing, processingMessage, setProcessing],
   );
+
+  return <ProcessingContext.Provider value={value}>{children}</ProcessingContext.Provider>;
 }
 
 export function useProcessing(): ProcessingContextValue {
