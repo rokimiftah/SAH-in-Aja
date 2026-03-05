@@ -412,7 +412,6 @@ export function TopUpCreditsPage() {
                           {payment.paymentLink ? (
                             <a
                               href={payment.paymentLink}
-                              target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center rounded-md bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800 transition-colors hover:bg-amber-200"
                             >
