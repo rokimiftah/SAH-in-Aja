@@ -264,11 +264,17 @@ export default defineSchema({
   mayar_payments: defineTable({
     userId: v.id("users"),
     mayarTransactionId: v.string(), // Mayar's transaction ID
+    mayarInvoiceId: v.optional(v.string()), // Mayar's invoice ID (for invoice flow)
     mayarPaymentId: v.optional(v.string()), // Mayar's payment ID
     paymentLink: v.string(), // Mayar payment link URL
     packageId: v.string(), // e.g., "credits_50", "credits_100", "credits_250"
     credits: v.number(), // Number of credits purchased
     amount: v.number(), // Amount in IDR
+    originalAmount: v.optional(v.number()), // Amount before discount
+    discountAmount: v.optional(v.number()), // Discount amount applied
+    couponCode: v.optional(v.string()), // Applied coupon code
+    quantity: v.optional(v.number()), // Quantity for invoice purchases
+    paymentType: v.optional(v.union(v.literal("payment_request"), v.literal("invoice"))),
     status: v.union(v.literal("pending"), v.literal("paid"), v.literal("expired"), v.literal("cancelled")),
     paidAt: v.optional(v.number()),
     expiredAt: v.optional(v.number()),

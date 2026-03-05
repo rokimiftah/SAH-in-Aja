@@ -1,6 +1,8 @@
+import type { Id } from "../../../convex/_generated/dataModel";
+
 import { useEffect, useState } from "react";
 
-import { useQuery } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import { AlertTriangle, ArrowLeft, History, Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
 
@@ -56,18 +58,23 @@ function getStatusLabel(status: string): string {
   }
 }
 
+const PAYMENT_REQUEST_COOLDOWN_MS = 60_000;
+
 export function TopUpCreditsPage() {
   const [, setLocation] = useLocation();
   const toast = useToast();
+  const cancelPendingPayment = useAction(api.mayar.cancelMyPendingPayment);
   const {
     packages,
     selectedPackage,
     selectedPackageData,
-    isCreatingPayment,
-    paymentLink,
+    couponCode,
+    isPaymentCooldown,
+    isPreparingPaymentLink,
     paymentError,
     selectPackage,
-    initiatePayment,
+    setCouponCode,
+    preparePaymentLink,
     resetPayment,
   } = usePayment();
   const paymentHistory = useQuery(api.mayar.getMyPayments);
@@ -76,8 +83,44 @@ export function TopUpCreditsPage() {
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [cancellingPaymentId, setCancellingPaymentId] = useState<Id<"mayar_payments"> | null>(null);
+  const [nowTimestamp, setNowTimestamp] = useState(Date.now());
+  const [modalSummary, setModalSummary] = useState({
+    packageName: "",
+    credits: 0,
+    amount: 0,
+  });
   const isUserLoading = currentUser === undefined;
   const hasPhoneForPayment = !isUserLoading && (currentUser?.phone ?? "").replace(/\D/g, "").length >= 10;
+
+  const latestPayment = paymentHistory?.[0] ?? null;
+  const latestPaymentId = latestPayment?._id ?? null;
+  const latestPaymentCreatedAt = latestPayment?.createdAt ?? null;
+  const latestPendingPayment = paymentHistory?.find((payment) => payment.status === "pending") ?? null;
+  const cooldownRemainingMs = latestPaymentCreatedAt
+    ? Math.max(0, PAYMENT_REQUEST_COOLDOWN_MS - (nowTimestamp - latestPaymentCreatedAt))
+    : 0;
+  const cooldownRemainingSeconds = Math.ceil(cooldownRemainingMs / 1000);
+  const isRecentPaymentCooldown = cooldownRemainingMs > 0;
+  const isPaymentHistoryLoading = paymentHistory === undefined;
+
+  useEffect(() => {
+    if (!latestPaymentCreatedAt || !latestPaymentId) return;
+
+    const initialRemainingMs = PAYMENT_REQUEST_COOLDOWN_MS - (Date.now() - latestPaymentCreatedAt);
+    if (initialRemainingMs <= 0) return;
+
+    const timer = setInterval(() => {
+      const nextNow = Date.now();
+      setNowTimestamp(nextNow);
+
+      if (nextNow - latestPaymentCreatedAt >= PAYMENT_REQUEST_COOLDOWN_MS) {
+        clearInterval(timer);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [latestPaymentCreatedAt, latestPaymentId]);
 
   const redirectToEditProfile = () => {
     setLocation(`/dashboard/profile?returnTo=${encodeURIComponent("/dashboard/top-up")}`);
@@ -85,12 +128,18 @@ export function TopUpCreditsPage() {
 
   // Show error toast when payment fails
   useEffect(() => {
-    if (paymentError) {
-      toast.error(paymentError);
-    }
-  }, [paymentError, toast]);
+    if (!paymentError) return;
 
-  const handleBuyCredits = async () => {
+    toast.error(paymentError);
+
+    if (/tunggu\s+1\s+menit|1\s+minute|duplicate request/i.test(paymentError) && showPaymentModal) {
+      setShowPaymentModal(false);
+      setModalSummary({ packageName: "", credits: 0, amount: 0 });
+      resetPayment();
+    }
+  }, [paymentError, resetPayment, showPaymentModal, toast]);
+
+  const handleOpenPaymentModal = () => {
     if (!selectedPackage || isUserLoading) return;
 
     if (!hasPhoneForPayment) {
@@ -99,17 +148,46 @@ export function TopUpCreditsPage() {
       return;
     }
 
-    try {
-      await initiatePayment();
-      setShowPaymentModal(true);
-    } catch {
-      // Error is handled in the hook
+    if (selectedPackageData) {
+      setModalSummary({
+        packageName: selectedPackageData.name,
+        credits: selectedPackageData.credits,
+        amount: selectedPackageData.amount,
+      });
     }
+    setShowPaymentModal(true);
   };
 
   const handleClosePaymentModal = () => {
     setShowPaymentModal(false);
+    setModalSummary({ packageName: "", credits: 0, amount: 0 });
     resetPayment();
+  };
+
+  const handleConfirmPayment = async () => {
+    try {
+      const result = await preparePaymentLink();
+      if (!result?.paymentLink) return;
+
+      setShowPaymentModal(false);
+      window.location.href = result.paymentLink;
+    } catch {
+      // Error is handled via paymentError toast
+    }
+  };
+
+  const handleCancelPendingPayment = async (paymentId: Id<"mayar_payments">) => {
+    if (cancellingPaymentId) return;
+
+    setCancellingPaymentId(paymentId);
+    try {
+      await cancelPendingPayment({ paymentId });
+      toast.success("Pembayaran dibatalkan");
+    } catch {
+      // Error is handled via paymentError toast
+    } finally {
+      setCancellingPaymentId(null);
+    }
   };
 
   return (
@@ -173,13 +251,29 @@ export function TopUpCreditsPage() {
             packages={packages}
             selectedPackage={selectedPackage}
             onSelect={selectPackage}
-            isLoading={isCreatingPayment}
+            isLoading={isPreparingPaymentLink}
           />
         ) : (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
           </div>
         )}
+      </div>
+
+      {/* Coupon */}
+      <div className="mb-6 rounded-xl border border-gray-200 bg-white p-4">
+        <label htmlFor="mayar-coupon" className="mb-2 block text-sm font-medium text-gray-700">
+          Kode Kupon Mayar (Opsional)
+        </label>
+        <input
+          id="mayar-coupon"
+          type="text"
+          value={couponCode}
+          onChange={(event) => setCouponCode(event.target.value.toUpperCase())}
+          placeholder="Contoh: HEMAT10"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 transition-colors outline-none focus:border-emerald-500"
+        />
+        <p className="mt-2 text-xs text-gray-500">Kupon akan divalidasi ke Mayar saat Anda membuat pembayaran.</p>
       </div>
 
       {/* Buy Button */}
@@ -204,15 +298,33 @@ export function TopUpCreditsPage() {
 
         <button
           type="button"
-          onClick={handleBuyCredits}
-          disabled={!selectedPackage || isCreatingPayment || isUserLoading}
+          onClick={handleOpenPaymentModal}
+          disabled={
+            !selectedPackage ||
+            isPreparingPaymentLink ||
+            isPaymentHistoryLoading ||
+            !!latestPendingPayment ||
+            isPaymentCooldown ||
+            isRecentPaymentCooldown ||
+            isUserLoading
+          }
           className="w-full cursor-pointer rounded-xl bg-linear-to-r from-emerald-500 to-teal-500 px-6 py-4 text-lg font-semibold text-white transition-all hover:from-emerald-600 hover:to-teal-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isCreatingPayment ? (
+          {isPreparingPaymentLink ? (
             <span className="flex items-center justify-center gap-2">
               <Loader2 className="h-5 w-5 animate-spin" />
               Memproses...
             </span>
+          ) : isPaymentHistoryLoading ? (
+            "Mengecek status pembayaran..."
+          ) : latestPendingPayment ? (
+            "Menunggu konfirmasi pembayaran..."
+          ) : isPaymentCooldown || isRecentPaymentCooldown ? (
+            isRecentPaymentCooldown ? (
+              `Tunggu ${cooldownRemainingSeconds} detik sebelum membuat pembayaran baru`
+            ) : (
+              "Tunggu 1 menit sebelum membuat pembayaran baru"
+            )
           ) : selectedPackageData && !isUserLoading && !hasPhoneForPayment ? (
             "Isi nomor HP dulu untuk melanjutkan"
           ) : selectedPackageData ? (
@@ -254,6 +366,28 @@ export function TopUpCreditsPage() {
                       >
                         {getStatusLabel(payment.status)}
                       </span>
+                      {payment.status === "pending" ? (
+                        <div className="mt-2 flex items-center justify-end gap-2">
+                          {payment.paymentLink ? (
+                            <a
+                              href={payment.paymentLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center rounded-md bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800 transition-colors hover:bg-amber-200"
+                            >
+                              Lanjutkan bayar
+                            </a>
+                          ) : null}
+                          <button
+                            type="button"
+                            onClick={() => handleCancelPendingPayment(payment._id)}
+                            disabled={cancellingPaymentId === payment._id}
+                            className="cursor-pointer rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {cancellingPaymentId === payment._id ? "Membatalkan..." : "Cancel"}
+                          </button>
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                 ))}
@@ -271,11 +405,11 @@ export function TopUpCreditsPage() {
       <PaymentModal
         isOpen={showPaymentModal}
         onClose={handleClosePaymentModal}
-        paymentLink={paymentLink}
-        packageName={selectedPackageData?.name || ""}
-        credits={selectedPackageData?.credits || 0}
-        amount={selectedPackageData?.amount || 0}
-        isLoading={isCreatingPayment}
+        onConfirmPayment={handleConfirmPayment}
+        packageName={modalSummary.packageName}
+        credits={modalSummary.credits}
+        amount={modalSummary.amount}
+        isLoading={isPreparingPaymentLink}
       />
     </PageContainer>
   );

@@ -7,7 +7,7 @@ interface TranscriptViewProps {
 
 export function TranscriptView({ transcript, isSpeaking }: TranscriptViewProps) {
   return (
-    <div className="flex max-h-[400px] flex-col gap-3 overflow-y-auto rounded-xl bg-gray-50 p-4">
+    <div className="flex max-h-100 flex-col gap-3 overflow-y-auto rounded-xl bg-gray-50 p-4">
       {transcript.length === 0 && (
         <div className="py-8 text-center text-gray-500">
           <p className="text-sm">Menunggu percakapan dimulai...</p>

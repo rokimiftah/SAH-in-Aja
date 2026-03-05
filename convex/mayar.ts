@@ -10,7 +10,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 
 import { api, internal } from "./_generated/api";
-import { action, internalMutation, query } from "./_generated/server";
+import { action, internalMutation, internalQuery, query } from "./_generated/server";
 
 // Credit packages configuration
 export const CREDIT_PACKAGES = [
@@ -45,11 +45,187 @@ export type CreditPackage = (typeof CREDIT_PACKAGES)[number];
 // Mayar API configuration
 // Production: https://api.mayar.id/hl/v1
 // Sandbox: https://api.mayar.club/hl/v1
-const MAYAR_BASE_URL = process.env.MAYAR_SANDBOX === "true" ? "https://api.mayar.club/hl/v1" : "https://api.mayar.id/hl/v1";
+const MAYAR_API_ORIGIN = process.env.MAYAR_SANDBOX === "true" ? "https://api.mayar.club" : "https://api.mayar.id";
+const MAYAR_BASE_URL = `${MAYAR_API_ORIGIN}/hl/v1`;
 
 // Webhook secret for verification (generate a random string and configure in Mayar webhook URL)
-// Example webhook URL: https://your-project.convex.site/api/mayar-webhook?token=YOUR_SECRET_HERE
+// Example webhook URL: https://your-project.convex.site/mayar-webhook?token=YOUR_SECRET_HERE
 const MAYAR_WEBHOOK_SECRET = process.env.MAYAR_WEBHOOK_SECRET;
+const MAYAR_COUPON_PAYMENT_LINK_ID = process.env.MAYAR_COUPON_PAYMENT_LINK_ID;
+const PAYMENT_REQUEST_MIN_INTERVAL_MS = 60_000;
+
+function getDateInUTC7(): string {
+  const now = new Date();
+  const jakartaDate = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
+  const year = jakartaDate.getFullYear();
+  const month = String(jakartaDate.getMonth() + 1).padStart(2, "0");
+  const day = String(jakartaDate.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function parseNumber(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return null;
+}
+
+function parseString(value: unknown): string | null {
+  if (typeof value === "string" && value.trim().length > 0) return value;
+  return null;
+}
+
+function parseMayarMessage(payload: unknown): string | null {
+  if (!payload || typeof payload !== "object") return null;
+  const data = payload as Record<string, unknown>;
+  return parseString(data.messages) || parseString(data.message);
+}
+
+function isFinalizedMayarPayment(data: Record<string, unknown>): boolean {
+  const transactionStatus = parseString(data.transactionStatus)?.toLowerCase();
+  const statusString = parseString(data.status)?.toLowerCase();
+  const statusBoolean = typeof data.status === "boolean" ? data.status : null;
+
+  if (statusBoolean === true) return true;
+  if (statusString && ["paid", "settled", "success", "true"].includes(statusString)) return true;
+  if (transactionStatus && ["paid", "settled", "success"].includes(transactionStatus)) return true;
+
+  if (statusBoolean === false) return false;
+  if (statusString && ["pending", "unpaid", "failed", "expired", "cancelled", "false"].includes(statusString)) {
+    return false;
+  }
+  if (transactionStatus && ["pending", "unpaid", "failed", "expired", "cancelled"].includes(transactionStatus)) {
+    return false;
+  }
+
+  // Mayar payment.received in sandbox can carry transactionStatus="created"
+  // while status is already SUCCESS. For safety, unknown combinations default
+  // to processed and idempotency is enforced by payment status checks.
+  return true;
+}
+
+type CouponValidationResult = {
+  couponCode: string;
+  discountType: string;
+  discountValue: number;
+  minimumPurchase: number | null;
+};
+
+function calculateCouponDiscount(amount: number, coupon: CouponValidationResult): number {
+  if (coupon.minimumPurchase !== null && amount < coupon.minimumPurchase) {
+    throw new ConvexError("Nominal belum memenuhi minimum pembelian untuk kupon");
+  }
+
+  const discountType = coupon.discountType.toLowerCase();
+
+  if (discountType.includes("percent")) {
+    return Math.round((amount * coupon.discountValue) / 100);
+  }
+
+  // Mayar docs use terms like monetary/fixed for nominal discount
+  if (discountType.includes("fixed") || discountType.includes("monetary") || discountType.includes("amount")) {
+    return Math.round(coupon.discountValue);
+  }
+
+  throw new ConvexError("Tipe diskon kupon belum didukung");
+}
+
+async function validateCouponWithMayar(args: {
+  apiKey: string;
+  paymentLinkId: string;
+  couponCode: string;
+  finalAmount: number;
+  customerEmail: string;
+}): Promise<CouponValidationResult> {
+  const endpoint = `${MAYAR_BASE_URL}/coupon/validate`;
+
+  const queryParams = new URLSearchParams({
+    paymentLinkId: args.paymentLinkId,
+    couponCode: args.couponCode,
+    finalAmount: String(args.finalAmount),
+    customerEmail: args.customerEmail,
+  });
+
+  const attempts: Array<{ method: "GET" | "POST"; url: string; body?: string }> = [
+    {
+      method: "GET",
+      url: `${endpoint}?${queryParams.toString()}`,
+    },
+    {
+      method: "POST",
+      url: endpoint,
+      body: JSON.stringify({
+        paymentLinkId: args.paymentLinkId,
+        tickets: [],
+        couponCode: args.couponCode,
+        finalAmount: args.finalAmount,
+        customerEmail: args.customerEmail,
+      }),
+    },
+  ];
+
+  let lastError = "Gagal memvalidasi kupon";
+
+  for (const attempt of attempts) {
+    const response = await fetch(attempt.url, {
+      method: attempt.method,
+      headers: {
+        Authorization: `Bearer ${args.apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: attempt.body,
+    });
+
+    let payload: unknown = null;
+    try {
+      payload = await response.json();
+    } catch {
+      payload = null;
+    }
+
+    if (!response.ok) {
+      lastError = parseMayarMessage(payload) || `HTTP ${response.status}`;
+      continue;
+    }
+
+    if (!payload || typeof payload !== "object") {
+      lastError = "Respons validasi kupon tidak valid";
+      continue;
+    }
+
+    const data = payload as Record<string, unknown>;
+    const statusCode = parseNumber(data.statusCode);
+    const bodyData = data.data && typeof data.data === "object" ? (data.data as Record<string, unknown>) : null;
+    const valid = bodyData ? bodyData.valid === true : false;
+    const coupon = bodyData?.coupon && typeof bodyData.coupon === "object" ? (bodyData.coupon as Record<string, unknown>) : null;
+
+    if (statusCode !== 200 || !valid || !coupon) {
+      lastError = parseMayarMessage(payload) || "Kupon tidak valid";
+      continue;
+    }
+
+    const couponCode = parseString(coupon.code) || parseString(coupon.couponCode) || args.couponCode;
+    const discountType = parseString(coupon.discountType) || parseString(coupon.couponDiscountType);
+    const discountValue = parseNumber(coupon.discountValue) ?? parseNumber(coupon.couponDiscountValue);
+    const minimumPurchase = parseNumber(coupon.minimumPurchase) ?? parseNumber(coupon.couponMinimumPurchase);
+
+    if (!discountType || discountValue === null) {
+      lastError = "Data diskon kupon tidak lengkap";
+      continue;
+    }
+
+    return {
+      couponCode,
+      discountType,
+      discountValue,
+      minimumPurchase,
+    };
+  }
+
+  throw new ConvexError(lastError);
+}
 
 /**
  * Verify webhook request is from Mayar
@@ -59,7 +235,7 @@ const MAYAR_WEBHOOK_SECRET = process.env.MAYAR_WEBHOOK_SECRET;
  * To configure:
  * 1. Generate a random secret: openssl rand -hex 32
  * 2. Add MAYAR_WEBHOOK_SECRET to Convex environment variables
- * 3. Set webhook URL in Mayar dashboard: https://your-project.convex.site/api/mayar-webhook?token=YOUR_SECRET
+ * 3. Set webhook URL in Mayar dashboard: https://your-project.convex.site/mayar-webhook?token=YOUR_SECRET
  */
 export function verifyWebhookRequest(token: string | null, webhookData: unknown): { valid: boolean; error?: string } {
   // Webhook secret MUST be configured for security
@@ -103,7 +279,135 @@ export const getMyPayments = query({
       .order("desc")
       .collect();
 
-    return payments.filter((payment) => payment.status === "paid").slice(0, 20);
+    return payments.slice(0, 20);
+  },
+});
+
+export const getLatestPaymentByUser = internalQuery({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("mayar_payments")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .order("desc")
+      .first();
+  },
+});
+
+export const getPaymentForCancellation = internalQuery({
+  args: {
+    paymentId: v.id("mayar_payments"),
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const payment = await ctx.db.get(args.paymentId);
+    if (!payment || payment.userId !== args.userId) {
+      return null;
+    }
+
+    return payment;
+  },
+});
+
+export const markPaymentCancelled = internalMutation({
+  args: {
+    paymentId: v.id("mayar_payments"),
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const payment = await ctx.db.get(args.paymentId);
+    if (!payment || payment.userId !== args.userId) {
+      throw new ConvexError("Pembayaran tidak ditemukan");
+    }
+
+    if (payment.status !== "pending") {
+      return { success: false, status: payment.status };
+    }
+
+    await ctx.db.patch(payment._id, {
+      status: "cancelled",
+    });
+
+    return { success: true };
+  },
+});
+
+export const cancelMyPendingPayment = action({
+  args: {
+    paymentId: v.id("mayar_payments"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Silakan login terlebih dahulu");
+
+    const payment = await ctx.runQuery(internal.mayar.getPaymentForCancellation, {
+      paymentId: args.paymentId,
+      userId,
+    });
+
+    if (!payment) {
+      throw new ConvexError("Pembayaran tidak ditemukan");
+    }
+
+    if (payment.status === "paid") {
+      throw new ConvexError("Pembayaran sudah berhasil dan tidak bisa dibatalkan");
+    }
+
+    if (payment.status === "cancelled") {
+      return { success: true, alreadyCancelled: true };
+    }
+
+    if (payment.status === "expired") {
+      return { success: true, alreadyExpired: true };
+    }
+
+    const mayarApiKey = process.env.MAYAR_API_KEY;
+    if (!mayarApiKey) throw new ConvexError("Konfigurasi pembayaran belum selesai");
+
+    if (!payment.mayarPaymentId) {
+      throw new ConvexError("Pembayaran ini belum memiliki ID Mayar untuk dibatalkan");
+    }
+
+    const response = await fetch(`${MAYAR_BASE_URL}/payment/close/${payment.mayarPaymentId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${mayarApiKey}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    const responseText = await response.text();
+    let payload: unknown = null;
+    try {
+      payload = JSON.parse(responseText) as unknown;
+    } catch {
+      payload = null;
+    }
+
+    if (!response.ok) {
+      throw new ConvexError(parseMayarMessage(payload) || "Gagal membatalkan pembayaran di Mayar");
+    }
+
+    if (!payload || typeof payload !== "object") {
+      throw new ConvexError("Respons pembatalan Mayar tidak valid");
+    }
+
+    const body = payload as Record<string, unknown>;
+    const statusCode = parseNumber(body.statusCode);
+    const message = (parseMayarMessage(payload) || "").toLowerCase();
+
+    if (statusCode !== 200 || message !== "success") {
+      throw new ConvexError(parseMayarMessage(payload) || "Gagal membatalkan pembayaran di Mayar");
+    }
+
+    await ctx.runMutation(internal.mayar.markPaymentCancelled, {
+      paymentId: args.paymentId,
+      userId,
+    });
+
+    return { success: true };
   },
 });
 
@@ -111,8 +415,12 @@ export const getMyPayments = query({
 export const createPayment = action({
   args: {
     packageId: v.string(),
+    couponCode: v.optional(v.string()),
   },
-  handler: async (ctx, args): Promise<{ paymentLink: string; paymentId: Id<"mayar_payments"> }> => {
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{ paymentLink: string; paymentId: Id<"mayar_payments">; amount: number; discountAmount: number }> => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new ConvexError("Silakan login terlebih dahulu");
 
@@ -126,6 +434,13 @@ export const createPayment = action({
 
     const mayarApiKey = process.env.MAYAR_API_KEY;
     if (!mayarApiKey) throw new ConvexError("Konfigurasi pembayaran belum selesai");
+
+    const latestPayment = await ctx.runQuery(internal.mayar.getLatestPaymentByUser, {
+      userId,
+    });
+    if (latestPayment && Date.now() - latestPayment.createdAt < PAYMENT_REQUEST_MIN_INTERVAL_MS) {
+      throw new ConvexError("Tunggu 1 menit sebelum membuat pembayaran baru");
+    }
 
     // Log environment for debugging
     const isSandbox = process.env.MAYAR_SANDBOX === "true";
@@ -143,6 +458,34 @@ export const createPayment = action({
       throw new ConvexError("Email diperlukan untuk pembayaran. Silakan lengkapi profil Anda.");
     }
 
+    const normalizedCouponCode = args.couponCode?.trim();
+    let discountAmount = 0;
+    let appliedCouponCode: string | undefined;
+
+    if (normalizedCouponCode) {
+      if (!MAYAR_COUPON_PAYMENT_LINK_ID) {
+        throw new ConvexError("Kupon belum bisa dipakai karena konfigurasi merchant belum lengkap");
+      }
+
+      const coupon = await validateCouponWithMayar({
+        apiKey: mayarApiKey,
+        paymentLinkId: MAYAR_COUPON_PAYMENT_LINK_ID,
+        couponCode: normalizedCouponCode,
+        finalAmount: pkg.amount,
+        customerEmail: email,
+      });
+
+      discountAmount = calculateCouponDiscount(pkg.amount, coupon);
+      if (discountAmount <= 0) {
+        throw new ConvexError("Kupon tidak memberikan potongan untuk paket ini");
+      }
+
+      appliedCouponCode = coupon.couponCode;
+    }
+
+    const finalAmount = Math.max(1, pkg.amount - discountAmount);
+    const siteUrl = (process.env.SITE_URL || "https://sahin.biz.id").replace(/\/$/, "");
+
     // Create payment request via Mayar API
     // Docs: https://docs.mayar.id/api-reference/reqpayment/create
     // Endpoint: /payment/create (simpler, uses amount directly without items array)
@@ -156,44 +499,81 @@ export const createPayment = action({
         name: user.name || "Pengguna SAH-in Aja",
         email: email,
         mobile: phone,
-        amount: pkg.amount,
+        amount: finalAmount,
         description: `${pkg.name} - ${pkg.credits} Kredit AI untuk SAH-in Aja!`,
-        redirectUrl: `${process.env.SITE_URL || "https://sahin.biz.id"}/dashboard?payment=success`,
+        redirectUrl: `${siteUrl}/dashboard/top-up`,
         // Set expiry to 24 hours from now
         expiredAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       }),
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error("Mayar API error:", error);
+      const errorText = await response.text();
+      console.error("Mayar API error:", errorText);
+
+      if (response.status === 429) {
+        let payload: unknown = null;
+        try {
+          payload = JSON.parse(errorText) as unknown;
+        } catch {
+          payload = null;
+        }
+
+        throw new ConvexError(
+          parseMayarMessage(payload) || "Permintaan duplikat terdeteksi. Tunggu 1 menit sebelum membuat pembayaran baru.",
+        );
+      }
+
       throw new ConvexError("Gagal membuat link pembayaran. Silakan coba lagi.");
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as unknown;
     console.log("Mayar API response:", JSON.stringify(data, null, 2));
 
-    if (data.statusCode !== 200 || !data.data?.link) {
+    if (!data || typeof data !== "object") {
+      throw new ConvexError("Respons Mayar tidak valid");
+    }
+
+    const payload = data as Record<string, unknown>;
+    const statusCode = parseNumber(payload.statusCode);
+    const payloadData = payload.data && typeof payload.data === "object" ? (payload.data as Record<string, unknown>) : null;
+
+    const link = payloadData ? parseString(payloadData.link) : null;
+    const mayarPaymentId = payloadData ? parseString(payloadData.id) : null;
+    const transactionId =
+      (payloadData && parseString(payloadData.transactionId)) ||
+      (payloadData && parseString(payloadData.transaction_id)) ||
+      (payloadData && parseString(payloadData.id));
+
+    if (statusCode !== 200 || !link || !transactionId || !mayarPaymentId) {
       console.error("Mayar API unexpected response:", data);
       throw new ConvexError("Gagal membuat link pembayaran. Silakan coba lagi.");
     }
 
     // Log the payment link for debugging
-    console.log("Mayar payment link:", data.data.link);
+    console.log("Mayar payment link:", link);
 
     // Store payment record in database
     const paymentId = await ctx.runMutation(internal.mayar.createPaymentRecord, {
       userId,
-      mayarTransactionId: data.data.transactionId || data.data.transaction_id,
-      paymentLink: data.data.link,
+      mayarTransactionId: transactionId,
+      paymentLink: link,
       packageId: pkg.id,
       credits: pkg.credits,
-      amount: pkg.amount,
+      amount: finalAmount,
+      paymentType: "payment_request",
+      quantity: 1,
+      originalAmount: finalAmount === pkg.amount ? undefined : pkg.amount,
+      discountAmount: discountAmount > 0 ? discountAmount : undefined,
+      couponCode: appliedCouponCode,
+      mayarPaymentId,
     });
 
     return {
-      paymentLink: data.data.link,
+      paymentLink: link,
       paymentId,
+      amount: finalAmount,
+      discountAmount,
     };
   },
 });
@@ -207,15 +587,29 @@ export const createPaymentRecord = internalMutation({
     packageId: v.string(),
     credits: v.number(),
     amount: v.number(),
+    paymentType: v.optional(v.union(v.literal("payment_request"), v.literal("invoice"))),
+    quantity: v.optional(v.number()),
+    originalAmount: v.optional(v.number()),
+    discountAmount: v.optional(v.number()),
+    couponCode: v.optional(v.string()),
+    mayarInvoiceId: v.optional(v.string()),
+    mayarPaymentId: v.optional(v.string()),
   },
   handler: async (ctx, args): Promise<Id<"mayar_payments">> => {
     return await ctx.db.insert("mayar_payments", {
       userId: args.userId,
       mayarTransactionId: args.mayarTransactionId,
+      mayarInvoiceId: args.mayarInvoiceId,
+      mayarPaymentId: args.mayarPaymentId,
       paymentLink: args.paymentLink,
       packageId: args.packageId,
       credits: args.credits,
       amount: args.amount,
+      originalAmount: args.originalAmount,
+      discountAmount: args.discountAmount,
+      couponCode: args.couponCode,
+      quantity: args.quantity ?? 1,
+      paymentType: args.paymentType ?? "payment_request",
       status: "pending",
       createdAt: Date.now(),
     });
@@ -229,6 +623,22 @@ export const handlePaymentReceived = internalMutation({
   },
   handler: async (ctx, args) => {
     const data = args.webhookData.data;
+    const paymentData = data as Record<string, unknown>;
+
+    // payment.received should only be processed as paid when transaction is finalized
+    if (!isFinalizedMayarPayment(paymentData)) {
+      const transactionStatus = parseString(paymentData.transactionStatus) || "unknown";
+      const status = parseString(paymentData.status) || "unknown";
+      console.warn("Ignoring payment.received with non-final status", {
+        transactionStatus,
+        status,
+      });
+      return {
+        success: false,
+        ignored: true,
+        reason: `transaction status is ${transactionStatus}`,
+      };
+    }
 
     // Find the payment by Mayar transaction ID
     const payment = await ctx.db
@@ -255,13 +665,7 @@ export const handlePaymentReceived = internalMutation({
     });
 
     // Add credits to user's daily credits
-    // Get today's date in UTC+7
-    const now = new Date();
-    const jakartaDate = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
-    const year = jakartaDate.getFullYear();
-    const month = String(jakartaDate.getMonth() + 1).padStart(2, "0");
-    const day = String(jakartaDate.getDate()).padStart(2, "0");
-    const today = `${year}-${month}-${day}`;
+    const today = getDateInUTC7();
 
     // Get or create daily credits record
     const dailyCredits = await ctx.db
