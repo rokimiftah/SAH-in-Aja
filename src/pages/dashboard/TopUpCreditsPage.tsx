@@ -85,7 +85,7 @@ export function TopUpCreditsPage() {
   const currentUser = useQuery(api.users.getCurrentUser);
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
+  const [showHistory, setShowHistory] = useState(true);
   const [cancellingPaymentId, setCancellingPaymentId] = useState<Id<"mayar_payments"> | null>(null);
   const [nowTimestamp, setNowTimestamp] = useState(Date.now());
   const [isSyncingPaymentStatus, setIsSyncingPaymentStatus] = useState(false);
