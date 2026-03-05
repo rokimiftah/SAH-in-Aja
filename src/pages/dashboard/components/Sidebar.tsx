@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { useAuthActions } from "@convex-dev/auth/react";
-import { useMutation, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 import {
   AlertTriangle,
   BookOpen,
@@ -12,7 +12,6 @@ import {
   ClipboardCheck,
   ExternalLink,
   FileText,
-  Gift,
   History,
   LayoutDashboard,
   LogOut,
@@ -26,7 +25,7 @@ import {
 } from "lucide-react";
 import { useLocation } from "wouter";
 
-import { useToast } from "@shared/components/ui";
+// import { useToast } from "@shared/components/ui";
 import { BRANDING, FEATURES } from "@shared/config/branding";
 import { useProcessing } from "@shared/contexts";
 import { cn } from "@shared/lib";
@@ -321,11 +320,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   }, []);
 
   const { signOut } = useAuthActions();
-  const toast = useToast();
+  // const toast = useToast();
   const { isProcessing, processingMessage } = useProcessing();
   const user = useQuery(api.users.getCurrentUser);
   const dailyCredits = useQuery(api.credits.getMyDailyCredits);
-  const applyPromoCode = useMutation(api.credits.applyPromoCode);
+  // const applyPromoCode = useMutation(api.credits.applyPromoCode);
 
   const handleNavigation = useCallback(
     (href: string) => {
@@ -648,7 +647,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             )}
           >
             {/* Promo Code */}
-            <form
+            {/* <form
               onSubmit={async (e) => {
                 e.preventDefault();
                 const form = e.target as HTMLFormElement;
@@ -687,7 +686,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               >
                 <Gift className="h-4 w-4" />
               </button>
-            </form>
+            </form> */}
             {user?.role === "admin" && (
               <>
                 <div className="border-t border-gray-100" />
