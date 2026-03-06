@@ -464,7 +464,7 @@ export function TopUpCreditsPage() {
                             disabled={cancellingPaymentId === payment._id}
                             className="cursor-pointer rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60"
                           >
-                            {cancellingPaymentId === payment._id ? "Membatalkan..." : "Cancel"}
+                            {cancellingPaymentId === payment._id ? "Membatalkan..." : "Batal"}
                           </button>
                         </div>
                       ) : null}
