@@ -72,6 +72,12 @@ export function TopUpCreditsPage() {
     selectedPackage,
     selectedPackageData,
     couponCode,
+    couponValidationStatus,
+    couponValidationMessage,
+    couponDiscountAmount,
+    couponFinalAmount,
+    couponDiscountType,
+    couponDiscountValue,
     isPaymentCooldown,
     isPreparingPaymentLink,
     paymentError,
@@ -109,6 +115,40 @@ export function TopUpCreditsPage() {
   const cooldownRemainingSeconds = Math.ceil(cooldownRemainingMs / 1000);
   const isRecentPaymentCooldown = cooldownRemainingMs > 0;
   const isPaymentHistoryLoading = paymentHistory === undefined;
+  const normalizedCouponCode = couponCode.trim();
+  const hasCouponCode = normalizedCouponCode.length > 0;
+  const normalizedDiscountType = (couponDiscountType || "").toLowerCase();
+  const couponHelperClassName =
+    couponValidationStatus === "valid"
+      ? "text-emerald-700"
+      : couponValidationStatus === "invalid"
+        ? "text-red-600"
+        : "text-gray-500";
+
+  const couponHelperText = (() => {
+    if (!hasCouponCode) {
+      return "Kupon akan divalidasi saat Anda membuat pembayaran.";
+    }
+
+    if (couponValidationStatus === "validating") {
+      return "Memvalidasi kupon...";
+    }
+
+    if (
+      couponValidationStatus === "valid" &&
+      couponDiscountAmount !== null &&
+      couponFinalAmount !== null &&
+      selectedPackageData
+    ) {
+      if (normalizedDiscountType.includes("percent") && couponDiscountValue !== null) {
+        return `Kupon valid: diskon ${couponDiscountValue}% (hemat ${formatCurrency(couponDiscountAmount)}), total menjadi ${formatCurrency(couponFinalAmount)}.`;
+      }
+
+      return `Kupon valid: hemat ${formatCurrency(couponDiscountAmount)}, total menjadi ${formatCurrency(couponFinalAmount)}.`;
+    }
+
+    return couponValidationMessage;
+  })();
 
   useEffect(() => {
     if (currentUser === undefined || !currentUser) return;
@@ -298,7 +338,7 @@ export function TopUpCreditsPage() {
       {/* Coupon */}
       <div className="mb-6 rounded-xl border border-gray-200 bg-white p-4">
         <label htmlFor="mayar-coupon" className="mb-2 block text-sm font-medium text-gray-700">
-          Kode Kupon Mayar (Opsional)
+          Kode Kupon (Opsional)
         </label>
         <input
           id="mayar-coupon"
@@ -308,7 +348,7 @@ export function TopUpCreditsPage() {
           placeholder="Contoh: HEMAT10"
           className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 transition-colors outline-none focus:border-emerald-500"
         />
-        <p className="mt-2 text-xs text-gray-500">Kupon akan divalidasi ke Mayar saat Anda membuat pembayaran.</p>
+        <p className={`mt-2 text-xs ${couponHelperClassName}`}>{couponHelperText}</p>
       </div>
 
       {/* Buy Button */}

@@ -83,6 +83,22 @@ function parseMayarMessage(payload: unknown): string | null {
   return parseString(data.messages) || parseString(data.message);
 }
 
+function parseErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error && error.message.trim().length > 0) {
+    const normalized = error.message.replace("Uncaught ConvexError:", "").trim();
+    const firstLine = normalized.split("\n")[0]?.trim();
+    if (firstLine) {
+      return firstLine;
+    }
+  }
+
+  if (typeof error === "string" && error.trim().length > 0) {
+    return error.trim();
+  }
+
+  return fallback;
+}
+
 function mapMayarPaymentStatus(status: string | null): "pending" | "paid" | "expired" | "cancelled" | null {
   if (!status) return null;
 
@@ -753,6 +769,97 @@ export const createPayment = action({
       amount: finalAmount,
       discountAmount,
     };
+  },
+});
+
+export const validateCouponPreview = action({
+  args: {
+    packageId: v.string(),
+    couponCode: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      return {
+        valid: false,
+        message: "Silakan login terlebih dahulu",
+      };
+    }
+
+    const pkg = CREDIT_PACKAGES.find((item) => item.id === args.packageId);
+    if (!pkg) {
+      return {
+        valid: false,
+        message: "Paket kredit tidak valid",
+      };
+    }
+
+    const normalizedCouponCode = args.couponCode.trim();
+    if (!normalizedCouponCode) {
+      return {
+        valid: false,
+        message: "Masukkan kode kupon",
+      };
+    }
+
+    const mayarApiKey = process.env.MAYAR_API_KEY;
+    if (!mayarApiKey) {
+      return {
+        valid: false,
+        message: "Konfigurasi pembayaran belum selesai",
+      };
+    }
+
+    if (!MAYAR_COUPON_PAYMENT_LINK_ID) {
+      return {
+        valid: false,
+        message: "Konfigurasi kupon merchant belum lengkap",
+      };
+    }
+
+    const user = await ctx.runQuery(api.users.getCurrentUser, {});
+    if (!user?.email) {
+      return {
+        valid: false,
+        message: "Email diperlukan untuk memvalidasi kupon",
+      };
+    }
+
+    try {
+      const coupon = await validateCouponWithMayar({
+        apiKey: mayarApiKey,
+        paymentLinkId: MAYAR_COUPON_PAYMENT_LINK_ID,
+        couponCode: normalizedCouponCode,
+        finalAmount: pkg.amount,
+        customerEmail: user.email,
+      });
+
+      const discountAmount = calculateCouponDiscount(pkg.amount, coupon);
+      if (discountAmount <= 0) {
+        return {
+          valid: false,
+          message: "Kupon tidak memberikan potongan untuk paket ini",
+        };
+      }
+
+      const finalAmount = Math.max(1, pkg.amount - discountAmount);
+
+      return {
+        valid: true,
+        message: "Kupon valid",
+        couponCode: coupon.couponCode,
+        discountType: coupon.discountType,
+        discountValue: coupon.discountValue,
+        originalAmount: pkg.amount,
+        discountAmount,
+        finalAmount,
+      };
+    } catch (error) {
+      return {
+        valid: false,
+        message: parseErrorMessage(error, "Kupon tidak valid"),
+      };
+    }
   },
 });
 

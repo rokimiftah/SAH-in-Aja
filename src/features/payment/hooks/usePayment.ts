@@ -16,6 +16,12 @@ interface CreditPackage {
 interface PaymentState {
   selectedPackage: string | null;
   couponCode: string;
+  couponValidationStatus: "idle" | "validating" | "valid" | "invalid";
+  couponValidationMessage: string;
+  couponDiscountAmount: number | null;
+  couponFinalAmount: number | null;
+  couponDiscountType: string | null;
+  couponDiscountValue: number | null;
   isPaymentCooldown: boolean;
   isPreparingPaymentLink: boolean;
   paymentError: string | null;
@@ -72,15 +78,24 @@ function getPaymentErrorMessage(error: unknown): string {
 export function usePayment() {
   const packages = useQuery(api.mayar.getCreditPackages) as CreditPackage[] | undefined;
   const createPayment = useAction(api.mayar.createPayment);
+  const validateCouponPreview = useAction(api.mayar.validateCouponPreview);
 
   const [state, setState] = useState<PaymentState>({
     selectedPackage: null,
     couponCode: "",
+    couponValidationStatus: "idle",
+    couponValidationMessage: "Kupon akan divalidasi saat Anda membuat pembayaran.",
+    couponDiscountAmount: null,
+    couponFinalAmount: null,
+    couponDiscountType: null,
+    couponDiscountValue: null,
     isPaymentCooldown: false,
     isPreparingPaymentLink: false,
     paymentError: null,
   });
   const cooldownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const couponValidationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const couponValidationRequestIdRef = useRef(0);
 
   const activateCooldown = useCallback((durationMs: number = PAYMENT_REQUEST_COOLDOWN_MS) => {
     if (cooldownTimerRef.current) {
@@ -106,8 +121,115 @@ export function usePayment() {
       if (cooldownTimerRef.current) {
         clearTimeout(cooldownTimerRef.current);
       }
+      if (couponValidationTimerRef.current) {
+        clearTimeout(couponValidationTimerRef.current);
+      }
     };
   }, []);
+
+  useEffect(() => {
+    if (couponValidationTimerRef.current) {
+      clearTimeout(couponValidationTimerRef.current);
+      couponValidationTimerRef.current = null;
+    }
+
+    const normalizedCouponCode = state.couponCode.trim();
+    if (!normalizedCouponCode) {
+      setState((prev) => ({
+        ...prev,
+        couponValidationStatus: "idle",
+        couponValidationMessage: "Kupon akan divalidasi saat Anda membuat pembayaran.",
+        couponDiscountAmount: null,
+        couponFinalAmount: null,
+        couponDiscountType: null,
+        couponDiscountValue: null,
+      }));
+      return;
+    }
+
+    if (!state.selectedPackage) {
+      setState((prev) => ({
+        ...prev,
+        couponValidationStatus: "invalid",
+        couponValidationMessage: "Pilih paket kredit terlebih dahulu untuk validasi kupon.",
+        couponDiscountAmount: null,
+        couponFinalAmount: null,
+        couponDiscountType: null,
+        couponDiscountValue: null,
+      }));
+      return;
+    }
+
+    const requestId = couponValidationRequestIdRef.current + 1;
+    couponValidationRequestIdRef.current = requestId;
+
+    setState((prev) => ({
+      ...prev,
+      couponValidationStatus: "validating",
+      couponValidationMessage: "Memvalidasi kupon...",
+      couponDiscountAmount: null,
+      couponFinalAmount: null,
+      couponDiscountType: null,
+      couponDiscountValue: null,
+    }));
+
+    couponValidationTimerRef.current = setTimeout(() => {
+      void validateCouponPreview({
+        packageId: state.selectedPackage as string,
+        couponCode: normalizedCouponCode,
+      })
+        .then((result) => {
+          if (couponValidationRequestIdRef.current !== requestId) {
+            return;
+          }
+
+          if (result.valid) {
+            setState((prev) => ({
+              ...prev,
+              couponValidationStatus: "valid",
+              couponValidationMessage: result.message,
+              couponDiscountAmount: result.discountAmount ?? null,
+              couponFinalAmount: result.finalAmount ?? null,
+              couponDiscountType: result.discountType ?? null,
+              couponDiscountValue: result.discountValue ?? null,
+            }));
+            return;
+          }
+
+          setState((prev) => ({
+            ...prev,
+            couponValidationStatus: "invalid",
+            couponValidationMessage: result.message,
+            couponDiscountAmount: null,
+            couponFinalAmount: null,
+            couponDiscountType: null,
+            couponDiscountValue: null,
+          }));
+        })
+        .catch(() => {
+          if (couponValidationRequestIdRef.current !== requestId) {
+            return;
+          }
+
+          setState((prev) => ({
+            ...prev,
+            couponValidationStatus: "invalid",
+            couponValidationMessage: "Gagal memvalidasi kupon. Coba lagi.",
+            couponDiscountAmount: null,
+            couponFinalAmount: null,
+            couponDiscountType: null,
+            couponDiscountValue: null,
+          }));
+        });
+    }, 600);
+
+    return () => {
+      if (couponValidationTimerRef.current) {
+        clearTimeout(couponValidationTimerRef.current);
+        couponValidationTimerRef.current = null;
+      }
+    };
+  }, [state.couponCode, state.selectedPackage, validateCouponPreview]);
 
   const selectPackage = useCallback((packageId: string) => {
     setState((prev) => ({
@@ -165,6 +287,12 @@ export function usePayment() {
     setState((prev) => ({
       ...prev,
       couponCode,
+      couponValidationStatus: couponCode.trim() ? "validating" : "idle",
+      couponValidationMessage: couponCode.trim() ? "Memvalidasi kupon..." : "Kupon akan divalidasi saat Anda membuat pembayaran.",
+      couponDiscountAmount: null,
+      couponFinalAmount: null,
+      couponDiscountType: null,
+      couponDiscountValue: null,
       paymentError: null,
     }));
   }, []);
@@ -173,6 +301,12 @@ export function usePayment() {
     setState((prev) => ({
       selectedPackage: null,
       couponCode: "",
+      couponValidationStatus: "idle",
+      couponValidationMessage: "Kupon akan divalidasi saat Anda membuat pembayaran.",
+      couponDiscountAmount: null,
+      couponFinalAmount: null,
+      couponDiscountType: null,
+      couponDiscountValue: null,
       isPaymentCooldown: prev.isPaymentCooldown,
       isPreparingPaymentLink: false,
       paymentError: null,
@@ -186,6 +320,12 @@ export function usePayment() {
     selectedPackage: state.selectedPackage,
     selectedPackageData,
     couponCode: state.couponCode,
+    couponValidationStatus: state.couponValidationStatus,
+    couponValidationMessage: state.couponValidationMessage,
+    couponDiscountAmount: state.couponDiscountAmount,
+    couponFinalAmount: state.couponFinalAmount,
+    couponDiscountType: state.couponDiscountType,
+    couponDiscountValue: state.couponDiscountValue,
     isPaymentCooldown: state.isPaymentCooldown,
     isPreparingPaymentLink: state.isPreparingPaymentLink,
     paymentError: state.paymentError,
